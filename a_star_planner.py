@@ -244,7 +244,9 @@ def grid_demo():
         print(c_i)
 
 def main():
+    print("Graph Demo: ")
     graph_demo()
+    print("Grid Demo:")
     grid_demo()
 
 if __name__ == '__main__':
