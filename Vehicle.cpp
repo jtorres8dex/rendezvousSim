@@ -73,4 +73,3 @@ void Vehicle::update_state(){
         }
     }
 
-int main(){return 0;}

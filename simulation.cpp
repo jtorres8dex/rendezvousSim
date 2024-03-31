@@ -6,7 +6,7 @@
 #include <sstream> 
 #include <unordered_map>
 
-#include "Simulation.h"  
+#include "simulation.h"  
 #include "Vehicle.h"
 
 
@@ -75,3 +75,5 @@ void Simulation::step()
     Simulation::log_states();
 
 }
+
+int main(){return 0;}
