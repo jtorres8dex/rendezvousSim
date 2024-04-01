@@ -10,14 +10,18 @@ Vehicle::Vehicle(const int id, std::vector<double> ics)
     state.x = ics[0];
     state.y = ics[1];
     state.theta = ics[2];
-    state.v = ics[3];
-    state.w = ics[4];
-
+    
     FSM = INIT;   
 
     static double ex_minus1 = 0.0;
     static double ey_minus1 = 0.0;
     static double etheta_minus1 = 0.0;
+
+    if(FSM == INIT)
+    {
+        goal_state = waypoints.front();
+        waypoints.pop();
+    }
 
     std::cout << "Constructor" << std::endl;
 }
@@ -34,22 +38,18 @@ Vehicle::~Vehicle(){
  * @param e_theta 
  * @return std::vector<double> 
  */
-std::vector<double> Vehicle::controller(Vehicle::State goal_state)
+void Vehicle::controller()
 {
     std::vector<double> cmds;
     double vL, vR;
-
-
-
     std::cout << "Controller" << std::endl;
 
-    return cmds;
 }
 
 
-void Vehicle::stop(State &current_state) {
-    current_state.v = 0.0;
-    current_state.w = 0.0;
+void Vehicle::stop() {
+    cmds.v = 0.0;
+    cmds.w = 0.0;
     std::cout << "stop" << std::endl;
     
 }
@@ -72,4 +72,13 @@ void Vehicle::update_state(){
             state.theta += 2 * M_PI;
         }
     }
+
+void Vehicle::set_FSM()
+{
+    double distance_to_goal = pow(((goal_state.x - state.x) + (goal_state.y - state.y)),2);
+    if (distance_to_goal <= geometry.waypoint_radius){
+        FSM = AT_GOAL;
+    }
+
+}
 

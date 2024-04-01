@@ -1,0 +1,1 @@
+/Library/Developer/CommandLineTools/usr/bin/c++ -g -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/firstRun.dir/firstRun.cpp.o CMakeFiles/firstRun.dir/simulation.cpp.o CMakeFiles/firstRun.dir/Vehicle.cpp.o -o firstRun

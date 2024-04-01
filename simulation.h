@@ -12,7 +12,8 @@ class Simulation
 {
 public:
     // Constructor 
-    Simulation(std::string sim_name, int time_steps, double dt, int num_vehicles);
+    Simulation(std::string sim_name, int time_steps, double dt, int num_vehicles,
+                std::vector<std::vector<double>> ics);
     // Destructor
     ~Simulation();
 
@@ -24,7 +25,7 @@ public:
     std::unordered_map<int, Vehicle::State> all_states;
     std::unordered_map<int, Vehicle::Commands> all_cmds;
 
-    std::unordered_map<int, std::vector<double>> waypoints;
+    
 
     // methods
     void spawn_vehicle(int id_, std::vector<double> ics);

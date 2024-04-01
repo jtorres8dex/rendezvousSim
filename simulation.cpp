@@ -4,24 +4,34 @@
 #include <iomanip>
 #include <ctime>
 #include <sstream> 
+
 #include <unordered_map>
+#include <vector>
+#include <queue>
 
 #include "simulation.h"  
 #include "Vehicle.h"
 
 
 // constructor
-Simulation::Simulation(std::string sim_name, int time_steps, double dt, int num_vehicles)
+Simulation::Simulation(std::string sim_name, 
+                        int time_steps, 
+                        double dt, 
+                        int num_vehicles,
+                        std::vector<std::vector<double>> ics)
 {
-    std::string filename = "SIMULATION_" + sim_name + ".csv";
+    std::string filename = "logs/SIMULATION_" + sim_name + ".csv";
     
     std::ofstream file(filename);
     file.open(filename);
 
-    // hardcode some waypoints (world is 600x600)
-    waypoints.emplace(1, std::vector<double>{0, 0});
-    waypoints.emplace(2, std::vector<double>{100, 100});
-    waypoints.emplace(3, std::vector<double>{200, -100});
+    //spawn vehicles at given ics
+    for(int i=0; i<num_vehicles; i++)
+    {
+        this->spawn_vehicle(i, ics[i]);
+    }
+
+    
 }
 // destructor
 Simulation::~Simulation()
@@ -34,9 +44,12 @@ Simulation::~Simulation()
 void Simulation::spawn_vehicle(int id_, std::vector<double> ics) 
 {
     Vehicle vehicle(id_, ics);
+    
+    //  some hardcoded waypoints (world is 600x600)
+    
     active_vehicle_ids.push_back(id_);
+
     vehicle_obs.push_back(vehicle);
-    // all_states.emplace(agent.state);
 }
 
 void Simulation::log_states() 
@@ -46,6 +59,7 @@ void Simulation::log_states()
         std::string time = logCurrentTimeWithChrono();
         file << time << ",";
         file << vehicle.id << ",";
+        file << vehicle.FSM << ",";
         file << vehicle.state.x << ",";
         file << vehicle.state.y << ",";
         file << vehicle.state.theta << std::endl;
@@ -67,13 +81,13 @@ std::string Simulation::logCurrentTimeWithChrono()
 
 void Simulation::step()
 {
-    // update all vehicle states
+    // step vehicles
     for (Vehicle& vehicle : vehicle_obs) {
+        vehicle.set_FSM();
+        vehicle.controller();
         vehicle.update_state();       
     }
     // log states to csv 
     Simulation::log_states();
 
 }
-
-int main(){return 0;}
