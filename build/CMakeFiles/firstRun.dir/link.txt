@@ -1,1 +1,0 @@
-/usr/bin/c++ -g CMakeFiles/firstRun.dir/firstRun.cpp.o CMakeFiles/firstRun.dir/simulation.cpp.o CMakeFiles/firstRun.dir/Vehicle.cpp.o -o firstRun 

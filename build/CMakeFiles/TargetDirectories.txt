@@ -1,3 +1,0 @@
-/workspaces/rendezvousSim/build/CMakeFiles/firstRun.dir
-/workspaces/rendezvousSim/build/CMakeFiles/edit_cache.dir
-/workspaces/rendezvousSim/build/CMakeFiles/rebuild_cache.dir
