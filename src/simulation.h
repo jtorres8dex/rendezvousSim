@@ -22,21 +22,28 @@ public:
     double dt;
     std::ofstream file;
     std::vector<int> active_vehicle_ids;
-    std::unordered_map<int, Vehicle::State> all_states;
+    std::vector<std::unique_ptr<Vehicle>> vehicles;
     std::unordered_map<int, Vehicle::Commands> all_cmds;
 
+    // file handling
+    std::ofstream file;
     
 
     // methods
-    void spawn_vehicle(int id_, std::vector<double> ics);
-    std::unordered_map<int, std::vector<double>> set_vehicle_actions(); //TODO 
+    void spawn_vehicle(int id_, const std::vector<double>& ics);
+    
     void step();
-    void log_states();
-    std::string logCurrentTimeWithChrono();
+    
 
 private:
-    std::vector<Vehicle> vehicle_obs;
+    std::vector<std::unique_ptr<Vehicle>> vehicles;
 
+    void log_states();
+    void observe_states();
+    std::unordered_map<int, std::vector<double>> set_vehicle_actions(); //TODO 
+    
+    // helper functions
+    std::string logCurrentTimeWithChrono();
 };
 
 

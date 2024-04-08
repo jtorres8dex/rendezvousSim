@@ -13,7 +13,6 @@
 #include "Vehicle.h"
 
 
-
 std::string sim_name = "firstRun";
 int time_steps = 100;
 double dt = 0.1;

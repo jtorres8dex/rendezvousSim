@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <ctime>
 #include <sstream> 
+#include <memory>
 
 #include <unordered_map>
 #include <vector>
@@ -21,7 +22,6 @@ Simulation::Simulation(std::string sim_name,
                         std::vector<std::vector<double>> ics)
 {
     std::string filename = "logs/SIMULATION_" + sim_name + ".csv";
-    
     std::ofstream file(filename);
     file.open(filename);
 
@@ -40,29 +40,26 @@ Simulation::~Simulation()
     if (file.is_open()){file.close();}
 }
 
-
-void Simulation::spawn_vehicle(int id_, std::vector<double> ics) 
+void Simulation::spawn_vehicle(int id_, const std::vector<double>& ics) 
 {
-    Vehicle vehicle(id_, ics);
-    
-    //  some hardcoded waypoints (world is 600x600)
-    
-    active_vehicle_ids.push_back(id_);
-
-    vehicle_obs.push_back(vehicle);
+        for (int i=0; ; i++)
+        {
+            vehicles.push_back(std::make_unique<Vehicle>(i, ics));
+        }
 }
+
 
 void Simulation::log_states() 
 {
-    for (Vehicle& vehicle : vehicle_obs)
+    for (auto& vehicle : vehicles)
     {
-        std::string time = logCurrentTimeWithChrono();
+        std::string time = this->logCurrentTimeWithChrono();
         file << time << ",";
-        file << vehicle.id << ",";
-        file << vehicle.FSM << ",";
-        file << vehicle.state.x << ",";
-        file << vehicle.state.y << ",";
-        file << vehicle.state.theta << std::endl;
+        file << vehicle->id << ",";
+        file << vehicle->FSM << ",";
+        file << vehicle->state.x << ",";
+        file << vehicle->state.y << ",";
+        file << vehicle->state.theta << std::endl;
 
     }
 }
@@ -81,13 +78,16 @@ std::string Simulation::logCurrentTimeWithChrono()
 
 void Simulation::step()
 {
+    // get sim states
+    this->observe_states();
+
+    // set vehicle actions
+    this->set_vehicle_actions();
+
     // step vehicles
-    for (Vehicle& vehicle : vehicle_obs) {
-        vehicle.set_FSM();
-        vehicle.controller();
-        vehicle.update_state();       
-    }
+    this->step();
+    
     // log states to csv 
-    Simulation::log_states();
+    this->log_states();
 
 }

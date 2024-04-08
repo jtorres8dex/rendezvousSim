@@ -19,8 +19,12 @@ Vehicle::Vehicle(const int id, std::vector<double> ics)
 
     if(FSM == INIT)
     {
-        goal_state = waypoints.front();
-        waypoints.pop();
+        if (false == waypoints.empty())
+        {
+            goal_state = waypoints.front();
+            waypoints.pop();
+        }
+        
     }
 
     std::cout << "Constructor" << std::endl;
