@@ -64,17 +64,6 @@ void Simulation::log_states()
     }
 }
 
-std::string Simulation::logCurrentTimeWithChrono() 
-    {
-        auto now = std::chrono::system_clock::now();
-        auto nowAsTimeT = std::chrono::system_clock::to_time_t(now);
-        auto nowAsLocalTime = std::localtime(&nowAsTimeT);
-
-        char buffer[80];
-        std::strftime(buffer, sizeof(buffer), "%d %H:%M:%S", nowAsLocalTime);
-
-        return std::string(buffer);
-    }
 
 void Simulation::step()
 {
@@ -86,8 +75,22 @@ void Simulation::step()
 
     // step vehicles
     this->step();
-    
+
     // log states to csv 
     this->log_states();
 
 }
+
+/******************************** HELPER FUNCTIONS *****************************************/
+
+std::string Simulation::logCurrentTimeWithChrono() 
+    {
+        auto now = std::chrono::system_clock::now();
+        auto nowAsTimeT = std::chrono::system_clock::to_time_t(now);
+        auto nowAsLocalTime = std::localtime(&nowAsTimeT);
+
+        char buffer[80];
+        std::strftime(buffer, sizeof(buffer), "%d %H:%M:%S", nowAsLocalTime);
+
+        return std::string(buffer);
+    }
