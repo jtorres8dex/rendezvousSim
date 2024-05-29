@@ -8,13 +8,14 @@ echo "Cleaning up old compilation artifacts..."
 rm -f vehicle.o $EXECUTABLE
 echo "Cleanup done."
 
-# Compile Vehicle.cpp (if it uses classes/methods from Vehicle.h)
-echo "Compiling Vehicle.cpp..."
-g++ -c Vehicle.cpp -o vehicle.o
+echo "Compiling component files..."
+g++ -c src/Vehicle.cpp -o build/vehicle.o
+g++ -c src/kinematics.cpp -o build/kinematics.o
 
 # Check if the compilation was successful
 if [ $? -ne 0 ]; then
-    echo "Compilation of Vehicle.cpp failed. Exiting."
+    echo 
+    echo "Compilation of componets failed. Exiting."
     exit 1
 fi
 
@@ -22,7 +23,7 @@ fi
 # and any other .cpp files you need to compile, generating the 'simulation' executable.
 # Note: Add other .cpp files as needed
 echo "Compiling simulation.cpp and linking..."
-g++ simulation.cpp vehicle.o -o $EXECUTABLE
+g++ src/simulation.cpp build/vehicle.o -o $EXECUTABLE
 
 # If compilation succeeds, print a success message
 if [ $? -eq 0 ]; then
