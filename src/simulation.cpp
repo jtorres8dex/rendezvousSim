@@ -19,7 +19,7 @@ Simulation::Simulation(std::string sim_name,
                         int time_steps, 
                         double dt, 
                         int num_vehicles,
-                        std::vector<std::vector<double>> ics)
+                        std::vector<std::vector<double> > ics)
 {
     std::string filename = "logs/SIMULATION_" + sim_name + ".csv";
     std::ofstream file(filename);
@@ -44,7 +44,7 @@ void Simulation::spawn_vehicle(int id_, const std::vector<double>& ics)
 {
         for (int i=0; ; i++)
         {
-            vehicles.push_back(std::make_unique<Vehicle>(i, ics));
+            // vehicles.push_back(std::make_unique<Vehicle>(i, ics));
         }
 }
 
@@ -80,6 +80,9 @@ void Simulation::step()
     this->log_states();
 
 }
+
+void Simulation::observe_states(){}
+void Simulation::set_vehicle_actions(){}
 
 /******************************** HELPER FUNCTIONS *****************************************/
 

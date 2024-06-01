@@ -17,7 +17,7 @@ std::string sim_name = "firstRun";
 int time_steps = 100;
 double dt = 0.1;
 int num_vehicles = 1;
-std::vector<std::vector<double>> ics = {{1,1}};
+std::vector<std::vector<double> > ics; //= {{1,1}};
 Simulation sim(
     sim_name,
     time_steps,

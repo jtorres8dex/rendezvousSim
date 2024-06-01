@@ -8,4 +8,4 @@
 
 static double TWO_PI = M_PI * 2;
 
-DifferentialDrive::DifferentialDrive(){}
+DifferentialDrive::DifferentialDrive(const int L, const int R, const int K_P){};

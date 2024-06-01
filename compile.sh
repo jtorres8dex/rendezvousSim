@@ -1,33 +1,40 @@
 #!/bin/bash
 
+# Set some colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+WHITE='\033[0;37m'
+NC='\033[0m' # No Color
+
 # Define the output executable name
-EXECUTABLE="simulation"
+EXECUTABLE="TEST_EXECUTABLE"
 
 # Clean up previous compilation artifacts
-echo "Cleaning up old compilation artifacts..."
-rm -f vehicle.o $EXECUTABLE
+echo "${BLUE}Cleaning up old compilation artifacts...${NC}"
+rm -f build/*.o $EXECUTABLE
 echo "Cleanup done."
 
-echo "Compiling component files..."
+echo "${BLUE}Compiling component files...${NC}"
 g++ -c src/Vehicle.cpp -o build/vehicle.o
 g++ -c src/kinematics.cpp -o build/kinematics.o
-
+g++ -c src/firstRun.cpp -o build/firstRun.o
 # Check if the compilation was successful
 if [ $? -ne 0 ]; then
-    echo 
-    echo "Compilation of componets failed. Exiting."
+    echo -e "${RED}Compilation of components failed. Exiting.${NC}"
     exit 1
 fi
 
-# Compile simulation.cpp along with the vehicle.o object file,
-# and any other .cpp files you need to compile, generating the 'simulation' executable.
-# Note: Add other .cpp files as needed
+# Compile simulation.cpp along with all object files
 echo "Compiling simulation.cpp and linking..."
-g++ src/simulation.cpp build/vehicle.o -o $EXECUTABLE
+g++ src/simulation.cpp build/vehicle.o build/kinematics.o build/firstRun.o -o $EXECUTABLE
 
 # If compilation succeeds, print a success message
 if [ $? -eq 0 ]; then
-    echo "Compilation successful. Executable created: $EXECUTABLE"
+    echo -e "${GREEN}Compilation successful. Executable created: $EXECUTABLE${NC}"
 else
-    echo "Compilation failed."
+    echo -e "${RED}Compilation failed.${NC}"
 fi

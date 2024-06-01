@@ -13,7 +13,7 @@ class Simulation
 public:
     // Constructor 
     Simulation(std::string sim_name, int time_steps, double dt, int num_vehicles,
-                std::vector<std::vector<double>> ics);
+                std::vector<std::vector<double> > ics);
     // Destructor
     ~Simulation();
 
@@ -22,11 +22,9 @@ public:
     double dt;
     std::ofstream file;
     std::vector<int> active_vehicle_ids;
-    std::vector<std::unique_ptr<Vehicle>> vehicles;
     std::unordered_map<int, Vehicle::Commands> all_cmds;
 
     // file handling
-    std::ofstream file;
     
 
     // methods
@@ -36,11 +34,11 @@ public:
     
 
 private:
-    std::vector<std::unique_ptr<Vehicle>> vehicles;
+    std::vector<std::unique_ptr<Vehicle> > vehicles;
 
     void log_states();
     void observe_states();
-    std::unordered_map<int, std::vector<double>> set_vehicle_actions(); //TODO 
+    void set_vehicle_actions(); //TODO 
     
     // helper functions
     std::string logCurrentTimeWithChrono();
