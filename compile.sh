@@ -19,9 +19,10 @@ rm -f build/*.o $EXECUTABLE
 echo "Cleanup done."
 
 echo "${BLUE}Compiling component files...${NC}"
-g++ -c src/Vehicle.cpp -o build/vehicle.o
-g++ -c src/kinematics.cpp -o build/kinematics.o
-g++ -c src/firstRun.cpp -o build/firstRun.o
+g++ -std=c++14 -c src/Vehicle.cpp -o build/vehicle.o
+g++ -std=c++14 -c src/kinematics.cpp -o build/kinematics.o
+g++ -std=c++14 -c src/simulation.cpp -o build/simulation.o
+g++ -std=c++14 -c src/firstRun.cpp -o build/firstRun.o
 # Check if the compilation was successful
 if [ $? -ne 0 ]; then
     echo -e "${RED}Compilation of components failed. Exiting.${NC}"
@@ -30,7 +31,7 @@ fi
 
 # Compile simulation.cpp along with all object files
 echo "Compiling simulation.cpp and linking..."
-g++ src/simulation.cpp build/vehicle.o build/kinematics.o build/firstRun.o -o $EXECUTABLE
+g++ src/firstRun.cpp build/vehicle.o build/kinematics.o build/simulation.o -o outputs/$EXECUTABLE
 
 # If compilation succeeds, print a success message
 if [ $? -eq 0 ]; then

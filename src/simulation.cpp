@@ -24,10 +24,12 @@ Simulation::Simulation(std::string sim_name,
     std::string filename = "logs/SIMULATION_" + sim_name + ".csv";
     std::ofstream file(filename);
     file.open(filename);
+    
 
     //spawn vehicles at given ics
     for(int i=0; i<num_vehicles; i++)
     {
+        
         this->spawn_vehicle(i, ics[i]);
     }
 
@@ -42,10 +44,8 @@ Simulation::~Simulation()
 
 void Simulation::spawn_vehicle(int id_, const std::vector<double>& ics) 
 {
-        for (int i=0; ; i++)
-        {
-            // vehicles.push_back(std::make_unique<Vehicle>(i, ics));
-        }
+            vehicles.push_back(std::make_unique<Vehicle>(id_, ics));
+            std::cout << "HERE" << std::endl;
 }
 
 
