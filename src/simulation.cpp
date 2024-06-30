@@ -65,24 +65,26 @@ void Simulation::log_states()
 }
 
 
-void Simulation::step()
+Simulation::Workspace Simulation::step(Simulation::Workspace ws)
 {
+
+
     // get sim states
-    this->observe_states();
+    this->compute_states(ws);
 
-    // set vehicle actions
-    this->set_vehicle_actions();
-
-    // step vehicles
-    this->step();
-
+    // update states
+    for (auto agentState = ws.vehicleStates.begin(); agentState != ws.vehicleStates.end(); agentState++)
+    {
+        Vehicle::State age;
+    }
     // log states to csv 
     this->log_states();
 
 }
+Simulation::Workspace initialize(){}
 
-void Simulation::observe_states(){}
-void Simulation::set_vehicle_actions(){}
+Simulation::Workspace Simulation::compute_states(Simulation::Workspace ws){}
+Simulation::Workspace Simulation::set_vehicle_actions(Simulation::Workspace ws){}
 
 /******************************** HELPER FUNCTIONS *****************************************/
 

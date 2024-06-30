@@ -11,6 +11,14 @@
 class Simulation
 {
 public:
+
+    struct Workspace
+    {
+        std::vector<int> active_vehicle_ids;
+        std::unordered_map<int, Vehicle::Commands> cmds;
+        std::unordered_map<int, Vehicle::State> vehicleStates;
+    };  
+
     // Constructor 
     Simulation(std::string sim_name, int time_steps, double dt, int num_vehicles,
                 std::vector<std::vector<double> > ics);
@@ -21,24 +29,20 @@ public:
     int time_steps;
     double dt;
     std::ofstream file;
-    std::vector<int> active_vehicle_ids;
-    std::unordered_map<int, Vehicle::Commands> all_cmds;
-
-    // file handling
-    
 
     // methods
     void spawn_vehicle(int id_, const std::vector<double>& ics);
     
-    void step();
+    Simulation::Workspace step(Simulation::Workspace ws);
     
 
 private:
     std::vector<std::unique_ptr<Vehicle> > vehicles;
 
+    Simulation::Workspace initialize(){}
     void log_states();
-    void observe_states();
-    void set_vehicle_actions(); //TODO 
+    Simulation::Workspace compute_states(Simulation::Workspace ws);
+    Simulation::Workspace set_vehicle_actions(Simulation::Workspace ws); //TODO 
     
     // helper functions
     std::string logCurrentTimeWithChrono();
