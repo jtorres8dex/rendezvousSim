@@ -16,24 +16,21 @@
 
 // constructor
 Simulation::Simulation(std::string sim_name, 
-                        int time_steps, 
-                        double dt, 
-                        int num_vehicles,
-                        std::vector<std::vector<double> > ics)
+                       int time_steps, 
+                       double dt, 
+                       int num_vehicles,
+                       std::vector<std::vector<double>> ics)
+    : time_steps(time_steps), dt(dt)
 {
     std::string filename = "logs/SIMULATION_" + sim_name + ".csv";
-    std::ofstream file(filename);
-    file.open(filename);
+    file.open(filename); // Open the file using the member variable
 
-
-    //spawn vehicles at given ics
-    for(int i=0; i<num_vehicles; i++)
+    // spawn vehicles at given ics
+    for(int i = 0; i < num_vehicles; i++)
     {
         Vehicle vehicle(i, ics[0]);
         vehicles.emplace_back(vehicle);
     }
-
-    
 }
 // destructor
 Simulation::~Simulation()
@@ -41,10 +38,6 @@ Simulation::~Simulation()
     std::cout << "Stopping Simulation" << std::endl;
     if (file.is_open()){file.close();}
 }
-
-
-
-
 
 Simulation::SimulationWorkspace Simulation::step(Simulation::SimulationWorkspace ws)
 {
@@ -81,12 +74,12 @@ void Simulation::log_states()
     }
 }
 
-Simulation::SimulationWorkspace initialize(Simulation::SimulationWorkspace ws){
+Simulation::SimulationWorkspace Simulation::initialize(Simulation::SimulationWorkspace ws){
         Simulation::SimulationWorkspace wsOut{ws};
     return wsOut;
 }
 
-Simulation::SimulationWorkspace compute_states(Simulation::SimulationWorkspace ws){
+Simulation::SimulationWorkspace Simulation::compute_states(Simulation::SimulationWorkspace ws){
     Simulation::SimulationWorkspace wsOut{ws};
     std::cout << "Inside compute_states()" << std::endl;
 
