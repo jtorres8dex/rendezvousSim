@@ -7,7 +7,7 @@ project(Simulation VERSION 1.0)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-CXXFLAGS += -I/your_project/libs/Eigen
+# CXXFLAGS += -I/rendezvousSim/libs/Eigen
 
 include_directories("libs/")
 

@@ -12,11 +12,14 @@ class Simulation
 {
 public:
 
-    struct Workspace
+    struct SimulationWorkspace
     {
         std::vector<int> active_vehicle_ids;
+        
         std::unordered_map<int, Vehicle::Commands> cmds;
         std::unordered_map<int, Vehicle::State> vehicleStates;
+
+        std::vector<Vehicle> vehicles;
     };  
 
     // Constructor 
@@ -33,19 +36,19 @@ public:
     // methods
     void spawn_vehicle(int id_, const std::vector<double>& ics);
     
-    Simulation::Workspace step(Simulation::Workspace ws);
+    SimulationWorkspace step(SimulationWorkspace ws);
     
 
-private:
-    std::vector<std::unique_ptr<Vehicle> > vehicles;
+    std::vector<Vehicle> vehicles;
 
-    Simulation::Workspace initialize(){}
-    void log_states();
-    Simulation::Workspace compute_states(Simulation::Workspace ws);
-    Simulation::Workspace set_vehicle_actions(Simulation::Workspace ws); //TODO 
+    SimulationWorkspace initialize(){}
+    SimulationWorkspace compute_states(SimulationWorkspace ws);
+    SimulationWorkspace set_vehicle_actions(SimulationWorkspace ws);
     
     // helper functions
     std::string logCurrentTimeWithChrono();
+    private:
+        void log_states();
 };
 
 

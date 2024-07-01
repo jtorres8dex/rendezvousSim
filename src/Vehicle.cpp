@@ -3,30 +3,16 @@
 #include <cmath>
 
 static double TWO_PI = M_PI * 2;
+static double dt = 0.1;
 
-Vehicle::Vehicle(const int id, std::vector<double> ics)
-    :id(id)
+Vehicle::Vehicle(const int id_, std::vector<double> ics)
 {
-    state.x = ics[0];
-    state.y = ics[1];
-    state.theta = ics[2];
+    Vehicle::VehicleWorkspace ws;
+    id = id_;
+    ws.state.x = ics[0];
+    ws.state.y = ics[1];
+    ws.state.theta = ics[2];
     
-    FSM = INIT;   
-
-    static double ex_minus1 = 0.0;
-    static double ey_minus1 = 0.0;
-    static double etheta_minus1 = 0.0;
-
-    if(FSM == INIT)
-    {
-        if (false == waypoints.empty())
-        {
-            goal_state = waypoints.front();
-            waypoints.pop();
-        }
-        
-    }
-
     std::cout << "Constructor" << std::endl;
 }
 
@@ -34,55 +20,40 @@ Vehicle::~Vehicle(){
     std::cout << "Destroying Vehicle object" << std::endl;
 }
 
-/**
- * @brief 
- * 
- * @param e_x 
- * @param e_y 
- * @param e_theta 
- * @return std::vector<double> 
- */
-void Vehicle::controller()
-{
-    std::vector<double> cmds;
-    double vL, vR;
-    std::cout << "Controller" << std::endl;
-
-}
 
 
-void Vehicle::stop() {
-    cmds.v = 0.0;
-    cmds.w = 0.0;
+Vehicle::VehicleWorkspace stop(Vehicle::VehicleWorkspace ws) {
+    Vehicle::VehicleWorkspace wsOut{ws};
+    wsOut.cmds.v = 0.0;
+    wsOut.cmds.w = 0.0;
     std::cout << "stop" << std::endl;
+
+    return wsOut;
     
 }
 
-void Vehicle::update_state(){
+Vehicle::VehicleWorkspace Vehicle::update_state(Vehicle::VehicleWorkspace ws){
 
-        float delta_x = cmds.v * cos(state.theta) * dt;
-        float delta_y = cmds.v * sin(state.theta) * dt;
-        float delta_theta = cmds.w * dt;
+        Vehicle::VehicleWorkspace wsOut{ws};
+
+        float delta_x = wsOut.cmds.v * cos(wsOut.state.theta) * dt;
+        float delta_y = wsOut.cmds.v * sin(wsOut.state.theta) * dt;
+        float delta_theta = wsOut.cmds.w * dt;
 
         // Update the state
-        state.x += delta_x;
-        state.y += delta_y;
-        state.theta += delta_theta;
+        wsOut.state.x += delta_x;
+        wsOut.state.y += delta_y;
+        wsOut.state.theta += delta_theta;
 
         // Normalize theta to be within [-pi, pi]
-        if (state.theta > M_PI) {
-            state.theta -= 2 * M_PI;
-        } else if (state.theta < -M_PI) {
-            state.theta += 2 * M_PI;
+        if (wsOut.state.theta > M_PI) {
+            wsOut.state.theta -= 2 * M_PI;
+        } else if (wsOut.state.theta < -M_PI) {
+            wsOut.state.theta += 2 * M_PI;
         }
-    }
 
-void Vehicle::set_FSM()
-{
-    double distance_to_goal = pow(((goal_state.x - state.x) + (goal_state.y - state.y)),2);
-    if (distance_to_goal <= geometry.waypoint_radius){
-        FSM = AT_GOAL;
-    }
-
+        return wsOut;
 }
+
+
 

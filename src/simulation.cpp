@@ -24,13 +24,13 @@ Simulation::Simulation(std::string sim_name,
     std::string filename = "logs/SIMULATION_" + sim_name + ".csv";
     std::ofstream file(filename);
     file.open(filename);
-    
+
 
     //spawn vehicles at given ics
     for(int i=0; i<num_vehicles; i++)
     {
-        
-        this->spawn_vehicle(i, ics[i]);
+        Vehicle vehicle(i, ics[0]);
+        vehicles.emplace_back(vehicle);
     }
 
     
@@ -42,10 +42,27 @@ Simulation::~Simulation()
     if (file.is_open()){file.close();}
 }
 
-void Simulation::spawn_vehicle(int id_, const std::vector<double>& ics) 
+
+
+
+
+Simulation::SimulationWorkspace Simulation::step(Simulation::SimulationWorkspace ws)
 {
-            vehicles.push_back(std::make_unique<Vehicle>(id_, ics));
-            std::cout << "HERE" << std::endl;
+    Simulation::SimulationWorkspace wsOut{ws};
+
+    // get sim states
+    wsOut = compute_states(wsOut);
+    
+
+    // step vehicles
+    for (auto agent = ws.vehicles.begin(); agent != ws.vehicles.end(); agent++)
+    {
+        std::cout << 1 << std::endl;
+    }
+
+    // log states to csv 
+    // log_states();
+
 }
 
 
@@ -55,36 +72,23 @@ void Simulation::log_states()
     {
         std::string time = this->logCurrentTimeWithChrono();
         file << time << ",";
-        file << vehicle->id << ",";
-        file << vehicle->FSM << ",";
-        file << vehicle->state.x << ",";
-        file << vehicle->state.y << ",";
-        file << vehicle->state.theta << std::endl;
+        file << vehicle.id << ",";
+        file << vehicle.ws.state.x << ",";
+        file << vehicle.ws.state.y << ",";
+        file << vehicle.ws.state.theta << std::endl;
 
     }
 }
 
+Simulation::SimulationWorkspace initialize(){}
 
-Simulation::Workspace Simulation::step(Simulation::Workspace ws)
-{
+Simulation::SimulationWorkspace compute_states(Simulation::SimulationWorkspace ws){
+    Simulation::SimulationWorkspace wsOut{ws};
+    std::cout << "Inside compute_states()" << std::endl;
 
-
-    // get sim states
-    this->compute_states(ws);
-
-    // update states
-    for (auto agentState = ws.vehicleStates.begin(); agentState != ws.vehicleStates.end(); agentState++)
-    {
-        Vehicle::State age;
-    }
-    // log states to csv 
-    this->log_states();
-
+    return wsOut;
 }
-Simulation::Workspace initialize(){}
-
-Simulation::Workspace Simulation::compute_states(Simulation::Workspace ws){}
-Simulation::Workspace Simulation::set_vehicle_actions(Simulation::Workspace ws){}
+Simulation::SimulationWorkspace Simulation::set_vehicle_actions(Simulation::SimulationWorkspace ws){}
 
 /******************************** HELPER FUNCTIONS *****************************************/
 
