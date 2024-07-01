@@ -51,7 +51,7 @@ Simulation::SimulationWorkspace Simulation::step(Simulation::SimulationWorkspace
     Simulation::SimulationWorkspace wsOut{ws};
 
     // get sim states
-    wsOut = compute_states(wsOut);
+    // wsOut = compute_states(wsOut);
     
 
     // step vehicles
@@ -63,6 +63,7 @@ Simulation::SimulationWorkspace Simulation::step(Simulation::SimulationWorkspace
     // log states to csv 
     // log_states();
 
+    return wsOut;
 }
 
 
@@ -80,7 +81,10 @@ void Simulation::log_states()
     }
 }
 
-Simulation::SimulationWorkspace initialize(){}
+Simulation::SimulationWorkspace initialize(Simulation::SimulationWorkspace ws){
+        Simulation::SimulationWorkspace wsOut{ws};
+    return wsOut;
+}
 
 Simulation::SimulationWorkspace compute_states(Simulation::SimulationWorkspace ws){
     Simulation::SimulationWorkspace wsOut{ws};
@@ -88,7 +92,10 @@ Simulation::SimulationWorkspace compute_states(Simulation::SimulationWorkspace w
 
     return wsOut;
 }
-Simulation::SimulationWorkspace Simulation::set_vehicle_actions(Simulation::SimulationWorkspace ws){}
+Simulation::SimulationWorkspace Simulation::set_vehicle_actions(Simulation::SimulationWorkspace ws){
+    Simulation::SimulationWorkspace wsOut{ws};
+    return wsOut;
+}
 
 /******************************** HELPER FUNCTIONS *****************************************/
 

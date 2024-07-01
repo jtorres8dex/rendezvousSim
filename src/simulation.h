@@ -41,14 +41,13 @@ public:
 
     std::vector<Vehicle> vehicles;
 
-    SimulationWorkspace initialize(){}
+    SimulationWorkspace initialize(Simulation::SimulationWorkspace ws);
     SimulationWorkspace compute_states(SimulationWorkspace ws);
     SimulationWorkspace set_vehicle_actions(SimulationWorkspace ws);
     
     // helper functions
     std::string logCurrentTimeWithChrono();
-    private:
-        void log_states();
+    void log_states();
 };
 
 
