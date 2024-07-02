@@ -37,11 +37,9 @@ public:
     {
         Geometry geometry;
 
-        std::queue<State> waypoints;
         Commands cmds;
         State state;
-        bool has_neighbors;
-        std::vector<int> neighbors;
+        
     };
     VehicleWorkspace ws;
 

@@ -47,6 +47,7 @@ class Agent
         struct AgentWorkspace 
         {
             const uint16_t id = 1;
+            std::vector<int> neighbors;
             ObservationSpace observationSpace;
             ActionSpace actionSpace;
             FSM fsm;
@@ -56,6 +57,8 @@ class Agent
         AgentWorkspace setFSM(const AgentWorkspace &ws);
 
         AgentWorkspace controller(const AgentWorkspace &ws);
+
+        AgentWorkspace pathPlanner(const AgentWorkspace &ws);
 
         
 };

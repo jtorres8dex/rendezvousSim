@@ -50,6 +50,7 @@ Agent::AgentWorkspace Agent::setFSM(const Agent::AgentWorkspace &ws)
 Agent::AgentWorkspace controller(const Agent::AgentWorkspace &ws)
 {
     Agent::AgentWorkspace wsOut{ws};
+    
 
     float k{1.0};
     Agent::State goalState = ws.waypointPlan.begin()->second;
@@ -64,3 +65,17 @@ Agent::AgentWorkspace controller(const Agent::AgentWorkspace &ws)
 
     return wsOut;
 }   
+
+Agent::AgentWorkspace Agent::pathPlanner(const Agent::AgentWorkspace &ws)
+{
+    Agent::AgentWorkspace wsOut{ws};
+    Agent::State goalState;
+    
+    if (APPROACHING == ws.fsm)
+    {
+        wsOut.observationSpace.goalState = ws.waypointPlan.begin()->second;
+    }
+
+
+    return wsOut;
+}

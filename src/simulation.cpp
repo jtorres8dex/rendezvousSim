@@ -44,18 +44,11 @@ Simulation::SimulationWorkspace Simulation::step(const Simulation::SimulationWor
 {
     Simulation::SimulationWorkspace wsOut{ws};
 
-    // get sim states
-    // wsOut = compute_states(wsOut);
+    // get agent commands
+
+    // propogate vehicle dynamics
+
     
-
-    // step vehicles
-    for (auto agent = ws.vehicles.begin(); agent != ws.vehicles.end(); agent++)
-    {
-        std::cout << 1 << std::endl;
-    }
-
-    // log states to csv 
-    // log_states();
 
     return wsOut;
 }
