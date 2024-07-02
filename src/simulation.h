@@ -36,14 +36,14 @@ public:
     // methods
     void spawn_vehicle(int id_, const std::vector<double>& ics);
     
-    SimulationWorkspace step(SimulationWorkspace ws);
+    SimulationWorkspace step(const Simulation::SimulationWorkspace &ws);
     
 
     std::vector<Vehicle> vehicles;
 
-    SimulationWorkspace initialize(Simulation::SimulationWorkspace ws);
-    SimulationWorkspace compute_states(SimulationWorkspace ws);
-    SimulationWorkspace set_vehicle_actions(SimulationWorkspace ws);
+    SimulationWorkspace initialize(const Simulation::SimulationWorkspace &ws);
+    SimulationWorkspace compute_states(const Simulation::SimulationWorkspace &ws);
+    SimulationWorkspace set_vehicle_actions(const Simulation::SimulationWorkspace &ws);
     
     // helper functions
     std::string logCurrentTimeWithChrono();

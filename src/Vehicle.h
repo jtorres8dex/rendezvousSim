@@ -50,11 +50,11 @@ public:
     // destructor
     ~Vehicle();
     // methods 
-    VehicleWorkspace update_state(VehicleWorkspace ws);
-    VehicleWorkspace stop(VehicleWorkspace ws);
+    VehicleWorkspace update_state(const Vehicle::VehicleWorkspace &ws);
+    VehicleWorkspace stop(const Vehicle::VehicleWorkspace &ws);
     //path planner #TODO 
-    VehicleWorkspace set_next_waypoint(VehicleWorkspace ws);
-    VehicleWorkspace get_next_waypoint(VehicleWorkspace ws);
+    VehicleWorkspace set_next_waypoint(const Vehicle::VehicleWorkspace &ws);
+    VehicleWorkspace get_next_waypoint(const Vehicle::VehicleWorkspace &ws);
 
     
 private:

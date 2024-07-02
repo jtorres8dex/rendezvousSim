@@ -13,7 +13,7 @@ Vehicle::Vehicle(const int id_, std::vector<double> ics)
     ws.state.y = ics[1];
     ws.state.theta = ics[2];
     
-    std::cout << "Constructor" << std::endl;
+    std::cout << "Vehicle Constructor" << std::endl;
 }
 
 Vehicle::~Vehicle(){
@@ -22,7 +22,7 @@ Vehicle::~Vehicle(){
 
 
 
-Vehicle::VehicleWorkspace stop(Vehicle::VehicleWorkspace ws) {
+Vehicle::VehicleWorkspace Vehicle::stop(const Vehicle::VehicleWorkspace &ws) {
     Vehicle::VehicleWorkspace wsOut{ws};
     wsOut.cmds.v = 0.0;
     wsOut.cmds.w = 0.0;
@@ -32,7 +32,7 @@ Vehicle::VehicleWorkspace stop(Vehicle::VehicleWorkspace ws) {
     
 }
 
-Vehicle::VehicleWorkspace Vehicle::update_state(Vehicle::VehicleWorkspace ws){
+Vehicle::VehicleWorkspace Vehicle::update_state(const Vehicle::VehicleWorkspace &ws){
 
         Vehicle::VehicleWorkspace wsOut{ws};
 

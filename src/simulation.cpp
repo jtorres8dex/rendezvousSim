@@ -26,6 +26,7 @@ Simulation::Simulation(std::string sim_name,
     file.open(filename); // Open the file using the member variable
 
     // spawn vehicles at given ics
+    std::cout << "Simulation Constructor: spawning " << num_vehicles << " vehicles" << std::endl;
     for(int i = 0; i < num_vehicles; i++)
     {
         Vehicle vehicle(i, ics[0]);
@@ -39,7 +40,7 @@ Simulation::~Simulation()
     if (file.is_open()){file.close();}
 }
 
-Simulation::SimulationWorkspace Simulation::step(Simulation::SimulationWorkspace ws)
+Simulation::SimulationWorkspace Simulation::step(const Simulation::SimulationWorkspace &ws)
 {
     Simulation::SimulationWorkspace wsOut{ws};
 
@@ -74,18 +75,18 @@ void Simulation::log_states()
     }
 }
 
-Simulation::SimulationWorkspace Simulation::initialize(Simulation::SimulationWorkspace ws){
+Simulation::SimulationWorkspace Simulation::initialize(const Simulation::SimulationWorkspace &ws){
         Simulation::SimulationWorkspace wsOut{ws};
     return wsOut;
 }
 
-Simulation::SimulationWorkspace Simulation::compute_states(Simulation::SimulationWorkspace ws){
+Simulation::SimulationWorkspace Simulation::compute_states(const Simulation::SimulationWorkspace &ws){
     Simulation::SimulationWorkspace wsOut{ws};
     std::cout << "Inside compute_states()" << std::endl;
 
     return wsOut;
 }
-Simulation::SimulationWorkspace Simulation::set_vehicle_actions(Simulation::SimulationWorkspace ws){
+Simulation::SimulationWorkspace Simulation::set_vehicle_actions(const Simulation::SimulationWorkspace &ws){
     Simulation::SimulationWorkspace wsOut{ws};
     return wsOut;
 }

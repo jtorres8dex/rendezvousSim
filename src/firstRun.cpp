@@ -34,6 +34,8 @@ int main()
         ics
     );
 
+    Simulation::SimulationWorkspace ws;
+
     
 
 
