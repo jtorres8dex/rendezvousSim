@@ -45,10 +45,10 @@ Simulation::SimulationWorkspace Simulation::step(const Simulation::SimulationWor
     Simulation::SimulationWorkspace wsOut{ws};
 
     // get agent commands
-
+    
     // propogate vehicle dynamics
 
-    
+    // safety checks
 
     return wsOut;
 }
