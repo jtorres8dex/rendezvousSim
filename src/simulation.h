@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "Vehicle.h"
+#include "Agent.h"
 
 
 class Simulation
@@ -16,8 +17,8 @@ public:
     {
         std::vector<int> active_vehicle_ids;
         
-        std::unordered_map<int, Vehicle::Commands> cmds;
-        std::unordered_map<int, Vehicle::State> vehicleStates;
+        std::unordered_map<int, Vehicle::VehicleWorkspace> vehicleWorkspaces;
+        std::unordered_map<int, Agent::AgentWorkspace> agentWorkspaces;
 
         std::vector<Vehicle> vehicles;
     };  

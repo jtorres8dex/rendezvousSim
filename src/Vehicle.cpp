@@ -2,8 +2,8 @@
 #include <iostream>
 #include <cmath>
 
-static double TWO_PI = M_PI * 2;
-static double dt = 0.1;
+static const double TWO_PI = M_PI * 2;
+static const double dt = 0.1;
 
 Vehicle::Vehicle(const int id_, std::vector<double> ics)
 {
