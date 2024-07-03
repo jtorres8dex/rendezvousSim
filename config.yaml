@@ -1,13 +1,12 @@
-#include "agent.h"
-#ifndef CONFIG_H
-#define CONFIG_H
-
-
-
-
-double waypointRadius = 0.05; 
-
-
-
-#endif
-
+simulation:
+  time_steps: 100
+  dt: 0.1
+  num_vehicles: 1
+agents:
+    name: "albert"
+    id: 1
+    waypoints:
+      1: [5.0, 4.0, 0.0]
+vehicles:
+  id: 1
+  ics: [1.0, 1.0, 0.0]

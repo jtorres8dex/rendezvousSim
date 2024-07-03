@@ -41,7 +41,7 @@ public:
 
     std::vector<Vehicle> vehicles;
 
-    SimulationWorkspace initialize(const Simulation::SimulationWorkspace &ws);
+    Simulation::SimulationWorkspace initialize(std::string configPath);
     SimulationWorkspace compute_states(const Simulation::SimulationWorkspace &ws);
     SimulationWorkspace set_vehicle_actions(const Simulation::SimulationWorkspace &ws);
     

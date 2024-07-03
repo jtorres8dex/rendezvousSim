@@ -30,24 +30,24 @@ Simulation::~Simulation()
     if (file.is_open()){file.close();}
 }
 
-Simulation::SimulationWorkspace Simulation::initialize(const Simulation::SimulationWorkspace &ws)
+Simulation::SimulationWorkspace Simulation::initialize(std::string configPath)
 {
     // read in config 
     YAML::Node config;
     try 
     {
-        config = YAML::LoadFile("config.yaml");
-        std::cout << "Loaded in config..." << std::endl;
-
+        config = YAML::LoadFile(configPath);
+        std::cout << "Loaded configuration:\n" << YAML::Dump(config) << std::endl;
+        std::cout << " " << std::endl;
     }
     catch (const YAML::Exception& e) 
     {
-        std::cerr << "Error reading YAML file: " << e.what() << std::endl;
+        std::cerr << "ERROR reading YAML file: "<< std::endl << e.what() << std::endl;
     }
 
     // initialize sim workspace
     Simulation::SimulationWorkspace wsOut;
-
+    
     // initialize sim environment
     sim_step = 0;
     sim_time = 0.0;

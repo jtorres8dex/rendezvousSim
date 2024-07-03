@@ -19,6 +19,7 @@ int main()
 {
     std::cout << "starting up firstRun..." << std::endl;
     Simulation sim("TEST");
+    sim.initialize("config.yaml");
 
 
     
