@@ -22,8 +22,7 @@ public:
     };  
 
     // Constructor 
-    Simulation(std::string sim_name, int time_steps, double dt, int num_vehicles,
-                std::vector<std::vector<double> > ics);
+    Simulation(std::string sim_name);
     // Destructor
     ~Simulation();
 

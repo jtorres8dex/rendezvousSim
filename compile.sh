@@ -14,18 +14,21 @@ NC='\033[0m' # No Color
 EXECUTABLE="TEST_EXECUTABLE"
 
 # Clean up previous compilation artifacts
-echo "${BLUE}Cleaning up old compilation artifacts...${NC}"
+echo -e "${BLUE}Cleaning up old compilation artifacts...${NC}"
 rm -f build/*.o outputs/$EXECUTABLE
-echo "Cleanup done."
+echo -e "${BLUE}Cleanup done."
+echo
 
 # Create build directory if it doesn't exist
 mkdir -p build
 
-echo "${BLUE}Compiling component files...${NC}"
-g++ -std=c++14 -I/opt/homebrew/Cellar/yaml-cpp/0.8.0/include -c src/Vehicle.cpp -o build/vehicle.o
-g++ -std=c++14 -I/opt/homebrew/Cellar/yaml-cpp/0.8.0/include -c src/kinematics.cpp -o build/kinematics.o
-g++ -std=c++14 -I/opt/homebrew/Cellar/yaml-cpp/0.8.0/include -c src/simulation.cpp -o build/simulation.o
-g++ -std=c++14 -I/opt/homebrew/Cellar/yaml-cpp/0.8.0/include -c src/firstRun.cpp -o build/firstRun.o
+# Compile component files
+echo -e "${BLUE}Compiling component files...${NC}"
+echo 
+g++ -w -std=c++14 -I/opt/homebrew/Cellar/yaml-cpp/0.8.0/include -c src/Vehicle.cpp -o build/vehicle.o
+g++ -w -std=c++14 -I/opt/homebrew/Cellar/yaml-cpp/0.8.0/include -c src/kinematics.cpp -o build/kinematics.o
+g++ -w -std=c++14 -I/opt/homebrew/Cellar/yaml-cpp/0.8.0/include -c src/simulation.cpp -o build/simulation.o
+g++ -w -std=c++14 -I/opt/homebrew/Cellar/yaml-cpp/0.8.0/include -c src/firstRun.cpp -o build/firstRun.o
 
 # Check if the compilation was successful
 if [ $? -ne 0 ]; then
@@ -34,8 +37,8 @@ if [ $? -ne 0 ]; then
 fi
 
 # Compile and link the executable
-echo "${BLUE}Compiling simulation.cpp and linking...${NC}"
-g++ build/vehicle.o build/kinematics.o build/simulation.o build/firstRun.o -o outputs/$EXECUTABLE -lyaml-cpp
+echo -e "${BLUE}Compiling simulation.cpp and linking...${NC}"
+g++ build/vehicle.o build/kinematics.o build/simulation.o build/firstRun.o -L/opt/homebrew/Cellar/yaml-cpp/0.8.0/lib -o outputs/$EXECUTABLE -lyaml-cpp
 
 # If compilation succeeds, print a success message
 if [ $? -eq 0 ]; then

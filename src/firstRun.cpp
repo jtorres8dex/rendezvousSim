@@ -18,23 +18,8 @@
 int main()
 {
     std::cout << "starting up firstRun..." << std::endl;
+    Simulation sim("TEST");
 
-    std::string sim_name = "firstRun";
-    int time_steps = 100;
-    double dt = 0.1;
-    int num_vehicles = 100;
-    std::vector<double> ics1(1.0, 1.0);
-    std::vector<std::vector<double> > ics; //= {{1,1}};
-    ics.emplace_back(ics1);
-    Simulation sim(
-        sim_name,
-        time_steps,
-        dt,
-        num_vehicles,
-        ics
-    );
-
-    Simulation::SimulationWorkspace ws;
 
     
 

@@ -13,13 +13,13 @@
 #include <yaml-cpp/yaml.h>
 
 #include "simulation.h"  
-#include "Vehicle.h"
+#include "vehicle.h"
 
 
 // constructor
-Simulation::Simulation(std::string sim_name)
+Simulation::Simulation(std::string sim_name_)
 {
-    std::string sim_name = "logs/SIMULATION_" + sim_name + ".csv";
+    std::string sim_name = "logs/SIMULATION_" + sim_name_ + ".csv";
     file.open(sim_name); // Open the file using the member variable
 }
 
@@ -33,9 +33,10 @@ Simulation::~Simulation()
 Simulation::SimulationWorkspace Simulation::initialize(const Simulation::SimulationWorkspace &ws)
 {
     // read in config 
+    YAML::Node config;
     try 
     {
-        YAML::Node config = YAML::LoadFile("config.yaml");
+        config = YAML::LoadFile("config.yaml");
         std::cout << "Loaded in config..." << std::endl;
 
     }
@@ -50,14 +51,14 @@ Simulation::SimulationWorkspace Simulation::initialize(const Simulation::Simulat
     // initialize sim environment
     sim_step = 0;
     sim_time = 0.0;
-    dt = config["simulation"]["dt"];
-    int num_vehicles = config["simulation"]["num_vehicles"];
+    dt = config["simulation"]["dt"].as<double>();
+    int num_vehicles = config["simulation"]["num_vehicles"].as<int>();
 
     // spawn vehicles at given ics
     std::cout << "Simulation Constructor: spawning " << num_vehicles << " vehicles" << std::endl;
     for(int i = 0; i < num_vehicles; i++)
     {
-        std::vector<double> ic = {config["vehicles"]["ics"].as<std::vector<double>>};
+        std::vector<double> ic = {config["vehicles"]["ics"].as<std::vector<double>>()};
         
         // Instantiate vehicles and conditions
         Vehicle::VehicleWorkspace vehicleWs;
@@ -75,12 +76,12 @@ Simulation::SimulationWorkspace Simulation::initialize(const Simulation::Simulat
         
 
         Agent::State firstWp;
-        firstWp.x = config["agents"]["waypoints"][1][0]; //TODO get rid of this ugly ass hardcode
-        firstWp.y = config["agents"]["waypoints"][1][1];
-        firstWp.theta = config["agents"]["waypoints"][1][2];
+        firstWp.x = config["agents"]["waypoints"][1][0].as<double>(); //TODO get rid of this ugly ass hardcode
+        firstWp.y = config["agents"]["waypoints"][1][1].as<double>();
+        firstWp.theta = config["agents"]["waypoints"][1][2].as<double>();
         agentWs.waypointPlan.insert({1, firstWp});
 
-        wsOut.agentWorkspaces.insert{i, agentWs};
+        wsOut.agentWorkspaces.insert({i, agentWs});
     }
 
     return wsOut;
