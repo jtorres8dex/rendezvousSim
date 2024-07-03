@@ -23,6 +23,7 @@ class Agent
             double y;
             double theta;
         };
+        
         enum FSM {
         INIT,
         APPROACHING,

@@ -1,0 +1,17 @@
+simulation:
+  time_steps: 100
+  dt: 0.1
+  num_vehicles: 1
+  
+
+agents:
+  1:
+    name: "albert"
+    id: 1
+    
+    waypoints:
+      1: [5.0, 4.0, 0.0]
+
+vehicles:
+  1:
+    ics: [1.0, 1.0, 0.0]

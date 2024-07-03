@@ -16,10 +16,8 @@ public:
     struct SimulationWorkspace
     {
         std::vector<int> active_vehicle_ids;
-        
         std::unordered_map<int, Vehicle::VehicleWorkspace> vehicleWorkspaces;
         std::unordered_map<int, Agent::AgentWorkspace> agentWorkspaces;
-
         std::vector<Vehicle> vehicles;
     };  
 
@@ -31,6 +29,8 @@ public:
 
     // attributes
     int time_steps;
+    int sim_step;
+    double sim_time;
     double dt;
     std::ofstream file;
 

@@ -10,29 +10,19 @@
 #include <vector>
 #include <queue>
 
+#include <yaml-cpp/yaml.h>
+
 #include "simulation.h"  
 #include "Vehicle.h"
 
 
 // constructor
-Simulation::Simulation(std::string sim_name, 
-                       int time_steps, 
-                       double dt, 
-                       int num_vehicles,
-                       std::vector<std::vector<double>> ics)
-    : time_steps(time_steps), dt(dt)
+Simulation::Simulation(std::string sim_name)
 {
-    std::string filename = "logs/SIMULATION_" + sim_name + ".csv";
-    file.open(filename); // Open the file using the member variable
-
-    // spawn vehicles at given ics
-    std::cout << "Simulation Constructor: spawning " << num_vehicles << " vehicles" << std::endl;
-    for(int i = 0; i < num_vehicles; i++)
-    {
-        Vehicle vehicle(i, ics[0]);
-        vehicles.emplace_back(vehicle);
-    }
+    std::string sim_name = "logs/SIMULATION_" + sim_name + ".csv";
+    file.open(sim_name); // Open the file using the member variable
 }
+
 // destructor
 Simulation::~Simulation()
 {
@@ -40,12 +30,68 @@ Simulation::~Simulation()
     if (file.is_open()){file.close();}
 }
 
+Simulation::SimulationWorkspace Simulation::initialize(const Simulation::SimulationWorkspace &ws)
+{
+    // read in config 
+    try 
+    {
+        YAML::Node config = YAML::LoadFile("config.yaml");
+        std::cout << "Loaded in config..." << std::endl;
+
+    }
+    catch (const YAML::Exception& e) 
+    {
+        std::cerr << "Error reading YAML file: " << e.what() << std::endl;
+    }
+
+    // initialize sim workspace
+    Simulation::SimulationWorkspace wsOut;
+
+    // initialize sim environment
+    sim_step = 0;
+    sim_time = 0.0;
+    dt = config["simulation"]["dt"];
+    int num_vehicles = config["simulation"]["num_vehicles"];
+
+    // spawn vehicles at given ics
+    std::cout << "Simulation Constructor: spawning " << num_vehicles << " vehicles" << std::endl;
+    for(int i = 0; i < num_vehicles; i++)
+    {
+        std::vector<double> ic = {config["vehicles"]["ics"].as<std::vector<double>>};
+        
+        // Instantiate vehicles and conditions
+        Vehicle::VehicleWorkspace vehicleWs;
+        vehicleWs.state.x = ic[0];
+        vehicleWs.state.y = ic[1];
+        vehicleWs.state.theta = ic[2];
+
+        wsOut.vehicleWorkspaces.insert({i, vehicleWs});
+
+        // Instantiate agents and conditions
+        Agent::AgentWorkspace agentWs;
+        agentWs.observationSpace.ownState.x = ic[0];
+        agentWs.observationSpace.ownState.y = ic[1];
+        agentWs.observationSpace.ownState.theta = ic[2];
+        
+
+        Agent::State firstWp;
+        firstWp.x = config["agents"]["waypoints"][1][0]; //TODO get rid of this ugly ass hardcode
+        firstWp.y = config["agents"]["waypoints"][1][1];
+        firstWp.theta = config["agents"]["waypoints"][1][2];
+        agentWs.waypointPlan.insert({1, firstWp});
+
+        wsOut.agentWorkspaces.insert{i, agentWs};
+    }
+
+    return wsOut;
+}
+
 Simulation::SimulationWorkspace Simulation::step(const Simulation::SimulationWorkspace &ws)
 {
     Simulation::SimulationWorkspace wsOut{ws};
 
     // get agent commands
-    
+
     // propogate vehicle dynamics
 
     // safety checks
@@ -68,17 +114,13 @@ void Simulation::log_states()
     }
 }
 
-Simulation::SimulationWorkspace Simulation::initialize(const Simulation::SimulationWorkspace &ws){
-        Simulation::SimulationWorkspace wsOut{ws};
-    return wsOut;
-}
-
 Simulation::SimulationWorkspace Simulation::compute_states(const Simulation::SimulationWorkspace &ws){
     Simulation::SimulationWorkspace wsOut{ws};
     std::cout << "Inside compute_states()" << std::endl;
 
     return wsOut;
 }
+
 Simulation::SimulationWorkspace Simulation::set_vehicle_actions(const Simulation::SimulationWorkspace &ws){
     Simulation::SimulationWorkspace wsOut{ws};
     return wsOut;

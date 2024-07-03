@@ -36,7 +36,6 @@ public:
     struct VehicleWorkspace
     {
         Geometry geometry;
-
         Commands cmds;
         State state;
         
