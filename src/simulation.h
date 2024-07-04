@@ -36,7 +36,7 @@ public:
     // methods
     void spawn_vehicle(int id_, const std::vector<double>& ics);
     
-    SimulationWorkspace step(const Simulation::SimulationWorkspace &ws);
+    SimulationWorkspace stepSim(const Simulation::SimulationWorkspace &ws);
     
 
     std::vector<Vehicle> vehicles;

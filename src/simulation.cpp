@@ -65,7 +65,7 @@ Simulation::SimulationWorkspace Simulation::initialize(std::string configPath)
         vehicleWs.state.x = ic[0];
         vehicleWs.state.y = ic[1];
         vehicleWs.state.theta = ic[2];
-
+        // construct workspace
         wsOut.vehicleWorkspaces.insert({i, vehicleWs});
 
         // Instantiate agents and conditions
@@ -73,7 +73,7 @@ Simulation::SimulationWorkspace Simulation::initialize(std::string configPath)
         agentWs.observationSpace.ownState.x = ic[0];
         agentWs.observationSpace.ownState.y = ic[1];
         agentWs.observationSpace.ownState.theta = ic[2];
-        
+        agentWs.fsm = Agent::INIT;
 
         Agent::State firstWp;
         firstWp.x = config["agents"]["waypoints"][1][0].as<double>(); //TODO get rid of this ugly ass hardcode
@@ -87,11 +87,22 @@ Simulation::SimulationWorkspace Simulation::initialize(std::string configPath)
     return wsOut;
 }
 
-Simulation::SimulationWorkspace Simulation::step(const Simulation::SimulationWorkspace &ws)
+Simulation::SimulationWorkspace Simulation::stepSim(const Simulation::SimulationWorkspace &ws)
 {
     Simulation::SimulationWorkspace wsOut{ws};
 
-    // get agent commands
+    // step agents
+    std::unordered_map<int, Agent::AgentWorkspace> agentWorkspaces_{ws.agentWorkspaces};
+
+    for (auto it = agentWorkspaces_.begin(); it != agentWorkspaces_.end(); ++it)
+    {
+        // get current workspace
+        Agent agent;
+        
+        Agent::AgentWorkspace ws_{it->second};
+        // replace with newly stepped workspace 
+        wsOut.agentWorkspaces[it->first] = agent.stepAgent(ws_);
+    }
 
     // propogate vehicle dynamics
 
