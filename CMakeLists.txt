@@ -18,9 +18,8 @@ include_directories("libs/")
 link_directories("/opt/homebrew/Cellar/yaml-cpp/0.8.0/lib")
 
 # Set the build type if not specified
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Debug)
-endif()
+set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
 
 # Define the output directories for different build types
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/Debug)

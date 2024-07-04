@@ -43,7 +43,6 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 # cd ../..
-ls * 
 # Move the executable to the outputs directory
 mkdir -p outputs
 mv Debug/runMe ../../outputs/$EXECUTABLE

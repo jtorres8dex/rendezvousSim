@@ -48,7 +48,7 @@ simulationWorkspacePtr Simulation::initialize(std::string configPath)
     }
 
     // initialize sim workspace
-    simulationWorkspacePtr wsOut;
+    simulationWorkspacePtr wsOut{std::make_shared<Simulation::SimulationWorkspace>()};
     
     // initialize sim environment
     sim_step = 0;
@@ -70,7 +70,8 @@ simulationWorkspacePtr Simulation::initialize(std::string configPath)
         vehicleWs.state.theta = ic[2];
         
         // construct workspace
-        wsOut->vehicleWorkspaces.insert({i, vehicleWs});
+        wsOut->vehicleWorkspaces[i] = vehicleWs;
+        // wsOut->vehicleWorkspaces.insert({i, vehicleWs});
         std::cout << "HERE" << std::endl;
         
         // Instantiate agents and conditions
