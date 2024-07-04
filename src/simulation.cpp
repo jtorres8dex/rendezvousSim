@@ -54,6 +54,7 @@ simulationWorkspacePtr Simulation::initialize(std::string configPath)
     sim_step = 0;
     sim_time = 0.0;
     dt = config["simulation"]["dt"].as<double>();
+    std::cout << dt << std::endl;
     int num_vehicles = config["simulation"]["num_vehicles"].as<int>();
 
     // spawn vehicles at given ics
@@ -67,9 +68,11 @@ simulationWorkspacePtr Simulation::initialize(std::string configPath)
         vehicleWs.state.x = ic[0];
         vehicleWs.state.y = ic[1];
         vehicleWs.state.theta = ic[2];
+        
         // construct workspace
         wsOut->vehicleWorkspaces.insert({i, vehicleWs});
-
+        std::cout << "HERE" << std::endl;
+        
         // Instantiate agents and conditions
         Agent::AgentWorkspace agentWs;
         agentWs.observationSpace.ownState.x = ic[0];
@@ -153,3 +156,18 @@ std::string Simulation::logCurrentTimeWithChrono()
 
         return std::string(buffer);
     }
+
+
+
+int main()
+{
+
+std::cout << "starting up firstRun..." << std::endl;
+
+Simulation sim("TEST");
+
+simulationWorkspacePtr simPtr = sim.initialize("config.yaml");
+
+
+return 0;
+}

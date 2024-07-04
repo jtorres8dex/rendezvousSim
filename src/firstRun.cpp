@@ -1,25 +1,25 @@
-#include <iostream>
-#include <fstream>
-#include <chrono>
-#include <iomanip>
-#include <ctime>
-#include <sstream> 
+// #include <iostream>
+// #include <fstream>
+// #include <chrono>
+// #include <iomanip>
+// #include <ctime>
+// #include <sstream> 
 
-#include <unordered_map>
-#include <vector>
-#include <queue>
+// #include <unordered_map>
+// #include <vector>
+// #include <queue>
 
-#include "simulation.h"  
-#include "Vehicle.h"
-
-
+// #include "simulation.h"  
+// #include "Vehicle.h"
 
 
-int main()
-{
-    std::cout << "starting up firstRun..." << std::endl;
-    // Simulation sim("TEST");
-    // Simulation::SimulationWorkspace ws = sim.initialize("config.yaml");
+
+
+// int main()
+// {
+//     std::cout << "starting up firstRun..." << std::endl;
+//     // Simulation sim("TEST");
+//     // Simulation::SimulationWorkspace ws = sim.initialize("config.yaml");
 
 
     
@@ -27,10 +27,10 @@ int main()
 
 
 
-    // for (int i=0; i<time_steps; i++)
-    // {
-    //     std::cout << "inside main " <<  std::endl;
-    //     sim.step();
-    // }
-    return 0;
-}
+//     // for (int i=0; i<time_steps; i++)
+//     // {
+//     //     std::cout << "inside main " <<  std::endl;
+//     //     sim.step();
+//     // }
+//     return 0;
+// }

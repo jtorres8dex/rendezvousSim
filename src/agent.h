@@ -10,10 +10,14 @@
 
 #include <iostream>
 #include <cmath> 
+
 static const double waypointRadius = 0.05;
+
+
 
 class Agent
 {
+
     public:
 
 
@@ -54,17 +58,18 @@ class Agent
             FSM fsm;
             std::map<int, Agent::State > waypointPlan;
         };
-
+        
         typedef std::shared_ptr<AgentWorkspace> AgentWorkspacePtr;
 
+        AgentWorkspacePtr stepAgent(const AgentWorkspacePtr &ws);
+
+    private:
+        
         AgentWorkspacePtr setFSM(const AgentWorkspacePtr &ws);
 
         AgentWorkspacePtr controller(const AgentWorkspacePtr &ws);
 
         AgentWorkspacePtr pathPlanner(const AgentWorkspacePtr &ws);
-
-        AgentWorkspacePtr stepAgent(const AgentWorkspacePtr &ws);
-
         
 };
 

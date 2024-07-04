@@ -11,6 +11,7 @@
 
 class Vehicle
 {
+
 public:
 
     int id;
@@ -51,11 +52,8 @@ public:
 
     vehicleWorkspacePtr update_state(const vehicleWorkspacePtr &ws);
     vehicleWorkspacePtr stop(const Vehicle::VehicleWorkspace &ws);
-    vehicleWorkspacePtr set_next_waypoint(const Vehicle::VehicleWorkspace &ws);
-    VehicleWorkspace get_next_waypoint(const Vehicle::VehicleWorkspace &ws);
-
     
-private:
+
 };
 
 #endif 

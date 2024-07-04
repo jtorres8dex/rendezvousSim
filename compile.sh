@@ -10,35 +10,43 @@ CYAN='\033[0;36m'
 WHITE='\033[0;37m'
 NC='\033[0m' # No Color
 
+# Define the build type (Debug/Release)
+BUILD_TYPE=$1
+if [ -z "$BUILD_TYPE" ]; then
+  BUILD_TYPE="Debug"
+fi
+
 # Define the output executable name
 EXECUTABLE="TEST_EXECUTABLE"
 
 # Clean up previous compilation artifacts
 echo -e "${BLUE}Cleaning up old compilation artifacts...${NC}"
-rm -f build/*.o outputs/$EXECUTABLE
-echo -e "${BLUE}Cleanup done."
+rm -f build/$BUILD_TYPE/*.o build/$BUILD_TYPE/$EXECUTABLE
+echo -e "${BLUE}Cleanup done.${NC}"
 echo
 
 # Create build directory if it doesn't exist
-mkdir -p build
+mkdir -p build/$BUILD_TYPE
 
-# Compile component files
-echo -e "${BLUE}Compiling component files...${NC}"
-echo 
-g++ -w -std=c++14 -I/opt/homebrew/Cellar/yaml-cpp/0.8.0/include -c src/Vehicle.cpp -o build/vehicle.o
-g++ -w -std=c++14 -I/opt/homebrew/Cellar/yaml-cpp/0.8.0/include -c src/kinematics.cpp -o build/kinematics.o
-g++ -w -std=c++14 -I/opt/homebrew/Cellar/yaml-cpp/0.8.0/include -c src/simulation.cpp -o build/simulation.o
-g++ -w -std=c++14 -I/opt/homebrew/Cellar/yaml-cpp/0.8.0/include -c src/firstRun.cpp -o build/firstRun.o
+# Navigate to the build directory
+cd build/$BUILD_TYPE
+
+# Run CMake and make
+echo -e "${BLUE}Running CMake...${NC}"
+cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE ../..
+echo -e "${BLUE}Building the project...${NC}"
+make
 
 # Check if the compilation was successful
 if [ $? -ne 0 ]; then
-    echo -e "${RED}Compilation of components failed. Exiting.${NC}"
+    echo -e "${RED}Compilation failed. Exiting.${NC}"
     exit 1
 fi
-
-# Compile and link the executable
-echo -e "${BLUE}Compiling simulation.cpp and linking...${NC}"
-g++ build/vehicle.o build/kinematics.o build/simulation.o build/firstRun.o -L/opt/homebrew/Cellar/yaml-cpp/0.8.0/lib -o outputs/$EXECUTABLE -lyaml-cpp
+# cd ../..
+ls * 
+# Move the executable to the outputs directory
+mkdir -p outputs
+mv Debug/runMe ../../outputs/$EXECUTABLE
 
 # If compilation succeeds, print a success message
 if [ $? -eq 0 ]; then
@@ -46,3 +54,6 @@ if [ $? -eq 0 ]; then
 else
     echo -e "${RED}Compilation failed.${NC}"
 fi
+
+# Navigate back to the root directory
+cd ../..
