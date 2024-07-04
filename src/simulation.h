@@ -8,6 +8,8 @@
 #include "Vehicle.h"
 #include "Agent.h"
 
+typedef std::shared_ptr<Agent::AgentWorkspace> agentWorkspacePtr;
+typedef std::shared_ptr<Vehicle::VehicleWorkspace> vehicleWorkspacePtr;
 
 class Simulation
 {
@@ -16,8 +18,8 @@ public:
     struct SimulationWorkspace
     {
         std::vector<int> active_vehicle_ids;
-        std::unordered_map<int, Vehicle::VehicleWorkspace> vehicleWorkspaces;
-        std::unordered_map<int, Agent::AgentWorkspace> agentWorkspaces;
+        std::unordered_map<int, vehicleWorkspacePtr> vehicleWorkspaces;
+        std::unordered_map<int, agentWorkspacePtr> agentWorkspaces;
         std::vector<Vehicle> vehicles;
     };  
 
@@ -37,10 +39,10 @@ public:
     typedef std::shared_ptr<SimulationWorkspace> simulationWorkspacePtr;
 
     simulationWorkspacePtr initialize(std::string configPath);
-    SimulationWorkspace compute_states(const Simulation::SimulationWorkspace &ws);
-    SimulationWorkspace set_vehicle_actions(const Simulation::SimulationWorkspace &ws);
+    simulationWorkspacePtr compute_states(const simulationWorkspacePtr &ws);
+    simulationWorkspacePtr set_vehicle_actions(const simulationWorkspacePtr &ws);
     
-    SimulationWorkspace stepSim(const Simulation::SimulationWorkspace &ws);
+    simulationWorkspacePtr stepSim(const simulationWorkspacePtr &ws);
     
     
     // helper functions

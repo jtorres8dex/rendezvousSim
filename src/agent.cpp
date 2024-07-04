@@ -10,7 +10,6 @@
 #include "agent.h"
 
 static const double TWO_PI = M_PI * 2;
-static const double dt = 0.1;
 
 typedef std::shared_ptr<Agent::AgentWorkspace> AgentWorkspacePtr;
 
@@ -77,7 +76,6 @@ AgentWorkspacePtr Agent::controller(const AgentWorkspacePtr &ws)
 AgentWorkspacePtr Agent::pathPlanner(const AgentWorkspacePtr &ws)
 {
     AgentWorkspacePtr wsOut{ws};
-    AgentWorkspacePtr goalState;
     
     if (APPROACHING == ws->fsm)
     {
@@ -90,5 +88,8 @@ AgentWorkspacePtr Agent::pathPlanner(const AgentWorkspacePtr &ws)
 
 AgentWorkspacePtr Agent::stepAgent(const AgentWorkspacePtr &ws)
 {
-    return controller(pathPlanner(setFSM(ws)));
+    // auto wsOut = std::make_shared<Agent::AgentWorkspace>(*ws);
+    AgentWorkspacePtr wsOut{ws};
+
+    return controller(pathPlanner(setFSM(wsOut)));
 }

@@ -13,9 +13,11 @@
 #include <yaml-cpp/yaml.h>
 
 #include "simulation.h"  
+#include "agent.h"
 #include "vehicle.h"
 
 typedef std::shared_ptr<Simulation::SimulationWorkspace> simulationWorkspacePtr;
+typedef std::shared_ptr<Agent::AgentWorkspace> agentWorkspacePtr;
 
 
 // constructor
@@ -64,10 +66,10 @@ simulationWorkspacePtr Simulation::initialize(std::string configPath)
         std::vector<double> ic = {config["vehicles"]["ics"].as<std::vector<double>>()};
         
         // Instantiate vehicles and conditions
-        Vehicle::VehicleWorkspace vehicleWs;
-        vehicleWs.state.x = ic[0];
-        vehicleWs.state.y = ic[1];
-        vehicleWs.state.theta = ic[2];
+        vehicleWorkspacePtr vehicleWs = std::make_shared<Vehicle::VehicleWorkspace>();;
+        vehicleWs->state.x = ic[0];
+        vehicleWs->state.y = ic[1];
+        vehicleWs->state.theta = ic[2];
         
         // construct workspace
         wsOut->vehicleWorkspaces[i] = vehicleWs;
@@ -75,17 +77,17 @@ simulationWorkspacePtr Simulation::initialize(std::string configPath)
         std::cout << "HERE" << std::endl;
         
         // Instantiate agents and conditions
-        Agent::AgentWorkspace agentWs;
-        agentWs.observationSpace.ownState.x = ic[0];
-        agentWs.observationSpace.ownState.y = ic[1];
-        agentWs.observationSpace.ownState.theta = ic[2];
-        agentWs.fsm = Agent::INIT;
+        agentWorkspacePtr agentWs = std::make_shared<Agent::AgentWorkspace>();;;
+        agentWs->observationSpace.ownState.x = ic[0];
+        agentWs->observationSpace.ownState.y = ic[1];
+        agentWs->observationSpace.ownState.theta = ic[2];
+        agentWs->fsm = Agent::INIT;
 
         Agent::State firstWp;
         firstWp.x = config["agents"]["waypoints"][1][0].as<double>(); //TODO get rid of this ugly ass hardcode
         firstWp.y = config["agents"]["waypoints"][1][1].as<double>();
         firstWp.theta = config["agents"]["waypoints"][1][2].as<double>();
-        agentWs.waypointPlan.insert({1, firstWp});
+        agentWs->waypointPlan.insert({1, firstWp});
 
         wsOut->agentWorkspaces.insert({i, agentWs});
     }
@@ -93,21 +95,23 @@ simulationWorkspacePtr Simulation::initialize(std::string configPath)
     return wsOut;
 }
 
-Simulation::SimulationWorkspace Simulation::stepSim(const Simulation::SimulationWorkspace &ws)
+simulationWorkspacePtr Simulation::stepSim(const simulationWorkspacePtr &ws)
 {
-    Simulation::SimulationWorkspace wsOut{ws};
+    simulationWorkspacePtr wsOut{ws};
 
     // step agents
-    std::unordered_map<int, Agent::AgentWorkspace> agentWorkspaces_{ws.agentWorkspaces};
+    std::unordered_map<int, agentWorkspacePtr> agentWorkspaces_{ws->agentWorkspaces};
 
     for (auto it = agentWorkspaces_.begin(); it != agentWorkspaces_.end(); ++it)
     {
         // get current workspace
-        Agent agent;
+
+        agentWorkspacePtr ws_{it->second};
         
-        Agent::AgentWorkspace ws_{it->second};
         // replace with newly stepped workspace 
-        // wsOut.agentWorkspaces[it->first] = agent.stepAgent(ws_);
+        
+        Agent* agent = new Agent();
+        wsOut->agentWorkspaces[it->first] = agent->stepAgent(ws_);
     }
 
     // propogate vehicle dynamics
@@ -132,15 +136,15 @@ void Simulation::log_states()
     }
 }
 
-Simulation::SimulationWorkspace Simulation::compute_states(const Simulation::SimulationWorkspace &ws){
-    Simulation::SimulationWorkspace wsOut{ws};
+simulationWorkspacePtr Simulation::compute_states(const simulationWorkspacePtr &ws){
+    simulationWorkspacePtr wsOut{ws};
     std::cout << "Inside compute_states()" << std::endl;
 
     return wsOut;
 }
 
-Simulation::SimulationWorkspace Simulation::set_vehicle_actions(const Simulation::SimulationWorkspace &ws){
-    Simulation::SimulationWorkspace wsOut{ws};
+simulationWorkspacePtr Simulation::set_vehicle_actions(const simulationWorkspacePtr &ws){
+    simulationWorkspacePtr wsOut{ws};
     return wsOut;
 }
 
@@ -168,6 +172,8 @@ std::cout << "starting up firstRun..." << std::endl;
 Simulation sim("TEST");
 
 simulationWorkspacePtr simPtr = sim.initialize("config.yaml");
+
+simPtr = sim.stepSim(simPtr);
 
 
 return 0;

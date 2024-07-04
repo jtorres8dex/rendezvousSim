@@ -10,6 +10,8 @@ CYAN='\033[0;36m'
 WHITE='\033[0;37m'
 NC='\033[0m' # No Color
 
+clear
+
 # Define the build type (Debug/Release)
 BUILD_TYPE=$1
 if [ -z "$BUILD_TYPE" ]; then
@@ -35,7 +37,8 @@ cd build/$BUILD_TYPE
 echo -e "${BLUE}Running CMake...${NC}"
 cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE ../..
 echo -e "${BLUE}Building the project...${NC}"
-make
+make # VERBOSE=1
+
 
 # Check if the compilation was successful
 if [ $? -ne 0 ]; then
