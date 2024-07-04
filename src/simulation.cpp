@@ -101,7 +101,7 @@ Simulation::SimulationWorkspace Simulation::stepSim(const Simulation::Simulation
         
         Agent::AgentWorkspace ws_{it->second};
         // replace with newly stepped workspace 
-        wsOut.agentWorkspaces[it->first] = agent.stepAgent(ws_);
+        // wsOut.agentWorkspaces[it->first] = agent.stepAgent(ws_);
     }
 
     // propogate vehicle dynamics

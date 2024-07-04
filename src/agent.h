@@ -55,13 +55,15 @@ class Agent
             std::map<int, Agent::State > waypointPlan;
         };
 
-        static AgentWorkspace setFSM(const AgentWorkspace &ws);
+        typedef std::shared_ptr<AgentWorkspace> AgentWorkspacePtr;
 
-        static AgentWorkspace controller(const AgentWorkspace &ws);
+        static AgentWorkspacePtr setFSM(const AgentWorkspacePtr &ws);
 
-        static AgentWorkspace pathPlanner(const AgentWorkspace &ws);
+        static AgentWorkspacePtr controller(const AgentWorkspacePtr &ws);
 
-        static AgentWorkspace stepAgent(const AgentWorkspace &ws);
+        static AgentWorkspacePtr pathPlanner(const AgentWorkspacePtr &ws);
+
+        static AgentWorkspacePtr stepAgent(const AgentWorkspacePtr &ws);
 
         
 };
