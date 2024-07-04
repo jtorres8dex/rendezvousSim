@@ -46,11 +46,12 @@ public:
     Vehicle(int id, std::vector<double> ics);
     // destructor
     ~Vehicle();
-    // methods 
-    VehicleWorkspace update_state(const Vehicle::VehicleWorkspace &ws);
-    VehicleWorkspace stop(const Vehicle::VehicleWorkspace &ws);
-    //path planner #TODO 
-    VehicleWorkspace set_next_waypoint(const Vehicle::VehicleWorkspace &ws);
+
+    typedef std::shared_ptr<VehicleWorkspace> vehicleWorkspacePtr;
+
+    vehicleWorkspacePtr update_state(const vehicleWorkspacePtr &ws);
+    vehicleWorkspacePtr stop(const Vehicle::VehicleWorkspace &ws);
+    vehicleWorkspacePtr set_next_waypoint(const Vehicle::VehicleWorkspace &ws);
     VehicleWorkspace get_next_waypoint(const Vehicle::VehicleWorkspace &ws);
 
     
