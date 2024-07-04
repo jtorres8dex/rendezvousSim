@@ -1,5 +1,4 @@
 # rendezvousSim
 
 ## Todo:
-- make use of private acessors to enforce levels of simulation->vehicle->agent
-- dynamic memory management for speedup
+- Iteratively make this less crappy and learn C++ along the way
