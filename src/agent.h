@@ -57,13 +57,13 @@ class Agent
 
         typedef std::shared_ptr<AgentWorkspace> AgentWorkspacePtr;
 
-        static AgentWorkspacePtr setFSM(const AgentWorkspacePtr &ws);
+        AgentWorkspacePtr setFSM(const AgentWorkspacePtr &ws);
 
-        static AgentWorkspacePtr controller(const AgentWorkspacePtr &ws);
+        AgentWorkspacePtr controller(const AgentWorkspacePtr &ws);
 
-        static AgentWorkspacePtr pathPlanner(const AgentWorkspacePtr &ws);
+        AgentWorkspacePtr pathPlanner(const AgentWorkspacePtr &ws);
 
-        static AgentWorkspacePtr stepAgent(const AgentWorkspacePtr &ws);
+        AgentWorkspacePtr stepAgent(const AgentWorkspacePtr &ws);
 
         
 };

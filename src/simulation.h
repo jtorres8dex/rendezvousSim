@@ -26,24 +26,22 @@ public:
     // Destructor
     ~Simulation();
 
-    // attributes
     int time_steps;
     int sim_step;
     double sim_time;
     double dt;
     std::ofstream file;
 
-    // methods
-    void spawn_vehicle(int id_, const std::vector<double>& ics);
+    std::vector<Vehicle> vehicles;
+
+    typedef std::shared_ptr<SimulationWorkspace> simulationWorkspacePtr;
+
+    simulationWorkspacePtr initialize(std::string configPath);
+    SimulationWorkspace compute_states(const Simulation::SimulationWorkspace &ws);
+    SimulationWorkspace set_vehicle_actions(const Simulation::SimulationWorkspace &ws);
     
     SimulationWorkspace stepSim(const Simulation::SimulationWorkspace &ws);
     
-
-    std::vector<Vehicle> vehicles;
-
-    Simulation::SimulationWorkspace initialize(std::string configPath);
-    SimulationWorkspace compute_states(const Simulation::SimulationWorkspace &ws);
-    SimulationWorkspace set_vehicle_actions(const Simulation::SimulationWorkspace &ws);
     
     // helper functions
     std::string logCurrentTimeWithChrono();

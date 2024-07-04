@@ -18,8 +18,8 @@
 int main()
 {
     std::cout << "starting up firstRun..." << std::endl;
-    Simulation sim("TEST");
-    Simulation::SimulationWorkspace ws = sim.initialize("config.yaml");
+    // Simulation sim("TEST");
+    // Simulation::SimulationWorkspace ws = sim.initialize("config.yaml");
 
 
     

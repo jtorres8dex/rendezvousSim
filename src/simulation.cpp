@@ -15,6 +15,8 @@
 #include "simulation.h"  
 #include "vehicle.h"
 
+typedef std::shared_ptr<Simulation::SimulationWorkspace> simulationWorkspacePtr;
+
 
 // constructor
 Simulation::Simulation(std::string sim_name_)
@@ -30,7 +32,7 @@ Simulation::~Simulation()
     if (file.is_open()){file.close();}
 }
 
-Simulation::SimulationWorkspace Simulation::initialize(std::string configPath)
+simulationWorkspacePtr Simulation::initialize(std::string configPath)
 {
     // read in config 
     YAML::Node config;
@@ -46,7 +48,7 @@ Simulation::SimulationWorkspace Simulation::initialize(std::string configPath)
     }
 
     // initialize sim workspace
-    Simulation::SimulationWorkspace wsOut;
+    simulationWorkspacePtr wsOut;
     
     // initialize sim environment
     sim_step = 0;
@@ -66,7 +68,7 @@ Simulation::SimulationWorkspace Simulation::initialize(std::string configPath)
         vehicleWs.state.y = ic[1];
         vehicleWs.state.theta = ic[2];
         // construct workspace
-        wsOut.vehicleWorkspaces.insert({i, vehicleWs});
+        wsOut->vehicleWorkspaces.insert({i, vehicleWs});
 
         // Instantiate agents and conditions
         Agent::AgentWorkspace agentWs;
@@ -81,7 +83,7 @@ Simulation::SimulationWorkspace Simulation::initialize(std::string configPath)
         firstWp.theta = config["agents"]["waypoints"][1][2].as<double>();
         agentWs.waypointPlan.insert({1, firstWp});
 
-        wsOut.agentWorkspaces.insert({i, agentWs});
+        wsOut->agentWorkspaces.insert({i, agentWs});
     }
 
     return wsOut;
