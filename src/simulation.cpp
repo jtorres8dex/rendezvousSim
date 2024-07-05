@@ -151,7 +151,7 @@ void log_states(const simulationWorkspacePtr &ws)
         // file << time << ",";
         // file << vehicle.id << ",";
         if (logFile.is_open()) {
-            logFile << state.x << " " << state.y << " " << state.theta << "\n";
+            logFile << state.x << "," << state.y << "," << state.theta << "\n";
         } 
         else 
         {

@@ -4,7 +4,7 @@ float robotSize = 20; // Size of the robot for visualization
 
 void setup() {
   size(600, 600); // Set the size of the window
-  table = loadTable("../SIMULATION_hardCodeTest.csv", "header"); // Load the CSV file
+  table = loadTable("../SIMULATION_TEST.csv", "header"); // Load the CSV file
 }
 
 void draw() {
