@@ -2,11 +2,24 @@
 #define SIMULATION_H
 
 #include <iostream>
+#include <fstream>
+#include <chrono>
+#include <iomanip>
+#include <ctime>
+#include <sstream> 
+#include <memory>
+
 #include <unordered_map>
 #include <vector>
+#include <tuple>
+#include <queue>
 
-#include "Vehicle.h"
-#include "Agent.h"
+#include <yaml-cpp/yaml.h>
+
+#include "simulation.h"  
+#include "agent.h"
+#include "vehicle.h"
+
 
 typedef std::shared_ptr<Agent::AgentWorkspace> agentWorkspacePtr;
 typedef std::shared_ptr<Vehicle::VehicleWorkspace> vehicleWorkspacePtr;
@@ -43,7 +56,6 @@ public:
     simulationWorkspacePtr set_vehicle_actions(const simulationWorkspacePtr &ws);
     
     simulationWorkspacePtr stepSim(const simulationWorkspacePtr &ws);
-    
     
     // helper functions
     std::string logCurrentTimeWithChrono();

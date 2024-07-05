@@ -50,7 +50,8 @@ public:
 
     typedef std::shared_ptr<VehicleWorkspace> vehicleWorkspacePtr;
 
-    vehicleWorkspacePtr update_state(const vehicleWorkspacePtr &ws);
+    static vehicleWorkspacePtr stepVehicle(const vehicleWorkspacePtr &ws, const std::tuple<float, float> &cmds);
+
     vehicleWorkspacePtr stop(const Vehicle::VehicleWorkspace &ws);
     
 

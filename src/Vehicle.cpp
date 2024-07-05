@@ -1,6 +1,8 @@
-#include "Vehicle.h"
 #include <iostream>
 #include <cmath>
+#include <tuple>
+
+#include "Vehicle.h"
 
 static const double TWO_PI = M_PI * 2;
 static const double dt = 0.1;
@@ -22,25 +24,16 @@ Vehicle::~Vehicle(){
     std::cout << "Destroying Vehicle object" << std::endl;
 }
 
-
-
-// vehicleWorkspacePtr Vehicle::stop(const vehicleWorkspacePtr &ws) {
-//     vehicleWorkspacePtr wsOut{ws};
-//     wsOut.cmds.v = 0.0;
-//     wsOut.cmds.w = 0.0;
-//     std::cout << "stop" << std::endl;
-
-//     return wsOut;
-    
-// }
-
-vehicleWorkspacePtr Vehicle::update_state(const vehicleWorkspacePtr &ws){
+vehicleWorkspacePtr Vehicle::stepVehicle(const vehicleWorkspacePtr &ws, const std::tuple<float, float> &cmd){
 
         vehicleWorkspacePtr wsOut{ws};
 
-        float delta_x = wsOut->cmds.v * cos(wsOut->state.theta) * dt;
-        float delta_y = wsOut->cmds.v * sin(wsOut->state.theta) * dt;
-        float delta_theta = wsOut->cmds.w * dt;
+        float v = std::get<0>(cmd);
+        float w = std::get<1>(cmd);
+
+        float delta_x = v * cos(wsOut->state.theta) * dt;
+        float delta_y = v * sin(wsOut->state.theta) * dt;
+        float delta_theta = w * dt;
 
         // Update the state
         wsOut->state.x += delta_x;

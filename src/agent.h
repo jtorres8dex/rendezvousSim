@@ -61,7 +61,7 @@ class Agent
         
         typedef std::shared_ptr<AgentWorkspace> AgentWorkspacePtr;
 
-        AgentWorkspacePtr stepAgent(const AgentWorkspacePtr &ws);
+        static AgentWorkspacePtr stepAgent(const AgentWorkspacePtr &ws);
 
     private:
         

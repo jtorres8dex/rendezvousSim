@@ -8,6 +8,7 @@
 
 #include <unordered_map>
 #include <vector>
+#include <tuple>
 #include <queue>
 
 #include <yaml-cpp/yaml.h>
@@ -41,7 +42,7 @@ simulationWorkspacePtr Simulation::initialize(std::string configPath)
     try 
     {
         config = YAML::LoadFile(configPath);
-        std::cout << "Loaded configuration:\n" << YAML::Dump(config) << std::endl;
+        std::cout << "Loaded configuration:\n" << YAML::Dump(config) << "\n" <<std::endl;
         std::cout << " " << std::endl;
     }
     catch (const YAML::Exception& e) 
@@ -56,7 +57,6 @@ simulationWorkspacePtr Simulation::initialize(std::string configPath)
     sim_step = 0;
     sim_time = 0.0;
     dt = config["simulation"]["dt"].as<double>();
-    std::cout << dt << std::endl;
     int num_vehicles = config["simulation"]["num_vehicles"].as<int>();
 
     // spawn vehicles at given ics
@@ -73,11 +73,9 @@ simulationWorkspacePtr Simulation::initialize(std::string configPath)
         
         // construct workspace
         wsOut->vehicleWorkspaces[i] = vehicleWs;
-        // wsOut->vehicleWorkspaces.insert({i, vehicleWs});
-        std::cout << "HERE" << std::endl;
         
         // Instantiate agents and conditions
-        agentWorkspacePtr agentWs = std::make_shared<Agent::AgentWorkspace>();;;
+        agentWorkspacePtr agentWs = std::make_shared<Agent::AgentWorkspace>();
         agentWs->observationSpace.ownState.x = ic[0];
         agentWs->observationSpace.ownState.y = ic[1];
         agentWs->observationSpace.ownState.theta = ic[2];
@@ -98,25 +96,39 @@ simulationWorkspacePtr Simulation::initialize(std::string configPath)
 simulationWorkspacePtr Simulation::stepSim(const simulationWorkspacePtr &ws)
 {
     simulationWorkspacePtr wsOut{ws};
+    std::vector<std::tuple<float, float>> vehicleCmds;
 
     // step agents
     std::unordered_map<int, agentWorkspacePtr> agentWorkspaces_{ws->agentWorkspaces};
 
     for (auto it = agentWorkspaces_.begin(); it != agentWorkspaces_.end(); ++it)
     {
-        // get current workspace
-
-        agentWorkspacePtr ws_{it->second};
+        // get current agent workspace
+        agentWorkspacePtr agentWs_{it->second};
         
         // replace with newly stepped workspace 
-        
-        Agent* agent = new Agent();
-        wsOut->agentWorkspaces[it->first] = agent->stepAgent(ws_);
+        wsOut->agentWorkspaces[it->first] = Agent::stepAgent(agentWs_);
+
+        // update simulation action space
+        vehicleCmds.push_back(std::make_tuple(agentWs_->actionSpace.v, agentWs_->actionSpace.w));
     }
 
-    // propogate vehicle dynamics
+    // propogate vehicle dynamics with agent action space
+    std::unordered_map<int, vehicleWorkspacePtr> vehicleWorkspaces_{ws->vehicleWorkspaces};
+    for (auto it = vehicleWorkspaces_.begin(); it != vehicleWorkspaces_.end(); ++it)
+    {
+        // get current vehicle workspace
+        vehicleWorkspacePtr vehicleWs_{it->second};
+        std::cout << "Before stepping: " << vehicleWs_->state.x << " " << vehicleWs_->state.y << " " << vehicleWs_->state.theta << std::endl;
+        
+        // step vehicle
+        std::tuple<float, float> cmd = vehicleCmds.front();
+        wsOut->vehicleWorkspaces[it->first] = Vehicle::stepVehicle(vehicleWs_, cmd);
+        vehicleCmds.erase(vehicleCmds.begin());
+    }
 
-    // safety checks
+    vehicleWorkspacePtr vehicleWs_ = wsOut->vehicleWorkspaces.begin()->second;
+    std::cout << "After stepping: " << vehicleWs_->state.x << " " << vehicleWs_->state.y << " " << vehicleWs_->state.theta << std::endl;
 
     return wsOut;
 }
@@ -173,7 +185,12 @@ Simulation sim("TEST");
 
 simulationWorkspacePtr simPtr = sim.initialize("config.yaml");
 
-simPtr = sim.stepSim(simPtr);
+
+YAML::Node config = YAML::LoadFile("config.yaml");
+for (int i = 0; i < config["simulation"]["time_steps"].as<int>(); ++i)
+{
+    simPtr = sim.stepSim(simPtr);
+}
 
 
 return 0;

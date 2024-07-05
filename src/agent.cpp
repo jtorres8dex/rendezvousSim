@@ -17,10 +17,10 @@ AgentWorkspacePtr Agent::setFSM(const AgentWorkspacePtr &ws)
 {
     AgentWorkspacePtr wsOut{ws};
     Agent::State goalState = ws->waypointPlan.begin()->second;
+    std::cout << "Goal state: " << goalState.x << " " << goalState.y << " " << goalState.theta << std::endl;
     
     // check if agent is at a waypoint
-    double distanceToGoal = pow(((ws->observationSpace.ownState.x - goalState.x) +
-                                (ws->observationSpace.ownState.y - goalState.y)), 0.5);
+    double distanceToGoal = std::sqrt(std::pow(ws->observationSpace.ownState.x - goalState.x, 2) + std::pow(ws->observationSpace.ownState.y - goalState.y, 2));
 
     if (waypointRadius >= distanceToGoal)
     {
@@ -64,7 +64,10 @@ AgentWorkspacePtr Agent::controller(const AgentWorkspacePtr &ws)
     Agent::State goalState = ws->waypointPlan.begin()->second;
     Agent::State ownState = ws->observationSpace.ownState;
 
-    double distanceToGoal = pow(((ownState.x - goalState.x) + (ownState.y - goalState.y)), 0.5);
+    double xDiff = goalState.x - ownState.x;
+    double yDiff = goalState.y - ownState.y;
+    
+    double distanceToGoal = std::sqrt(std::pow(xDiff, 2) + std::pow(yDiff, 2));
     wsOut->actionSpace.v = k * distanceToGoal;
 
     double angleToGoal = goalState.theta - ownState.theta;
@@ -82,14 +85,13 @@ AgentWorkspacePtr Agent::pathPlanner(const AgentWorkspacePtr &ws)
         wsOut->observationSpace.goalState = ws->waypointPlan.begin()->second;
     }
 
-
     return wsOut;
 }
 
 AgentWorkspacePtr Agent::stepAgent(const AgentWorkspacePtr &ws)
 {
-    // auto wsOut = std::make_shared<Agent::AgentWorkspace>(*ws);
     AgentWorkspacePtr wsOut{ws};
+    Agent agent;
 
-    return controller(pathPlanner(setFSM(wsOut)));
+    return agent.controller(agent.pathPlanner(agent.setFSM(wsOut)));
 }
