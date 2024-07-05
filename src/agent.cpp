@@ -18,7 +18,8 @@ AgentWorkspacePtr Agent::setFSM(const AgentWorkspacePtr &ws)
 {
     AgentWorkspacePtr wsOut{ws};
     Agent::State goalState = ws->waypointPlan.begin()->second;
-    int wpId = ws->waypointPlan.end()->first;
+    int wpId = ws->waypointPlan.begin()->first;
+    std::cout << wpId << std::endl; 
     std::vector<double> wpPos = {goalState.x, goalState.y};
 
     // check if agent is at a waypoint

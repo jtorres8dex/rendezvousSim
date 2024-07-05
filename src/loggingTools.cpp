@@ -29,14 +29,14 @@ namespace logger
     {
         if (logFile.is_open())
         {
-            logFile << VEHICLE_STATE << id << vState[0] << "," << vState[1] << "," << vState[2] << "\n";
+            logFile << VEHICLE_STATE << "," << id << "," << vState[0] << "," << vState[1] << "," << vState[2] << "\n";
         }
     };
     void logWaypointInfo(int id, std::vector<double> location)
     {
         if (logFile.is_open())
         {
-            logFile << WAYPOINT << id << location[0] << location [1] << "\n";
+            logFile << WAYPOINT << "," << id << "," << location[0] << "," << location [1] << "\n";
         }
     };
     void logEvent(logType type, std::vector<double> data)
