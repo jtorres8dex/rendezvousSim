@@ -51,10 +51,6 @@ public:
     typedef std::shared_ptr<VehicleWorkspace> vehicleWorkspacePtr;
 
     static vehicleWorkspacePtr stepVehicle(const vehicleWorkspacePtr &ws, const std::tuple<float, float> &cmds);
-
-    vehicleWorkspacePtr stop(const Vehicle::VehicleWorkspace &ws);
-    
-
 };
 
 #endif 

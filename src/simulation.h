@@ -59,7 +59,7 @@ public:
     
     // helper functions
     std::string logCurrentTimeWithChrono();
-    void log_states();
+    void log_states(const simulationWorkspacePtr &ws);
 };
 
 

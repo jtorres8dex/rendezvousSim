@@ -20,12 +20,13 @@
 typedef std::shared_ptr<Simulation::SimulationWorkspace> simulationWorkspacePtr;
 typedef std::shared_ptr<Agent::AgentWorkspace> agentWorkspacePtr;
 
+std::ofstream logFile;
 
 // constructor
 Simulation::Simulation(std::string sim_name_)
 {
     std::string sim_name = "logs/SIMULATION_" + sim_name_ + ".csv";
-    file.open(sim_name); // Open the file using the member variable
+    logFile.open(sim_name); // Open the file using the member variable
 }
 
 // destructor
@@ -123,8 +124,12 @@ simulationWorkspacePtr Simulation::stepSim(const simulationWorkspacePtr &ws)
         
         // step vehicle
         std::tuple<float, float> cmd = vehicleCmds.front();
-        wsOut->vehicleWorkspaces[it->first] = Vehicle::stepVehicle(vehicleWs_, cmd);
+        vehicleWs_ = Vehicle::stepVehicle(vehicleWs_, cmd);
+        wsOut->vehicleWorkspaces[it->first] = vehicleWs_;
         vehicleCmds.erase(vehicleCmds.begin());
+
+        // log vehicle states
+
     }
 
     vehicleWorkspacePtr vehicleWs_ = wsOut->vehicleWorkspaces.begin()->second;
@@ -134,17 +139,24 @@ simulationWorkspacePtr Simulation::stepSim(const simulationWorkspacePtr &ws)
 }
 
 
-void Simulation::log_states() 
+void log_states(const simulationWorkspacePtr &ws)
 {
-    for (auto& vehicle : vehicles)
+    for (auto it = ws->vehicleWorkspaces.begin(); it != ws->vehicleWorkspaces.end(); ++it)
     {
-        std::string time = this->logCurrentTimeWithChrono();
-        file << time << ",";
-        file << vehicle.id << ",";
-        file << vehicle.ws.state.x << ",";
-        file << vehicle.ws.state.y << ",";
-        file << vehicle.ws.state.theta << std::endl;
-
+        Vehicle::State state;
+        state.x = it->second->state.x;
+        state.y = it->second->state.y;
+        state.theta = it->second->state.theta;
+        // std::string time = this->logCurrentTimeWithChrono();
+        // file << time << ",";
+        // file << vehicle.id << ",";
+        if (logFile.is_open()) {
+            logFile << state.x << " " << state.y << " " << state.theta << "\n";
+        } 
+        else 
+        {
+        std::cerr << "Unable to open log file!" << std::endl;
+        }
     }
 }
 
@@ -185,11 +197,11 @@ Simulation sim("TEST");
 
 simulationWorkspacePtr simPtr = sim.initialize("config.yaml");
 
-
 YAML::Node config = YAML::LoadFile("config.yaml");
 for (int i = 0; i < config["simulation"]["time_steps"].as<int>(); ++i)
 {
     simPtr = sim.stepSim(simPtr);
+    log_states(simPtr);
 }
 
 
