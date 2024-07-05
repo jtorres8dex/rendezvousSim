@@ -8,6 +8,7 @@
 #include <cmath>
 
 #include "agent.h"
+#include "loggingTools.h"
 
 static const double TWO_PI = M_PI * 2;
 
@@ -17,8 +18,9 @@ AgentWorkspacePtr Agent::setFSM(const AgentWorkspacePtr &ws)
 {
     AgentWorkspacePtr wsOut{ws};
     Agent::State goalState = ws->waypointPlan.begin()->second;
-    std::cout << "Goal state: " << goalState.x << " " << goalState.y << " " << goalState.theta << std::endl;
-    
+    int wpId = ws->waypointPlan.end()->first;
+    std::vector<double> wpPos = {goalState.x, goalState.y};
+
     // check if agent is at a waypoint
     double distanceToGoal = std::sqrt(std::pow(ws->observationSpace.ownState.x - goalState.x, 2) + std::pow(ws->observationSpace.ownState.y - goalState.y, 2));
 
@@ -43,6 +45,7 @@ AgentWorkspacePtr Agent::setFSM(const AgentWorkspacePtr &ws)
     else
     {
         wsOut->fsm = APPROACHING; 
+        logger::logWaypointInfo(wpId, wpPos);
     }
 
     return wsOut;
@@ -66,7 +69,7 @@ AgentWorkspacePtr Agent::controller(const AgentWorkspacePtr &ws)
 
     double xDiff = goalState.x - ownState.x;
     double yDiff = goalState.y - ownState.y;
-    
+
     double distanceToGoal = std::sqrt(std::pow(xDiff, 2) + std::pow(yDiff, 2));
     wsOut->actionSpace.v = k * distanceToGoal;
 

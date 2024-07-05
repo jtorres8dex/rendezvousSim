@@ -57,9 +57,6 @@ public:
     
     simulationWorkspacePtr stepSim(const simulationWorkspacePtr &ws);
     
-    // helper functions
-    std::string logCurrentTimeWithChrono();
-    void log_states(const simulationWorkspacePtr &ws);
 };
 
 

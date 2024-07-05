@@ -16,24 +16,24 @@
 #include "simulation.h"  
 #include "agent.h"
 #include "vehicle.h"
+#include "loggingTools.h"
 
 typedef std::shared_ptr<Simulation::SimulationWorkspace> simulationWorkspacePtr;
 typedef std::shared_ptr<Agent::AgentWorkspace> agentWorkspacePtr;
-
-std::ofstream logFile;
 
 // constructor
 Simulation::Simulation(std::string sim_name_)
 {
     std::string sim_name = "logs/SIMULATION_" + sim_name_ + ".csv";
-    logFile.open(sim_name); // Open the file using the member variable
+    logger::initializeLogger(sim_name);
+    
 }
 
 // destructor
 Simulation::~Simulation()
 {
     std::cout << "Stopping Simulation" << std::endl;
-    if (file.is_open()){file.close();}
+    logger::deInitializeLogger();
 }
 
 simulationWorkspacePtr Simulation::initialize(std::string configPath)
@@ -120,7 +120,6 @@ simulationWorkspacePtr Simulation::stepSim(const simulationWorkspacePtr &ws)
     {
         // get current vehicle workspace
         vehicleWorkspacePtr vehicleWs_{it->second};
-        std::cout << "Before stepping: " << vehicleWs_->state.x << " " << vehicleWs_->state.y << " " << vehicleWs_->state.theta << std::endl;
         
         // step vehicle
         std::tuple<float, float> cmd = vehicleCmds.front();
@@ -129,64 +128,20 @@ simulationWorkspacePtr Simulation::stepSim(const simulationWorkspacePtr &ws)
         vehicleCmds.erase(vehicleCmds.begin());
 
         // log vehicle states
+        std::vector<double> stateVec;
+        stateVec.push_back(vehicleWs_->state.x);
+        stateVec.push_back(vehicleWs_->state.y);
+        stateVec.push_back(vehicleWs_->state.theta);
+        logger::logVehicleState(vehicleWs_->id, stateVec);
 
     }
 
     vehicleWorkspacePtr vehicleWs_ = wsOut->vehicleWorkspaces.begin()->second;
-    std::cout << "After stepping: " << vehicleWs_->state.x << " " << vehicleWs_->state.y << " " << vehicleWs_->state.theta << std::endl;
 
     return wsOut;
 }
 
-
-void log_states(const simulationWorkspacePtr &ws)
-{
-    for (auto it = ws->vehicleWorkspaces.begin(); it != ws->vehicleWorkspaces.end(); ++it)
-    {
-        Vehicle::State state;
-        state.x = it->second->state.x;
-        state.y = it->second->state.y;
-        state.theta = it->second->state.theta;
-        // std::string time = this->logCurrentTimeWithChrono();
-        // file << time << ",";
-        // file << vehicle.id << ",";
-        if (logFile.is_open()) {
-            logFile << state.x << "," << state.y << "," << state.theta << "\n";
-        } 
-        else 
-        {
-        std::cerr << "Unable to open log file!" << std::endl;
-        }
-    }
-}
-
-simulationWorkspacePtr Simulation::compute_states(const simulationWorkspacePtr &ws){
-    simulationWorkspacePtr wsOut{ws};
-    std::cout << "Inside compute_states()" << std::endl;
-
-    return wsOut;
-}
-
-simulationWorkspacePtr Simulation::set_vehicle_actions(const simulationWorkspacePtr &ws){
-    simulationWorkspacePtr wsOut{ws};
-    return wsOut;
-}
-
-/******************************** HELPER FUNCTIONS *****************************************/
-
-std::string Simulation::logCurrentTimeWithChrono() 
-    {
-        auto now = std::chrono::system_clock::now();
-        auto nowAsTimeT = std::chrono::system_clock::to_time_t(now);
-        auto nowAsLocalTime = std::localtime(&nowAsTimeT);
-
-        char buffer[80];
-        std::strftime(buffer, sizeof(buffer), "%d %H:%M:%S", nowAsLocalTime);
-
-        return std::string(buffer);
-    }
-
-
+/******************************** MAIN *****************************************/
 
 int main()
 {
@@ -201,7 +156,6 @@ YAML::Node config = YAML::LoadFile("config.yaml");
 for (int i = 0; i < config["simulation"]["time_steps"].as<int>(); ++i)
 {
     simPtr = sim.stepSim(simPtr);
-    log_states(simPtr);
 }
 
 

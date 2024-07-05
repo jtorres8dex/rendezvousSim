@@ -12,7 +12,7 @@ typedef std::shared_ptr<Vehicle::VehicleWorkspace> vehicleWorkspacePtr;
 Vehicle::Vehicle(const int id_, std::vector<double> ics)
 {
     Vehicle::VehicleWorkspace ws;
-    id = id_;
+    int id = id_;
     ws.state.x = ics[0];
     ws.state.y = ics[1];
     ws.state.theta = ics[2];

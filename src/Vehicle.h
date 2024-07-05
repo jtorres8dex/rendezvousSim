@@ -14,8 +14,6 @@ class Vehicle
 
 public:
 
-    int id;
-    
     struct Commands {
         double v;
         double w;
@@ -36,6 +34,7 @@ public:
     
     struct VehicleWorkspace
     {
+        int id;
         Geometry geometry;
         Commands cmds;
         State state;

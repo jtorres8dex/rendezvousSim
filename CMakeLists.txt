@@ -26,7 +26,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/Debug)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release)
 
 # Add an executable target called "firstRun" to be built from the specified source files
-add_executable(runMe src/simulation.cpp src/Vehicle.cpp src/agent.cpp)
+add_executable(runMe src/simulation.cpp src/Vehicle.cpp src/agent.cpp src/loggingTools.cpp)
 
 # Suppress warnings
 target_compile_options(runMe PRIVATE -w)
