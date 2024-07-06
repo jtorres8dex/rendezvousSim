@@ -82,12 +82,19 @@ simulationWorkspacePtr Simulation::initialize(std::string configPath)
         agentWs->observationSpace.ownState.theta = ic[2];
         agentWs->fsm = Agent::INIT;
         agentWs->waypointRadius = config["simulation"]["waypoint_radius"].as<double>();
+        
+        // agent waypoint list
+        Agent::State wp;
+        for (auto it = config["agents"]["waypoints"].begin(); it != config["agents"]["waypoints"].end(); ++it) 
+        {
+            int id = it->first.as<int>();
+            wp.x = it->second.as<std::vector<double>>()[0]; 
+            wp.y = it->second.as<std::vector<double>>()[1];
+            wp.theta = it->second.as<std::vector<double>>()[2]; 
 
-        Agent::State firstWp;
-        firstWp.x = config["agents"]["waypoints"][1][0].as<double>(); //TODO get rid of this ugly ass hardcode
-        firstWp.y = config["agents"]["waypoints"][1][1].as<double>();
-        firstWp.theta = config["agents"]["waypoints"][1][2].as<double>();
-        agentWs->waypointPlan.insert({1, firstWp});
+            agentWs->waypointPlan.insert({id, wp});
+
+        }
 
         wsOut->agentWorkspaces.insert({i, agentWs});
     }

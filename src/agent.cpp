@@ -50,7 +50,6 @@ AgentWorkspacePtr Agent::setFSM(const AgentWorkspacePtr &ws)
                 std::cout << "Agent " << ws->id << " is DONE" << std::endl;
             }
 
-            std::cout << wsOut->waypointPlan.size() << std::endl;
 
         }
     }
@@ -84,8 +83,8 @@ AgentWorkspacePtr Agent::controller(const AgentWorkspacePtr &ws)
     Agent::State goalState = ws->waypointPlan.begin()->second;
     Agent::State ownState = ws->observationSpace.ownState;
 
-    std::cout << "CURRENT pos: " << ownState.x << "," << ownState.y << std::endl;
-    std::cout << "GOAL pos: " << goalState.x << "," << goalState.y << std::endl;
+    // std::cout << "CURRENT pos: " << ownState.x << "," << ownState.y << std::endl;
+    // std::cout << "GOAL pos: " << goalState.x << "," << goalState.y << std::endl;
 
     double xDiff = goalState.x - ownState.x;
     double yDiff = goalState.y - ownState.y;
@@ -97,7 +96,7 @@ AgentWorkspacePtr Agent::controller(const AgentWorkspacePtr &ws)
     theta_error = std::atan2(std::sin(theta_error), std::cos(theta_error));
 
     double distanceToGoal = std::sqrt(std::pow(xDiff, 2) + std::pow(yDiff, 2));
-    std::cout << "Distance to goal: " << distanceToGoal << std::endl;
+    // std::cout << "Distance to goal: " << distanceToGoal << std::endl;
     wsOut->actionSpace.v = k_v * distanceToGoal;
 
     double angleToGoal = goalState.theta - ownState.theta;

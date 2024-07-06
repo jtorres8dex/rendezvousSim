@@ -31,8 +31,6 @@ vehicleWorkspacePtr Vehicle::stepVehicle(const vehicleWorkspacePtr &ws, const st
         float v = std::get<0>(cmd);
         float w = std::get<1>(cmd);
 
-        std::cout << "v: " <<  v << " " << "w: " << w << std::endl;
-
         float delta_x = v * cos(wsOut->state.theta) * dt;
         float delta_y = v * sin(wsOut->state.theta) * dt;
         float delta_theta = w * dt;
