@@ -57,6 +57,7 @@ class Agent
             ActionSpace actionSpace;
             FSM fsm;
             std::map<int, Agent::State > waypointPlan;
+            double waypointRadius;
         };
         
         typedef std::shared_ptr<AgentWorkspace> AgentWorkspacePtr;

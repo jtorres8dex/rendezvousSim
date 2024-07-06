@@ -81,6 +81,7 @@ simulationWorkspacePtr Simulation::initialize(std::string configPath)
         agentWs->observationSpace.ownState.y = ic[1];
         agentWs->observationSpace.ownState.theta = ic[2];
         agentWs->fsm = Agent::INIT;
+        agentWs->waypointRadius = config["simulation"]["waypoint_radius"].as<double>();
 
         Agent::State firstWp;
         firstWp.x = config["agents"]["waypoints"][1][0].as<double>(); //TODO get rid of this ugly ass hardcode
@@ -124,6 +125,7 @@ simulationWorkspacePtr Simulation::stepSim(const simulationWorkspacePtr &ws)
         // step vehicle
         std::tuple<float, float> cmd = vehicleCmds.front();
         vehicleWs_ = Vehicle::stepVehicle(vehicleWs_, cmd);
+        // update vehicle state space in sim workspace
         wsOut->vehicleWorkspaces[it->first] = vehicleWs_;
         vehicleCmds.erase(vehicleCmds.begin());
 
@@ -134,9 +136,18 @@ simulationWorkspacePtr Simulation::stepSim(const simulationWorkspacePtr &ws)
         stateVec.push_back(vehicleWs_->state.theta);
         logger::logVehicleState(vehicleWs_->id, stateVec);
 
+        // update agent observation space
+        wsOut->agentWorkspaces[it->first]->observationSpace.ownState.x = stateVec[0];
+        wsOut->agentWorkspaces[it->first]->observationSpace.ownState.y = stateVec[1];
+        wsOut->agentWorkspaces[it->first]->observationSpace.ownState.theta = stateVec[2];
+
+
     }
 
     vehicleWorkspacePtr vehicleWs_ = wsOut->vehicleWorkspaces.begin()->second;
+
+    // update agent observation space
+
 
     return wsOut;
 }
@@ -146,7 +157,7 @@ simulationWorkspacePtr Simulation::stepSim(const simulationWorkspacePtr &ws)
 int main()
 {
 
-std::cout << "starting up firstRun..." << std::endl;
+std::cout << "starting up firstRun..." << "\n" << std::endl;
 
 Simulation sim("TEST");
 
