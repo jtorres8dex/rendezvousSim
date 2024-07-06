@@ -36,6 +36,29 @@ Simulation::~Simulation()
     logger::deInitializeLogger();
 }
 
+
+std::vector<std::unique_ptr<Agent>> registerAgents(const YAML::Node& config) 
+{
+    std::vector<std::unique_ptr<Agent>> agents;
+    for (const auto& node : config["agents"]) {
+        int id = node["id"].as<int>();
+        std::vector<double> ics; // Assuming initial conditions (ics) are used in the constructor
+        // Assuming name is stored separately and passed to the Agent constructor later
+        std::string name = node["name"].as<std::string>();
+
+        auto agent = std::make_unique<Agent>(id, ics);
+
+        for (auto it = node["waypoints"].begin(); it != node["waypoints"].end(); ++it) {
+            int waypoint_id = it->first.as<int>();
+            std::vector<double> waypoint_coords = it->second.as<std::vector<double>>();
+            agent->workspace.waypointPlan[waypoint_id] = { waypoint_coords[0], waypoint_coords[1], waypoint_coords[2] };
+        }
+
+        agents.push_back(std::move(agent));
+    }
+    return agents;
+}
+
 simulationWorkspacePtr Simulation::initialize(std::string configPath)
 {
     // read in config 
@@ -64,10 +87,10 @@ simulationWorkspacePtr Simulation::initialize(std::string configPath)
     std::cout << "Simulation Constructor: spawning " << num_vehicles << " vehicles" << std::endl;
     for(int i = 0; i < num_vehicles; i++)
     {
-        std::vector<double> ic = {config["vehicles"]["ics"].as<std::vector<double>>()};
+        std::vector<double> ic = {config["vehicles"][i]["ics"].as<std::vector<double>>()};
         
         // Instantiate vehicles and conditions
-        vehicleWorkspacePtr vehicleWs = std::make_shared<Vehicle::VehicleWorkspace>();;
+        vehicleWorkspacePtr vehicleWs = std::make_shared<Vehicle::VehicleWorkspace>();
         vehicleWs->state.x = ic[0];
         vehicleWs->state.y = ic[1];
         vehicleWs->state.theta = ic[2];
@@ -76,6 +99,25 @@ simulationWorkspacePtr Simulation::initialize(std::string configPath)
         wsOut->vehicleWorkspaces[i] = vehicleWs;
         
         // Instantiate agents and conditions
+        std::vector<Agent> agents;
+        // for (const auto& node : config["agents"]) 
+        // {
+        //     Agent agent;
+        //     agent.name = node["name"].as<std::string>();
+        //     agent.id = node["id"].as<int>();
+            
+        //     // load waypoints for this given agent 
+        //     for (auto it = node["waypoints"].begin(); it != node["waypoints"].end(); ++it) 
+        //     {
+        //         int waypoint_id = it->first.as<int>();
+        //         Agent::State wp;
+                
+        //         wp.x = it->second.as<std::vector<double>>()[0]; 
+        //         wp.y = it->second.as<std::vector<double>>()[1]; 
+        //         wp.theta = it->second.as<std::vector<double>>()[2];
+        //     }
+        // }
+
         agentWorkspacePtr agentWs = std::make_shared<Agent::AgentWorkspace>();
         agentWs->observationSpace.ownState.x = ic[0];
         agentWs->observationSpace.ownState.y = ic[1];
@@ -132,6 +174,7 @@ simulationWorkspacePtr Simulation::stepSim(const simulationWorkspacePtr &ws)
         // step vehicle
         std::tuple<float, float> cmd = vehicleCmds.front();
         vehicleWs_ = Vehicle::stepVehicle(vehicleWs_, cmd);
+        
         // update vehicle state space in sim workspace
         wsOut->vehicleWorkspaces[it->first] = vehicleWs_;
         vehicleCmds.erase(vehicleCmds.begin());

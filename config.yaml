@@ -1,15 +1,34 @@
 simulation:
   time_steps: 1000
   dt: 0.1
-  num_vehicles: 1
+  num_vehicles: 2
   waypoint_radius: 2.0
+  
+  spawn_explicit: true          # spawn all agents at specific state
+  
+vehicles:
+  - id: 1
+    ics: [0.0, 0.0, 0.0]
+    agent: "albert"
+
+  - id: 2
+    ics: [20.0, 20.0, 20.0]
+    agent: "joe"
+
 agents:
-    name: "albert"
+  - name: "albert"
     id: 1
+    waypoint_mode: true
+    leader: true
     waypoints:
       1: [-300.0, -200.0, 0.0]
       2: [200.0, -100.0, 1.0]
       3: [0.0, 200.0, 0.5]
-vehicles:
-  id: 1
-  ics: [0.0, 0.0, 0.0]
+  - name: "joe"
+    id: 2
+    waypoint_mode: true
+    leader: true 
+    waypoints:
+      1: [-100.0, 200.0, 0.0]
+      2: [220.0, -150.0, 1.0]
+      3: [130.0, 200.0, 0.5]

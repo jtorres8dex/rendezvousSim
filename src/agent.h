@@ -20,6 +20,7 @@ class Agent
 
     public:
 
+        Agent(int id, std::vector<double> ics);
 
         struct State
         {
@@ -41,7 +42,6 @@ class Agent
             State ownState;
             State goalState;
         };
-        
 
         struct ActionSpace
         {
@@ -59,6 +59,7 @@ class Agent
             std::map<int, Agent::State > waypointPlan;
             double waypointRadius;
         };
+        AgentWorkspace workspace;
         
         typedef std::shared_ptr<AgentWorkspace> AgentWorkspacePtr;
 

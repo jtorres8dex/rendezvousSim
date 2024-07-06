@@ -51,6 +51,7 @@ public:
 
     typedef std::shared_ptr<SimulationWorkspace> simulationWorkspacePtr;
 
+    Agent registerAgents(const YAML::Node& config);
     simulationWorkspacePtr initialize(std::string configPath);
     simulationWorkspacePtr compute_states(const simulationWorkspacePtr &ws);
     simulationWorkspacePtr set_vehicle_actions(const simulationWorkspacePtr &ws);

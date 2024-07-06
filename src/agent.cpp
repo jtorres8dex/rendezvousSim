@@ -15,6 +15,12 @@ static const double TWO_PI = M_PI * 2;
 
 typedef std::shared_ptr<Agent::AgentWorkspace> AgentWorkspacePtr;
 
+Agent::Agent(int id, std::vector<double> ics){
+    workspace.observationSpace.ownState.x = ics[0];
+    workspace.observationSpace.ownState.y = ics[1];
+    workspace.observationSpace.ownState.theta = ics[2];
+}
+
 AgentWorkspacePtr Agent::setFSM(const AgentWorkspacePtr &ws)
 {
     AgentWorkspacePtr wsOut{ws};
