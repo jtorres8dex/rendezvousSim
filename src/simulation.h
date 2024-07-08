@@ -21,8 +21,8 @@
 #include "vehicle.h"
 
 
-typedef std::shared_ptr<Agent::AgentWorkspace> agentWorkspacePtr;
-typedef std::shared_ptr<Vehicle::VehicleWorkspace> vehicleWorkspacePtr;
+typedef std::unique_ptr<Vehicle::VehicleWorkspace> agentWorkspacePtr;
+typedef std::unique_ptr<Vehicle::VehicleWorkspace> vehicleWorkspacePtr;
 
 class Simulation
 {
@@ -31,10 +31,19 @@ public:
     struct SimulationWorkspace
     {
         std::vector<int> active_vehicle_ids;
-        std::unordered_map<int, vehicleWorkspacePtr> vehicleWorkspaces;
-        std::unordered_map<int, agentWorkspacePtr> agentWorkspaces;
-        std::vector<Vehicle> vehicles;
-    };  
+        // std::unordered_map<int, vehicleworkspacePtr> vehicleWorkspaces;
+        // std::unordered_map<int, agentWorkspacePtr> agentWorkspaces;
+        std::vector<Agent::AgentWorkspace> agentWorkspaces;
+        std::vector<Vehicle::VehicleWorkspace> vehicleWorkspaces;
+
+        Agent agentObj;
+        Vehicle vehicleObj;
+        // std::vector<Vehicle> vehicles;
+        // std::vector<Agent> agents;
+
+        bool is_connected_swarm;
+    }; 
+    SimulationWorkspace simulationWorkspace;
 
     // Constructor 
     Simulation(std::string sim_name);
@@ -47,16 +56,12 @@ public:
     double dt;
     std::ofstream file;
 
-    std::vector<Vehicle> vehicles;
+    typedef std::unique_ptr<SimulationWorkspace> simulationWorkspacePtr;
 
-    typedef std::shared_ptr<SimulationWorkspace> simulationWorkspacePtr;
-
-    Agent registerAgents(const YAML::Node& config);
-    simulationWorkspacePtr initialize(std::string configPath);
-    simulationWorkspacePtr compute_states(const simulationWorkspacePtr &ws);
-    simulationWorkspacePtr set_vehicle_actions(const simulationWorkspacePtr &ws);
-    
-    simulationWorkspacePtr stepSim(const simulationWorkspacePtr &ws);
+    std::vector<Agent::AgentWorkspace> registerAgents(const YAML::Node& config);
+    std::vector<Vehicle::VehicleWorkspace> registerVehicles(const YAML::Node& config);
+    SimulationWorkspace initialize(std::string configPath);
+    SimulationWorkspace stepSim(SimulationWorkspace ws);
     
 };
 

@@ -1,4 +1,5 @@
 simulation:
+  sim_name: "TEST"
   time_steps: 1000
   dt: 0.1
   num_vehicles: 2
@@ -20,6 +21,7 @@ agents:
     id: 1
     waypoint_mode: true
     leader: true
+    ics: [0.0, 0.0, 0.0]
     waypoints:
       1: [-300.0, -200.0, 0.0]
       2: [200.0, -100.0, 1.0]
@@ -28,6 +30,7 @@ agents:
     id: 2
     waypoint_mode: true
     leader: true 
+    ics: [20.0, 20.0, 20.0]
     waypoints:
       1: [-100.0, 200.0, 0.0]
       2: [220.0, -150.0, 1.0]

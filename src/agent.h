@@ -20,7 +20,8 @@ class Agent
 
     public:
 
-        Agent(int id, std::vector<double> ics);
+        // Agent(int id, std::vector<double> ics);
+        Agent();
 
         struct State
         {
@@ -51,7 +52,7 @@ class Agent
 
         struct AgentWorkspace 
         {
-            const uint16_t id = 1;
+            uint16_t id = 1;
             std::vector<int> neighbors;
             ObservationSpace observationSpace;
             ActionSpace actionSpace;
@@ -59,19 +60,19 @@ class Agent
             std::map<int, Agent::State > waypointPlan;
             double waypointRadius;
         };
-        AgentWorkspace workspace;
+        AgentWorkspace agentWorkspace;
         
-        typedef std::shared_ptr<AgentWorkspace> AgentWorkspacePtr;
+        typedef std::unique_ptr<AgentWorkspace> AgentWorkspacePtr;
 
-        static AgentWorkspacePtr stepAgent(const AgentWorkspacePtr &ws);
+        static AgentWorkspace stepAgent(AgentWorkspace ws);
 
     private:
         
-        AgentWorkspacePtr setFSM(const AgentWorkspacePtr &ws);
+        AgentWorkspacePtr setFSM(AgentWorkspacePtr ws);
 
-        AgentWorkspacePtr controller(const AgentWorkspacePtr &ws);
+        AgentWorkspacePtr controller(AgentWorkspacePtr ws);
 
-        AgentWorkspacePtr pathPlanner(const AgentWorkspacePtr &ws);
+        AgentWorkspacePtr pathPlanner(AgentWorkspacePtr ws);
         
 };
 

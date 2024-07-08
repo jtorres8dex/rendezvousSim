@@ -31,12 +31,20 @@ namespace logger
         {
             logFile << VEHICLE_STATE << "," << id << "," << vState[0] << "," << vState[1] << "," << vState[2] << "\n";
         }
+        else
+        {
+            std::cout << "ERROR- logger::" << __func__ << " file not open" << std::endl;
+        }
     };
     void logWaypointInfo(int id, std::vector<double> location)
     {
         if (logFile.is_open())
         {
             logFile << WAYPOINT << "," << id << "," << location[0] << "," << location [1] << "\n";
+        }
+        else
+        {
+            std::cout << "ERROR- logger::" << __func__ << " file not open" << std::endl;
         }
     };
     void logEvent(logType type, std::vector<double> data)

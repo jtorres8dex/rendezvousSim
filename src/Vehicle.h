@@ -40,16 +40,17 @@ public:
         State state;
         
     };
-    VehicleWorkspace ws;
+    VehicleWorkspace vehicleWorkspace;
 
     // constructor
-    Vehicle(int id, std::vector<double> ics);
+    Vehicle();
     // destructor
     ~Vehicle();
 
-    typedef std::shared_ptr<VehicleWorkspace> vehicleWorkspacePtr;
+    typedef std::unique_ptr<VehicleWorkspace> vehicleWorkspacePtr;
 
-    static vehicleWorkspacePtr stepVehicle(const vehicleWorkspacePtr &ws, const std::tuple<float, float> &cmds);
+    // static vehicleWorkspacePtr stepVehicle(vehicleWorkspacePtr ws, const std::tuple<float, float> &cmds);
+    static VehicleWorkspace stepVehicle(VehicleWorkspace ws, const std::tuple<float, float> &cmd);
 };
 
 #endif 

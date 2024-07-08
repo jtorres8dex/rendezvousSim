@@ -13,36 +13,38 @@
 
 static const double TWO_PI = M_PI * 2;
 
-typedef std::shared_ptr<Agent::AgentWorkspace> AgentWorkspacePtr;
+typedef std::unique_ptr<Agent::AgentWorkspace> AgentWorkspacePtr;
 
-Agent::Agent(int id, std::vector<double> ics){
-    workspace.observationSpace.ownState.x = ics[0];
-    workspace.observationSpace.ownState.y = ics[1];
-    workspace.observationSpace.ownState.theta = ics[2];
-}
+// Agent::Agent(int id, std::vector<double> ics){
+//     workspace.observationSpace.ownState.x = ics[0];
+//     workspace.observationSpace.ownState.y = ics[1];
+//     workspace.observationSpace.ownState.theta = ics[2];
+// }
 
-AgentWorkspacePtr Agent::setFSM(const AgentWorkspacePtr &ws)
+Agent::Agent(){};
+
+AgentWorkspacePtr Agent::setFSM(AgentWorkspacePtr ws)
 {
-    AgentWorkspacePtr wsOut{ws};
+    AgentWorkspacePtr wsOut{std::move(ws)};
     
     // do nothing if done
-    if (DONE == ws->fsm)
+    if (DONE == wsOut->fsm)
     {
         return wsOut;
     }
 
-    Agent::State goalState = ws->waypointPlan.begin()->second;
-    int wpId = ws->waypointPlan.begin()->first;
+    Agent::State goalState = wsOut->waypointPlan.begin()->second;
+    int wpId = wsOut->waypointPlan.begin()->first;
     std::vector<double> wpPos = {goalState.x, goalState.y};
 
     // check if agent is at a waypoint
-    double distanceToGoal = std::sqrt(std::pow(ws->observationSpace.ownState.x - goalState.x, 2) + std::pow(ws->observationSpace.ownState.y - goalState.y, 2));
+    double distanceToGoal = std::sqrt(std::pow(wsOut->observationSpace.ownState.x - goalState.x, 2) + std::pow(wsOut->observationSpace.ownState.y - goalState.y, 2));
 
-    if (ws->waypointRadius >= abs(distanceToGoal))
+    if (wsOut->waypointRadius >= abs(distanceToGoal))
     {
-        if (0 != ws->waypointPlan.size())
+        if (0 != wsOut->waypointPlan.size())
         {
-            std::cout << "Agent " << ws->id << " reached waypoint " << wsOut->waypointPlan.begin()->first << std::endl;
+            std::cout << "Agent " << wsOut->id << " reached waypoint " << wsOut->waypointPlan.begin()->first << std::endl;
             // remove from global planner    
             wsOut->waypointPlan.erase(wsOut->waypointPlan.begin());
             // move on to next waypoint
@@ -53,13 +55,13 @@ AgentWorkspacePtr Agent::setFSM(const AgentWorkspacePtr &ws)
             else
             {
                 wsOut->fsm = DONE;
-                std::cout << "Agent " << ws->id << " is DONE" << std::endl;
+                std::cout << "Agent " << wsOut->id << " is DONE" << std::endl;
             }
 
 
         }
     }
-    else if (ws->waypointRadius <= abs(distanceToGoal))
+    else if (wsOut->waypointRadius <= abs(distanceToGoal))
     {
         wsOut->fsm = APPROACHING; 
         logger::logWaypointInfo(wpId, wpPos);
@@ -72,9 +74,9 @@ AgentWorkspacePtr Agent::setFSM(const AgentWorkspacePtr &ws)
     return wsOut;
 }
 
-AgentWorkspacePtr Agent::controller(const AgentWorkspacePtr &ws)
+AgentWorkspacePtr Agent::controller(AgentWorkspacePtr ws)
 {
-    AgentWorkspacePtr wsOut{ws};
+    AgentWorkspacePtr wsOut{std::move(ws)};
 
     if (DONE == wsOut->fsm)
     {
@@ -86,8 +88,8 @@ AgentWorkspacePtr Agent::controller(const AgentWorkspacePtr &ws)
 
     float k_v{1};
     float k_w{10};
-    Agent::State goalState = ws->waypointPlan.begin()->second;
-    Agent::State ownState = ws->observationSpace.ownState;
+    Agent::State goalState = wsOut->waypointPlan.begin()->second;
+    Agent::State ownState = wsOut->observationSpace.ownState;
 
     // std::cout << "CURRENT pos: " << ownState.x << "," << ownState.y << std::endl;
     // std::cout << "GOAL pos: " << goalState.x << "," << goalState.y << std::endl;
@@ -111,22 +113,29 @@ AgentWorkspacePtr Agent::controller(const AgentWorkspacePtr &ws)
     return wsOut;
 }   
 
-AgentWorkspacePtr Agent::pathPlanner(const AgentWorkspacePtr &ws)
+AgentWorkspacePtr Agent::pathPlanner(AgentWorkspacePtr ws)
 {
-    AgentWorkspacePtr wsOut{ws};
+    AgentWorkspacePtr wsOut{std::move(ws)};
     
-    if (APPROACHING == ws->fsm)
+    if (APPROACHING == wsOut->fsm)
     {
-        wsOut->observationSpace.goalState = ws->waypointPlan.begin()->second;
+        wsOut->observationSpace.goalState = wsOut->waypointPlan.begin()->second;
     }
 
     return wsOut;
 }
 
-AgentWorkspacePtr Agent::stepAgent(const AgentWorkspacePtr &ws)
+Agent::AgentWorkspace Agent::stepAgent(Agent::AgentWorkspace ws)
 {
-    AgentWorkspacePtr wsOut{ws};
+    AgentWorkspacePtr wsPtr = std::make_unique<AgentWorkspace>(ws);
+
+    int id = wsPtr->id;
+    double x = wsPtr->observationSpace.ownState.x;
+    double y = wsPtr->observationSpace.ownState.y;
+    double theta = wsPtr->observationSpace.ownState.theta;
+    std::vector<double> ics = {x, y, theta};
+
     Agent agent;
 
-    return agent.controller(agent.pathPlanner(agent.setFSM(wsOut)));
+    return *agent.controller(agent.pathPlanner(agent.setFSM(std::move(wsPtr))));
 }
