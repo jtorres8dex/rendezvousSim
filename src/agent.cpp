@@ -26,7 +26,12 @@ Agent::Agent(){};
 AgentWorkspacePtr Agent::setFSM(AgentWorkspacePtr ws)
 {
     AgentWorkspacePtr wsOut{std::move(ws)};
-    
+
+    Agent::State ownState = wsOut->observationSpace.ownState;
+    std::cout << "[FSM]   agent " << wsOut->id << " state " << ownState.x << " " << ownState.y << " " << ownState.theta << std::endl;
+
+
+    std::cout << "Agent " << wsOut->id << " is DONE" << std::endl;
     // do nothing if done
     if (DONE == wsOut->fsm)
     {
@@ -78,6 +83,7 @@ AgentWorkspacePtr Agent::controller(AgentWorkspacePtr ws)
 {
     AgentWorkspacePtr wsOut{std::move(ws)};
 
+    
     if (DONE == wsOut->fsm)
     {
         wsOut->actionSpace.v = 0.0;
@@ -90,9 +96,6 @@ AgentWorkspacePtr Agent::controller(AgentWorkspacePtr ws)
     float k_w{10};
     Agent::State goalState = wsOut->waypointPlan.begin()->second;
     Agent::State ownState = wsOut->observationSpace.ownState;
-
-    // std::cout << "CURRENT pos: " << ownState.x << "," << ownState.y << std::endl;
-    // std::cout << "GOAL pos: " << goalState.x << "," << goalState.y << std::endl;
 
     double xDiff = goalState.x - ownState.x;
     double yDiff = goalState.y - ownState.y;
@@ -109,7 +112,9 @@ AgentWorkspacePtr Agent::controller(AgentWorkspacePtr ws)
 
     double angleToGoal = goalState.theta - ownState.theta;
     wsOut->actionSpace.w = k_w * theta_error;
-
+    
+    // std::cout << "stepping agent " << wsOut->id << "   " << wsOut->actionSpace.v <<"," <<wsOut->actionSpace.w << std::endl;
+    std::cout << "[CONTROLLER]   agent " << wsOut->id << " state " << ownState.x << " " << ownState.y << " " << ownState.theta << std::endl;
     return wsOut;
 }   
 

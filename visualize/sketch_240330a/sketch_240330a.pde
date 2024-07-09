@@ -35,7 +35,7 @@ void draw() {
   fill(0, 255, 255); // Set fill color for waypoints
   for (PVector waypoint : waypoints) {
     ellipse(waypoint.x, waypoint.y, 10, 10); // Draw waypoint as a circle
-    println("Drawing waypoint at (" + waypoint.x + ", " + waypoint.y + ")"); // Debugging
+    //println("Drawing waypoint at (" + waypoint.x + ", " + waypoint.y + ")"); // Debugging
   }
 
   // Check if we still have data to read
@@ -47,6 +47,7 @@ void draw() {
       float x = row.getFloat(2); // Third column is x
       float y = row.getFloat(3); // Fourth column is y
       float theta = radians(row.getFloat(4)); // Fifth column is theta
+      float id = int(row.getInt(1));
 
       // Draw the robot
       pushMatrix(); // Save the current transformation matrix
@@ -58,7 +59,7 @@ void draw() {
       stroke(255, 0, 0); // Set the stroke color for the direction line
       line(0, 0, robotSize / 2, 0); // Draw the direction line
       popMatrix(); // Restore the previous transformation matrix
-      println("Drawing robot at (" + x + ", " + y + ") with theta: " + degrees(theta)); // Debugging
+      println("Drawing vehicle " + id + " at (" + x + ", " + y + ") with theta: " + degrees(theta)); // Debugging
     }
 
     // Increment the index to read the next row in the next frame

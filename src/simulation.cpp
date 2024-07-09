@@ -46,9 +46,8 @@ std::vector<Agent::AgentWorkspace> Simulation::registerAgents(const YAML::Node& 
 
         // workspace to be added to sim vector
         Agent::AgentWorkspace ws;
-
         // load agent initial conditions
-        // ws.id = node["id"].as<int>();
+        ws.id = node["id"].as<int>();
         ws.waypointRadius = config["simulation"]["waypoint_radius"].as<double>();
         std::vector<double> ics = node["ics"].as<std::vector<double>>(); 
         ws.observationSpace.ownState.x = ics[0];
@@ -56,6 +55,7 @@ std::vector<Agent::AgentWorkspace> Simulation::registerAgents(const YAML::Node& 
         ws.observationSpace.ownState.theta = ics[2];
         ws.fsm = Agent::INIT;
         
+        std::cout << "spawning agent " << ws.id << " at " << ics[0] << "," << ics[1] << "," << ics[2] << std::endl;
         // if we are in waypoint mode load them in
         if (true == node["waypoint_mode"].as<bool>())
         {
@@ -82,6 +82,8 @@ std::vector<Vehicle::VehicleWorkspace> Simulation::registerVehicles(const YAML::
     for (int i = 0; i < num_vehicles; ++i)
     {
         Vehicle::VehicleWorkspace ws;
+
+        ws.id = i;
 
         std::vector<double> ics = {config["vehicles"][i]["ics"].as<std::vector<double>>()};
         ws.state.x = ics[0];
@@ -141,15 +143,16 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
     std::vector<std::tuple<float, float>> vehicleCmds;
 
     // step agents - update agent observation space in sim workspace in place
-    for (Agent::AgentWorkspace& agentWs : ws.agentWorkspaces)
+    for (Agent::AgentWorkspace& agentWs : wsOut.agentWorkspaces)
     {
+        std::cout << "agent " << agentWs.id << " observation space: " << agentWs.observationSpace.ownState.x << " " << agentWs.observationSpace.ownState.y << " "<<agentWs.observationSpace.ownState.theta << std::endl;
         // Step the agent to update workspace and get commands
         agentWs = Agent::stepAgent(agentWs);
         vehicleCmds.push_back(std::make_tuple(agentWs.actionSpace.v, agentWs.actionSpace.w));
     }
     
     // step vehicles - update vehicle state space in sim workspace in place
-    for (Vehicle::VehicleWorkspace& vehicleWs : ws.vehicleWorkspaces)
+    for (Vehicle::VehicleWorkspace& vehicleWs : wsOut.vehicleWorkspaces)
     {
         // step
         std::tuple<float, float> cmd = vehicleCmds.front();
@@ -166,49 +169,21 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
     }
     
     // update agent observation space
-    for (Agent::AgentWorkspace& agentWs : ws.agentWorkspaces)
+    for (Agent::AgentWorkspace& agentWs : wsOut.agentWorkspaces)
     {
         int i{0};
+        
 
         agentWs.observationSpace.ownState.x = ws.vehicleWorkspaces[i].state.x;
         agentWs.observationSpace.ownState.y = ws.vehicleWorkspaces[i].state.y;
         agentWs.observationSpace.ownState.theta = ws.vehicleWorkspaces[i].state.theta;
 
+        Agent::State ownState = agentWs.observationSpace.ownState;
+        std::cout << "[STEPSIM]   agent " << i%2 << " state " << ownState.x << " " << ownState.y << " " << ownState.theta << std::endl;
+        
+        // std::cout << "updating agent " << agentWs.id << " observation space: " << ws.vehicleWorkspaces[i].state.x << std::endl;
         i++;
     }
-
-
-
-    // for (auto it = vehicleWorkspaces_.begin(); it != vehicleWorkspaces_.end(); ++it)
-    // {
-    //     // get current vehicle workspace
-    //     vehicleWorkspacePtr vehicleWs_{std::move(it->second)};
-        
-    //     // step vehicle
-    //     std::tuple<float, float> cmd = vehicleCmds.front();
-    //     vehicleWs_ = Vehicle::stepVehicle(std::move(vehicleWs_), cmd);
-        
-    //     // update vehicle state space in sim workspace
-    //     wsOut->vehicleWorkspaces[it->first] = std::move(vehicleWs_);
-    //     vehicleCmds.erase(vehicleCmds.begin());
-
-    //     // log vehicle states
-    //     std::vector<double> stateVec;
-    //     stateVec.push_back(vehicleWs_->state.x);
-    //     stateVec.push_back(vehicleWs_->state.y);
-    //     stateVec.push_back(vehicleWs_->state.theta);
-    //     logger::logVehicleState(vehicleWs_->id, stateVec);
-
-    //     // update agent observation space
-    //     wsOut->agentWorkspaces[it->first]->observationSpace.ownState.x = stateVec[0];
-    //     wsOut->agentWorkspaces[it->first]->observationSpace.ownState.y = stateVec[1];
-    //     wsOut->agentWorkspaces[it->first]->observationSpace.ownState.theta = stateVec[2];
-    // }
-
-    // vehicleWorkspacePtr vehicleWs_ = std::move(wsOut->vehicleWorkspaces.begin()->second);
-
-    // update agent observation space
-
     return wsOut;
 }
 
@@ -224,15 +199,24 @@ Simulation sim("TEST");
 YAML::Node config = YAML::LoadFile("config.yaml");
 std::string simName = config["simulation"]["sim_name"].as<std::string>();
 
-// simulationWorkspacePtr simPtr = sim.initialize(simName);
 Simulation::SimulationWorkspace simWs = sim.initialize("config.yaml");
+
+auto start = std::chrono::high_resolution_clock::now();
 
 for (int i = 0; i < config["simulation"]["time_steps"].as<int>(); ++i)
 {
-    std::cout << i << std::endl;
-    simWs = sim.stepSim(simWs);
-}
+    std::cout << "i="<< i << std::endl;
 
+    simWs = sim.stepSim(simWs);
+    int j = 0;
+}
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+
+    // Convert nanoseconds to seconds as a floating-point number
+    double seconds = duration / 1e9;
+    std::cout << "" << std::endl;
+    std::cout << "Duration in seconds: " << std::fixed << std::setprecision(9) << seconds << " s" << std::endl;
 
 return 0;
 }

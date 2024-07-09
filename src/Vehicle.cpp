@@ -18,11 +18,11 @@ Vehicle::Vehicle()
     // ws.state.y = ics[1];
     // ws.state.theta = ics[2];
     
-    std::cout << "Vehicle Constructor" << std::endl;
+    // std::cout << "Vehicle Constructor" << std::endl;
 }
 
 Vehicle::~Vehicle(){
-    std::cout << "Destroying Vehicle object" << std::endl;
+    // std::cout << "Destroying Vehicle object" << std::endl;
 }
 
 Vehicle::VehicleWorkspace Vehicle::stepVehicle(Vehicle::VehicleWorkspace ws, const std::tuple<float, float> &cmd)
