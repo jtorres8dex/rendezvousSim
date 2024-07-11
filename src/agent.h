@@ -20,6 +20,8 @@ class Agent
 
     public:
 
+        // template <typename Type>
+
         // Agent(int id, std::vector<double> ics);
         Agent();
 
@@ -72,6 +74,7 @@ class Agent
 
         AgentWorkspacePtr controller(AgentWorkspacePtr ws);
 
+        
         AgentWorkspacePtr pathPlanner(AgentWorkspacePtr ws);
         
 };

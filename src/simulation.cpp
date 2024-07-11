@@ -25,7 +25,8 @@ typedef std::unique_ptr<Simulation::SimulationWorkspace> simulationWorkspacePtr;
 Simulation::Simulation(std::string sim_name_)
 {
     std::string sim_name = "logs/SIMULATION_" + sim_name_ + ".csv";
-    logger::initializeLogger(sim_name);
+    std::string logFileName{"logs/" + sim_name_ + "_eventLogs.log"} ;
+    logger::initializeLogger(sim_name, logFileName);
     
 }
 
@@ -55,7 +56,6 @@ std::vector<Agent::AgentWorkspace> Simulation::registerAgents(const YAML::Node& 
         ws.observationSpace.ownState.theta = ics[2];
         ws.fsm = Agent::INIT;
         
-        std::cout << "spawning agent " << ws.id << " at " << ics[0] << "," << ics[1] << "," << ics[2] << std::endl;
         // if we are in waypoint mode load them in
         if (true == node["waypoint_mode"].as<bool>())
         {
@@ -83,7 +83,7 @@ std::vector<Vehicle::VehicleWorkspace> Simulation::registerVehicles(const YAML::
     {
         Vehicle::VehicleWorkspace ws;
 
-        ws.id = i;
+        ws.id = i + 1;
 
         std::vector<double> ics = {config["vehicles"][i]["ics"].as<std::vector<double>>()};
         ws.state.x = ics[0];
@@ -128,7 +128,6 @@ Simulation::SimulationWorkspace Simulation::initialize(std::string configPath)
     wsOut.vehicleObj = simVehicle;
 
     // spawn vehicles at given ics
-    std::cout << "Simulation Constructor: spawning " << num_vehicles << " vehicles" << std::endl;
     wsOut.vehicleWorkspaces = registerVehicles(config);
 
     // initialize agent workspaces
@@ -141,14 +140,21 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
 {
     Simulation::SimulationWorkspace wsOut{ws};
     std::vector<std::tuple<float, float>> vehicleCmds;
-
+    
     // step agents - update agent observation space in sim workspace in place
     for (Agent::AgentWorkspace& agentWs : wsOut.agentWorkspaces)
     {
-        std::cout << "agent " << agentWs.id << " observation space: " << agentWs.observationSpace.ownState.x << " " << agentWs.observationSpace.ownState.y << " "<<agentWs.observationSpace.ownState.theta << std::endl;
+        std::vector<double> logData = {agentWs.observationSpace.ownState.x, agentWs.observationSpace.ownState.y, agentWs.observationSpace.ownState.theta};
+        std::string info = "Agent " + std::to_string(agentWs.id) + " ownState: ";
+        logger::createEvent(__func__, info, logData);
+
         // Step the agent to update workspace and get commands
         agentWs = Agent::stepAgent(agentWs);
         vehicleCmds.push_back(std::make_tuple(agentWs.actionSpace.v, agentWs.actionSpace.w));
+        
+        logData = {agentWs.actionSpace.v, agentWs.actionSpace.w};
+        info = "Agent " + std::to_string(agentWs.id) + " actionSpace: ";
+        logger::createEvent(__func__, info, logData);
     }
     
     // step vehicles - update vehicle state space in sim workspace in place
@@ -166,6 +172,10 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
         stateVec.push_back(vehicleWs.state.theta);
         logger::logVehicleState(vehicleWs.id, stateVec);
 
+        std::vector<double> logData = {vehicleWs.state.x, vehicleWs.state.y, vehicleWs.state.theta};
+        std::string info = "Vehicle " + std::to_string(vehicleWs.id) + " state: ";
+        logger::createEvent(__func__, info, logData);
+
     }
     
     // update agent observation space
@@ -179,11 +189,14 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
         agentWs.observationSpace.ownState.theta = ws.vehicleWorkspaces[i].state.theta;
 
         Agent::State ownState = agentWs.observationSpace.ownState;
-        std::cout << "[STEPSIM]   agent " << i%2 << " state " << ownState.x << " " << ownState.y << " " << ownState.theta << std::endl;
         
-        // std::cout << "updating agent " << agentWs.id << " observation space: " << ws.vehicleWorkspaces[i].state.x << std::endl;
+        std::vector<double> logData = {ownState.x, ownState.y, ownState.theta};
+        std::string info = "Agent " + std::to_string(agentWs.id) + " ownState: ";
+        logger::createEvent(__func__, info, logData);
+        
         i++;
     }
+    
     return wsOut;
 }
 
@@ -205,7 +218,7 @@ auto start = std::chrono::high_resolution_clock::now();
 
 for (int i = 0; i < config["simulation"]["time_steps"].as<int>(); ++i)
 {
-    std::cout << "i="<< i << std::endl;
+    // std::cout << "************** i="<< i << " **************"<<std::endl;
 
     simWs = sim.stepSim(simWs);
     int j = 0;

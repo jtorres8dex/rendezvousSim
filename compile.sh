@@ -47,8 +47,8 @@ if [ $? -ne 0 ]; then
 fi
 # cd ../..
 # Move the executable to the outputs directory
-mkdir -p outputs
-mv Debug/runMe ../../outputs/$EXECUTABLE
+mkdir -p executables
+mv Debug/runMe ../../executables/$EXECUTABLE
 
 # If compilation succeeds, print a success message
 if [ $? -eq 0 ]; then

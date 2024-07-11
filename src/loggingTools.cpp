@@ -12,6 +12,7 @@ namespace logger
 {
 
     std::ofstream logFile;
+    std::ofstream eventFile;
 
     enum logType
     {
@@ -20,9 +21,19 @@ namespace logger
         EVENT
     };
 
-    void initializeLogger(std::string sim_name)
+    enum eventType
     {
-        logFile.open(sim_name); // Open the file using the member variable
+        STATE,
+        CMD,
+        GOAL_REACHED
+
+    };
+
+    void initializeLogger(std::string sim_name, std::string eventFileName)
+    {
+        logFile.open(sim_name); 
+        eventFile.open(eventFileName);
+
     }
 
     void logVehicleState(int id, std::vector<double> vState)
@@ -47,14 +58,11 @@ namespace logger
             std::cout << "ERROR- logger::" << __func__ << " file not open" << std::endl;
         }
     };
-    void logEvent(logType type, std::vector<double> data)
-    {
-
-    };
-
+    
     void deInitializeLogger()
     {
         if (logFile.is_open()){logFile.close();}
+        if (eventFile.is_open()){eventFile.close();}
     };
 
     std::string logCurrentTimeWithChrono() 
