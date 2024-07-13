@@ -14,13 +14,10 @@
 static const double TWO_PI = M_PI * 2;
 double dt = 0.1;
 
-typedef std::unique_ptr<Agent::AgentWorkspace> AgentWorkspacePtr;
+static double ePosMinus1{0};
+static double eThetaMinus1{0};
 
-// Agent::Agent(int id, std::vector<double> ics){
-//     workspace.observationSpace.ownState.x = ics[0];
-//     workspace.observationSpace.ownState.y = ics[1];
-//     workspace.observationSpace.ownState.theta = ics[2];
-// }
+typedef std::unique_ptr<Agent::AgentWorkspace> AgentWorkspacePtr;
 
 Agent::Agent(){};
 
@@ -31,6 +28,7 @@ AgentWorkspacePtr Agent::setFSM(AgentWorkspacePtr ws)
     // do nothing if done
     if (DONE == wsOut->fsm)
     {
+        std::cout << "DONE" << std::endl;
         std::string info = "Agent " + std::to_string(wsOut->id) + " FSM: DONE";
         logger::createEvent<double>(__func__, info);
 
@@ -41,22 +39,23 @@ AgentWorkspacePtr Agent::setFSM(AgentWorkspacePtr ws)
     int wpId = wsOut->waypointPlan.begin()->first;
     std::vector<double> wpPos = {goalState.x, goalState.y};
 
-    // check if agent is at a waypoint
     double distanceToGoal = std::sqrt(std::pow(wsOut->observationSpace.ownState.x - goalState.x, 2) + std::pow(wsOut->observationSpace.ownState.y - goalState.y, 2));
-
+    std::cout<< "ssss" << wsOut->waypointPlan.size() << std::endl;
+    // check if agent is at a waypoint
     if (wsOut->waypointRadius >= abs(distanceToGoal))
     {
         std::string info = "Agent " + std::to_string(wsOut->id) + " reached waypoint " + std::to_string(wsOut->waypointPlan.begin()->first);
         logger::createEvent<double>(__func__, info);
 
-        if (0 != wsOut->waypointPlan.size())
+        if (!wsOut->waypointPlan.empty())
         {
             // remove from global planner    
             wsOut->waypointPlan.erase(wsOut->waypointPlan.begin());
-            // move on to next waypoint
             
+            // move on to next waypoint or finish
             if (!wsOut->waypointPlan.empty())
             {
+                
                 wsOut->observationSpace.goalState = wsOut->waypointPlan.begin()->second;
             }
             else
@@ -94,17 +93,18 @@ AgentWorkspacePtr Agent::controller(AgentWorkspacePtr ws)
 {
     AgentWorkspacePtr wsOut{std::move(ws)};
 
-    
     if (DONE == wsOut->fsm)
     {
         wsOut->actionSpace.v = 0.0;
         wsOut->actionSpace.w = 0.0;
-
         return wsOut;
     }
 
-    float kp_v{0.1};
-    float kp_w{1.0};
+    float kp_v{1.0};     // Proportional gain
+    float kd_v{1.0};     // Derivative gain
+
+    float kp_w{5.0};     // Proportional gain
+    float kd_w{1.0};     // Derivative gain
 
     Agent::State goalState = wsOut->waypointPlan.begin()->second;
     Agent::State ownState = wsOut->observationSpace.ownState;
@@ -116,25 +116,33 @@ AgentWorkspacePtr Agent::controller(AgentWorkspacePtr ws)
     double xDiff = goalState.x - ownState.x;
     double yDiff = goalState.y - ownState.y;
 
-    float desired_theta = std::atan2(yDiff, xDiff);
-    float theta_error = desired_theta - ownState.theta;
+    // Calculate the distance to the goal
+    double distanceToGoal = std::sqrt(xDiff * xDiff + yDiff * yDiff);
+
+    // Calculate the angle the robot should be facing towards the waypoint in the global frame
+    double angleToGoal = std::atan2(yDiff, xDiff);
+
+    // Calculate the error in the robot's orientation in the global frame
+    float theta_error = angleToGoal - ownState.theta;
 
     // Normalize theta error to be within -PI to PI
     theta_error = std::atan2(std::sin(theta_error), std::cos(theta_error));
 
-    double distanceToGoal = std::sqrt(std::pow(xDiff, 2) + std::pow(yDiff, 2));
-    // std::cout << "Distance to goal: " << distanceToGoal << std::endl;
-    wsOut->actionSpace.v = kp_v * distanceToGoal;
-
-    double angleToGoal = goalState.theta - ownState.theta;
-    wsOut->actionSpace.w = kp_w * theta_error;
+    // Calculate linear and angular velocities
+    wsOut->actionSpace.v = kp_v * distanceToGoal; // + kd_v * ePosMinus1;
+    ePosMinus1 = distanceToGoal;
+    
+    
+    wsOut->actionSpace.w = kp_w * theta_error; // + kd_w * eThetaMinus1;
+    eThetaMinus1 = theta_error;
 
     logData = {wsOut->actionSpace.v, wsOut->actionSpace.w};
     info = "Agent " + std::to_string(wsOut->id) + " actionSpace: ";
     logger::createEvent(__func__, info, logData);
 
     return wsOut;
-}   
+}
+
 
 AgentWorkspacePtr Agent::pathPlanner(AgentWorkspacePtr ws)
 {

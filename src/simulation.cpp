@@ -20,6 +20,7 @@
 
 typedef std::unique_ptr<Simulation::SimulationWorkspace> simulationWorkspacePtr;
 // typedef Agent::AgentWorkspace* agentWorkspacePtr;
+static int t = 0;
 
 // constructor
 Simulation::Simulation(std::string sim_name_)
@@ -37,10 +38,13 @@ Simulation::~Simulation()
     logger::deInitializeLogger();
 }
 
+
+
 std::vector<Agent::AgentWorkspace> Simulation::registerAgents(const YAML::Node& config)
 {
     // here we instantiate 
     std::vector<Agent::AgentWorkspace> agentWorkspaces;
+
 
     for (const auto& node : config["agents"]) 
     {
@@ -50,10 +54,19 @@ std::vector<Agent::AgentWorkspace> Simulation::registerAgents(const YAML::Node& 
         // load agent initial conditions
         ws.id = node["id"].as<int>();
         ws.waypointRadius = config["simulation"]["waypoint_radius"].as<double>();
+
+        if (true == config["simulation"]["spawn_explicit"].as<bool>())
+        {
         std::vector<double> ics = node["ics"].as<std::vector<double>>(); 
         ws.observationSpace.ownState.x = ics[0];
         ws.observationSpace.ownState.y = ics[1];
         ws.observationSpace.ownState.theta = ics[2];
+        }
+        else if (true == config["simulation"]["spawn_distributed"].as<bool>())
+        {
+            
+        }
+
         ws.fsm = Agent::INIT;
         
         // if we are in waypoint mode load them in
@@ -66,7 +79,6 @@ std::vector<Agent::AgentWorkspace> Simulation::registerAgents(const YAML::Node& 
                 ws.waypointPlan[waypoint_id] = { waypoint_coords[0], waypoint_coords[1], waypoint_coords[2] };
             }
         }
-        
         // register fully initialized agent into the sim
         agentWorkspaces.push_back(ws);
     }
@@ -158,19 +170,21 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
     }
     
     // step vehicles - update vehicle state space in sim workspace in place
+    
     for (Vehicle::VehicleWorkspace& vehicleWs : wsOut.vehicleWorkspaces)
     {
         // step
         std::tuple<float, float> cmd = vehicleCmds.front();
         vehicleWs = Vehicle::stepVehicle(vehicleWs, cmd);
         vehicleCmds.erase(vehicleCmds.begin());
-
+        
         // log vehicle states
         std::vector<double> stateVec;
         stateVec.push_back(vehicleWs.state.x);
         stateVec.push_back(vehicleWs.state.y);
         stateVec.push_back(vehicleWs.state.theta);
-        logger::logVehicleState(vehicleWs.id, stateVec);
+        logger::logVehicleState(t, vehicleWs.id, stateVec);
+        std::cout<< "Theta " << vehicleWs.state.theta << std::endl;
 
         std::vector<double> logData = {vehicleWs.state.x, vehicleWs.state.y, vehicleWs.state.theta};
         std::string info = "Vehicle " + std::to_string(vehicleWs.id) + " state: ";
@@ -196,9 +210,10 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
         
         i++;
     }
-    
+    // std::cout << t << std::endl;
+    ++t;
     return wsOut;
-}
+} // step sim
 
 /******************************** MAIN *****************************************/
 

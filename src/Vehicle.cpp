@@ -35,16 +35,18 @@ Vehicle::VehicleWorkspace Vehicle::stepVehicle(Vehicle::VehicleWorkspace ws, con
         float delta_x = v * cos(wsOut.state.theta) * dt;
         float delta_y = v * sin(wsOut.state.theta) * dt;
         float delta_theta = w * dt;
+        std::cout << v << std::endl;
 
         // Update  state
         wsOut.state.x += delta_x;
         wsOut.state.y += delta_y;
         wsOut.state.theta += delta_theta;
-
+    
         // Normalize theta to be within [-pi, pi]
-        if (wsOut.state.theta > M_PI) {
+        while (wsOut.state.theta > M_PI) {
             wsOut.state.theta -= 2 * M_PI;
-        } else if (wsOut.state.theta < -M_PI) {
+        } 
+        while (wsOut.state.theta < -M_PI) {
             wsOut.state.theta += 2 * M_PI;
         }
 

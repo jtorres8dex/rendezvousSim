@@ -34,7 +34,7 @@ enum eventType
 
 
 void initializeLogger(std::string sim_name, std::string eventFileName);
-void logVehicleState(int id, std::vector<double> vState);
+void logVehicleState(int id, int t, std::vector<double> vState);
 void logWaypointInfo(int id, std::vector<double> location);
 void deInitializeLogger();
 

@@ -36,11 +36,11 @@ namespace logger
 
     }
 
-    void logVehicleState(int id, std::vector<double> vState)
+    void logVehicleState(int t, int id, std::vector<double> vState)
     {
         if (logFile.is_open())
         {
-            logFile << VEHICLE_STATE << "," << id << "," << vState[0] << "," << vState[1] << "," << vState[2] << "\n";
+            logFile  << t << "," << VEHICLE_STATE << "," << id << "," << vState[0] << "," << vState[1] << "," << vState[2] << "\n";
         }
         else
         {

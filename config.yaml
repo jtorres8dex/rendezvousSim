@@ -1,11 +1,12 @@
 simulation:
   sim_name: "TEST"
-  time_steps: 100
+  time_steps: 1000
   dt: 0.1
   num_vehicles: 1
   waypoint_radius: 2.0
   
-  spawn_explicit: true          # spawn all agents at specific state
+  spawn_explicit: false          # spawn all agents at specific state
+  spawn_distributed: true        # for large N, spread agents out evenly
 
   log_events: false
   
@@ -19,21 +20,21 @@ vehicles:
     agent: "joe"
 
 agents:
-  - name: "albert"
-    id: 1
-    waypoint_mode: true
-    leader: true
-    ics: [0.0, 0.0, 0.0]
-    waypoints:
-      1: [-300.0, -200.0, 0.0]
-      2: [200.0, -100.0, 1.0]
-      3: [0.0, 200.0, 0.5]
-  # - name: "joe"
-  #   id: 2
+  # - name: "albert"
+  #   id: 1
   #   waypoint_mode: true
-  #   leader: true 
-  #   ics: [20.0, 20.0, 20.0]
+  #   leader: true
+  #   ics: [0.0, 0.0, 0.0]
   #   waypoints:
-  #     1: [-100.0, 200.0, 0.0]
-  #     2: [220.0, -150.0, 1.0]
-  #     3: [130.0, 200.0, 0.5]
+  #     1: [-300.0, -200.0, 0.0]
+  #     2: [200.0, -100.0, 1.0]
+  #     3: [0.0, 200.0, 0.5]
+  - name: "joe"
+    id: 2
+    waypoint_mode: true
+    leader: true 
+    ics: [20.0, 20.0, 20.0]
+    waypoints:
+      1: [-100.0, 200.0, 0.0]
+      2: [220.0, -150.0, 1.0]
+      3: [130.0, 200.0, 0.5]
