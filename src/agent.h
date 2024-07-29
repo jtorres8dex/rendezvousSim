@@ -52,10 +52,25 @@ class Agent
             float w;
         };
 
+        struct neighborSort {
+            State ownState;
+
+            neighborSort() = default; // Default constructor
+            neighborSort(State ownState) : ownState(ownState) {}
+
+            bool operator()(const State& a, const State& b) {
+                double distanceA = std::sqrt(std::pow(a.x - ownState.x, 2) + std::pow(a.y - ownState.y, 2));
+                double distanceB = std::sqrt(std::pow(b.x - ownState.x, 2) + std::pow(b.y - ownState.y, 2));
+                return distanceA > distanceB;
+            }
+        };
+
         struct AgentWorkspace 
         {
             uint16_t id = 1;
+            
             std::vector<int> neighbors;
+            std::priority_queue<State, std::vector<State>, neighborSort> neighborStates;
             ObservationSpace observationSpace;
             ActionSpace actionSpace;
             FSM fsm;
@@ -68,14 +83,30 @@ class Agent
 
         static AgentWorkspace stepAgent(AgentWorkspace ws);
 
+        static bool isNeighbor(State ownState, State otherState, double r)
+        {
+            double dx = otherState.x - ownState.x;
+            double dy = otherState.y - ownState.y;
+
+            double distance = std::sqrt(std::pow(dx, 2) + std::pow(dy, 2));
+
+            return distance < r;            
+        }
+
     private:
         
         AgentWorkspacePtr setFSM(AgentWorkspacePtr ws);
 
         AgentWorkspacePtr controller(AgentWorkspacePtr ws);
 
-        
         AgentWorkspacePtr pathPlanner(AgentWorkspacePtr ws);
+
+        AgentWorkspacePtr getNeighbors(AgentWorkspacePtr ws);
+
+
+
+
+
         
 };
 

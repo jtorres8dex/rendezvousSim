@@ -69,8 +69,53 @@ std::vector<Agent::AgentWorkspace> Simulation::registerAgents(const YAML::Node& 
 
         ws.fsm = Agent::INIT;
         
-        // if we are in waypoint mode load them in
-        if (true == node["waypoint_mode"].as<bool>())
+        // Read in simulation type 
+        int performanceType{node["performance"].as<int>()};
+        
+        switch(performanceType)
+        {
+            case Simulation::performanceType::WAYPOINT:
+                
+                for (auto it = node["waypoints"].begin(); it != node["waypoints"].end(); ++it)
+                {
+                    int waypoint_id = it->first.as<int>();
+                    std::vector<double> waypoint_coords = it->second.as<std::vector<double>>();
+                    ws.waypointPlan[waypoint_id] = { waypoint_coords[0], waypoint_coords[1], waypoint_coords[2] };
+                }
+                break;
+
+            case Simulation::performanceType::RENDEVOUS:
+
+                static const double neighbor_radius = config["neighbor_radius"].as<double>();
+
+                // append neighbor states
+                for (const auto& node : config["agents"]) 
+                {
+                    // only look for other agents, not self
+                    if (node["id"].as<int>() != ws.id)
+                    {
+                        Agent::State otherState;
+                        otherState.x = node["ics"].as<std::vector<double>>()[0];
+                        otherState.y = node["ics"].as<std::vector<double>>()[1];
+                        otherState.theta = node["ics"].as<std::vector<double>>()[2];
+
+                        // add neighbor states to observation space
+                        if (true == Agent::isNeighbor(otherState, ws.observationSpace.ownState, neighbor_radius))
+                        {
+                            // push state onto priority queue
+                            ws.neighborStates.push({otherState.x, otherState.y, otherState.theta});
+                        }
+
+                    }
+
+                }
+                break;
+
+            default:
+                throw std::invalid_argument( "performance type not found" );
+
+        }
+        if ("waypoint" == node["performance"].as<std::string>())
         {
             for (auto it = node["waypoints"].begin(); it != node["waypoints"].end(); ++it)
             {
@@ -184,7 +229,6 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
         stateVec.push_back(vehicleWs.state.y);
         stateVec.push_back(vehicleWs.state.theta);
         logger::logVehicleState(t, vehicleWs.id, stateVec);
-        std::cout<< "Theta " << vehicleWs.state.theta << std::endl;
 
         std::vector<double> logData = {vehicleWs.state.x, vehicleWs.state.y, vehicleWs.state.theta};
         std::string info = "Vehicle " + std::to_string(vehicleWs.id) + " state: ";
@@ -210,7 +254,6 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
         
         i++;
     }
-    // std::cout << t << std::endl;
     ++t;
     return wsOut;
 } // step sim
@@ -233,7 +276,6 @@ auto start = std::chrono::high_resolution_clock::now();
 
 for (int i = 0; i < config["simulation"]["time_steps"].as<int>(); ++i)
 {
-    // std::cout << "************** i="<< i << " **************"<<std::endl;
 
     simWs = sim.stepSim(simWs);
     int j = 0;

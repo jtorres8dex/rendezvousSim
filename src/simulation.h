@@ -58,6 +58,13 @@ public:
 
     typedef std::unique_ptr<SimulationWorkspace> simulationWorkspacePtr;
 
+    enum performanceType
+    {
+        WAYPOINT,
+        RENDEVOUS,
+        SWARM_CONTROL
+    };
+
     std::vector<Agent::AgentWorkspace> registerAgents(const YAML::Node& config);
     std::vector<Vehicle::VehicleWorkspace> registerVehicles(const YAML::Node& config);
     SimulationWorkspace initialize(std::string configPath);

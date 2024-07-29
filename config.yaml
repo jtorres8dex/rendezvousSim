@@ -7,6 +7,9 @@ simulation:
   
   spawn_explicit: false          # spawn all agents at specific state
   spawn_distributed: true        # for large N, spread agents out evenly
+  performance: 1      # waypoint[0], rendevous[1], swarm control[2]
+
+  neighbor_radius: 80.0
 
   log_events: false
   
@@ -16,8 +19,16 @@ vehicles:
     agent: "albert"
 
   - id: 2
-    ics: [20.0, 20.0, 20.0]
-    agent: "joe"
+    ics: [20.0, 20.0, 0.0]
+    agent: "albert"
+  
+  - id: 3
+    ics: [20.0, 0.0, 0.0]
+    agent: "albert"
+
+  - id: 4
+    ics: [0.0, 20.0, 0.0]
+    agent: "albert"
 
 agents:
   # - name: "albert"
@@ -29,7 +40,7 @@ agents:
   #     1: [-300.0, -200.0, 0.0]
   #     2: [200.0, -100.0, 1.0]
   #     3: [0.0, 200.0, 0.5]
-  - name: "joe"
+  - name: "albert"
     id: 2
     waypoint_mode: true
     leader: true 

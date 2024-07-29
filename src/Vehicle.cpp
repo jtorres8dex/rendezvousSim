@@ -35,7 +35,6 @@ Vehicle::VehicleWorkspace Vehicle::stepVehicle(Vehicle::VehicleWorkspace ws, con
         float delta_x = v * cos(wsOut.state.theta) * dt;
         float delta_y = v * sin(wsOut.state.theta) * dt;
         float delta_theta = w * dt;
-        std::cout << v << std::endl;
 
         // Update  state
         wsOut.state.x += delta_x;

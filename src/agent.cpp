@@ -28,7 +28,6 @@ AgentWorkspacePtr Agent::setFSM(AgentWorkspacePtr ws)
     // do nothing if done
     if (DONE == wsOut->fsm)
     {
-        std::cout << "DONE" << std::endl;
         std::string info = "Agent " + std::to_string(wsOut->id) + " FSM: DONE";
         logger::createEvent<double>(__func__, info);
 
@@ -40,7 +39,6 @@ AgentWorkspacePtr Agent::setFSM(AgentWorkspacePtr ws)
     std::vector<double> wpPos = {goalState.x, goalState.y};
 
     double distanceToGoal = std::sqrt(std::pow(wsOut->observationSpace.ownState.x - goalState.x, 2) + std::pow(wsOut->observationSpace.ownState.y - goalState.y, 2));
-    std::cout<< "ssss" << wsOut->waypointPlan.size() << std::endl;
     // check if agent is at a waypoint
     if (wsOut->waypointRadius >= abs(distanceToGoal))
     {
