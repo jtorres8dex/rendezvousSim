@@ -162,6 +162,12 @@ AgentWorkspacePtr Agent::pathPlanner(AgentWorkspacePtr ws)
     return wsOut;
 }
 
+AgentWorkspacePtr getNeighbors(AgentWorkspacePtr wsIn, std::unordered_map<int, std::vector> otherStates)
+{
+    AgentWorkspacePtr wsOut{std::move(wsIn)};
+
+}
+
 Agent::AgentWorkspace Agent::stepAgent(Agent::AgentWorkspace ws)
 {
     AgentWorkspacePtr wsPtr = std::make_unique<AgentWorkspace>(ws);

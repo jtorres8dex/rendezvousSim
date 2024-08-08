@@ -21,6 +21,7 @@
 typedef std::unique_ptr<Simulation::SimulationWorkspace> simulationWorkspacePtr;
 // typedef Agent::AgentWorkspace* agentWorkspacePtr;
 static int t = 0;
+static const bool DEBUG_MODE{true};
 
 // constructor
 Simulation::Simulation(std::string sim_name_)
@@ -58,19 +59,20 @@ std::vector<Agent::AgentWorkspace> Simulation::registerAgents(const YAML::Node& 
         if (true == config["simulation"]["spawn_explicit"].as<bool>())
         {
         std::vector<double> ics = node["ics"].as<std::vector<double>>(); 
+        // Agent::State ownState{ics[0], ics[1], ics[2]}
         ws.observationSpace.ownState.x = ics[0];
         ws.observationSpace.ownState.y = ics[1];
         ws.observationSpace.ownState.theta = ics[2];
         }
         else if (true == config["simulation"]["spawn_distributed"].as<bool>())
         {
-            
+            std::cout << "SPAWN DISTRIBUTED" << std::endl;
         }
 
         ws.fsm = Agent::INIT;
         
         // Read in simulation type 
-        int performanceType{node["performance"].as<int>()};
+        int performanceType{config["simulation"]["performance"].as<int>()};
         
         switch(performanceType)
         {
@@ -86,38 +88,49 @@ std::vector<Agent::AgentWorkspace> Simulation::registerAgents(const YAML::Node& 
 
             case Simulation::performanceType::RENDEVOUS:
 
-                static const double neighbor_radius = config["neighbor_radius"].as<double>();
+                static const double neighbor_radius = config["simulation"]["neighbor_radius"].as<double>();
 
                 // append neighbor states
-                for (const auto& node : config["agents"]) 
-                {
                     // only look for other agents, not self
                     if (node["id"].as<int>() != ws.id)
                     {
                         Agent::State otherState;
                         otherState.x = node["ics"].as<std::vector<double>>()[0];
                         otherState.y = node["ics"].as<std::vector<double>>()[1];
+                        std::cout << "####################" << std::endl;
+                        std::cout << "State for agent " << node["id"].as<int>() << ": " << otherState.x << ", " << otherState.y << std::endl;
+                        std::cout << "####################" << std::endl;
                         otherState.theta = node["ics"].as<std::vector<double>>()[2];
 
                         // add neighbor states to observation space
+                        std::cout << "comparing agent " << ws.id << " to agent " << node["id"].as<int>() << " ";
+                        bool result{false};
                         if (true == Agent::isNeighbor(otherState, ws.observationSpace.ownState, neighbor_radius))
                         {
                             // push state onto priority queue
                             ws.neighborStates.push({otherState.x, otherState.y, otherState.theta});
+                            result = true;
                         }
+                        std::cout << "result: " << result << std::endl;
 
                     }
 
+                if (DEBUG_MODE)
+                {
+                    std::cout << "Agent " << ws.id << " number of neighbors:  " << ws.neighborStates.size() << std::endl;
                 }
+
                 break;
 
             default:
+            
+                std::cout << performanceType << std::endl;
                 throw std::invalid_argument( "performance type not found" );
 
         }
-        if ("waypoint" == node["performance"].as<std::string>())
+        if ("waypoint" == config["simulation"]["performance"].as<std::string>())
         {
-            for (auto it = node["waypoints"].begin(); it != node["waypoints"].end(); ++it)
+            for (auto it = config["waypoints"].begin(); it != node["waypoints"].end(); ++it)
             {
                 int waypoint_id = it->first.as<int>();
                 std::vector<double> waypoint_coords = it->second.as<std::vector<double>>();
@@ -164,8 +177,11 @@ Simulation::SimulationWorkspace Simulation::initialize(std::string configPath)
     try 
     {
         config = YAML::LoadFile(configPath);
-        std::cout << "Loaded configuration:\n" << YAML::Dump(config) << "\n" <<std::endl;
-        std::cout << " " << std::endl;
+        if (DEBUG_MODE)
+        {
+            std::cout << "Loaded configuration:\n" << YAML::Dump(config) << "\n" <<std::endl;
+            std::cout << " " << std::endl;
+        }
     }
     catch (const YAML::Exception& e) 
     {

@@ -81,27 +81,35 @@ class Agent
         
         typedef std::unique_ptr<AgentWorkspace> AgentWorkspacePtr;
 
-        static AgentWorkspace stepAgent(AgentWorkspace ws);
+        static AgentWorkspace stepAgent(AgentWorkspace wsIn);
 
-        static bool isNeighbor(State ownState, State otherState, double r)
-        {
-            double dx = otherState.x - ownState.x;
-            double dy = otherState.y - ownState.y;
+        AgentWorkspacePtr getNeighbors(AgentWorkspacePtr wsIn, std::unordered_map<int, std::vector> otherStates);
 
-            double distance = std::sqrt(std::pow(dx, 2) + std::pow(dy, 2));
 
-            return distance < r;            
-        }
 
     private:
+        bool isNeighbor(State ownState, State otherState, double r)
+        {   
+            std::cout << std::endl;
+            std::cout << __func__ << "()" << std::endl;
+            std::cout << "ownState: " << ownState.x << ", " << ownState.y << std::endl;
+            std::cout << "otherState: " << otherState.x << ", " << otherState.y << std::endl;
+
+            double dx = otherState.x - ownState.x;
+            double dy = otherState.y - ownState.y;
+            double distance = std::sqrt(std::pow(dx, 2) + std::pow(dy, 2));
+            std::cout << "distance: " << distance << std::endl;
+            return std::abs(distance) < std::abs(r);            
+        }
+
         
-        AgentWorkspacePtr setFSM(AgentWorkspacePtr ws);
+        AgentWorkspacePtr setFSM(AgentWorkspacePtr wsIn);
 
-        AgentWorkspacePtr controller(AgentWorkspacePtr ws);
+        AgentWorkspacePtr controller(AgentWorkspacePtr wsIn);
 
-        AgentWorkspacePtr pathPlanner(AgentWorkspacePtr ws);
+        AgentWorkspacePtr pathPlanner(AgentWorkspacePtr wsIn);
 
-        AgentWorkspacePtr getNeighbors(AgentWorkspacePtr ws);
+        AgentWorkspacePtr getNeighbors(AgentWorkspacePtr wsIn);
 
 
 
