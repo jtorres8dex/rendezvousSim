@@ -5,8 +5,8 @@ simulation:
   num_vehicles: 1
   waypoint_radius: 2.0
   
-  spawn_explicit: false        # spawn all agents at specific state
-  spawn_distributed: true      # for large N, spread agents out evenly
+  spawn_explicit: true        # spawn all agents at specific state
+  spawn_distributed: false      # for large N, spread agents out evenly
   performance: 1               # waypoint[0], rendevous[1], swarm control[2]
 
   neighbor_radius: 80.0

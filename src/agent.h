@@ -83,12 +83,11 @@ class Agent
 
         static AgentWorkspace stepAgent(AgentWorkspace wsIn);
 
-        AgentWorkspacePtr getNeighbors(AgentWorkspacePtr wsIn, std::unordered_map<int, std::vector> otherStates);
+        AgentWorkspacePtr getNeighbors(AgentWorkspacePtr wsIn, std::unordered_map<int, std::vector<double>> otherStates);
 
 
 
-    private:
-        bool isNeighbor(State ownState, State otherState, double r)
+        static bool isNeighbor(State ownState, State otherState, double r)
         {   
             std::cout << std::endl;
             std::cout << __func__ << "()" << std::endl;
@@ -102,6 +101,7 @@ class Agent
             return std::abs(distance) < std::abs(r);            
         }
 
+    private:
         
         AgentWorkspacePtr setFSM(AgentWorkspacePtr wsIn);
 

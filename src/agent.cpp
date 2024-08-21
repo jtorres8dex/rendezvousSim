@@ -162,7 +162,7 @@ AgentWorkspacePtr Agent::pathPlanner(AgentWorkspacePtr ws)
     return wsOut;
 }
 
-AgentWorkspacePtr getNeighbors(AgentWorkspacePtr wsIn, std::unordered_map<int, std::vector> otherStates)
+AgentWorkspacePtr getNeighbors(AgentWorkspacePtr wsIn, std::unordered_map<int, std::vector<double>> otherStates)
 {
     AgentWorkspacePtr wsOut{std::move(wsIn)};
 
