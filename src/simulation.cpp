@@ -3,7 +3,7 @@
 #include <chrono>
 #include <iomanip>
 #include <ctime>
-#include <sstream> 
+#include <sstream>
 #include <memory>
 
 #include <unordered_map>
@@ -12,11 +12,13 @@
 #include <queue>
 
 #include <yaml-cpp/yaml.h>
+#include <Eigen/Dense>
 
-#include "simulation.h"  
+#include "simulation.h"
 #include "agent.h"
 #include "vehicle.h"
 #include "loggingTools.h"
+#include "graphTheoryTools.h"
 
 typedef std::unique_ptr<Simulation::SimulationWorkspace> simulationWorkspacePtr;
 // typedef Agent::AgentWorkspace* agentWorkspacePtr;
@@ -27,9 +29,8 @@ static const bool DEBUG_MODE{true};
 Simulation::Simulation(std::string sim_name_)
 {
     std::string sim_name = "logs/SIMULATION_" + sim_name_ + ".csv";
-    std::string logFileName{"logs/" + sim_name_ + "_eventLogs.log"} ;
+    std::string logFileName{"logs/" + sim_name_ + "_eventLogs.log"};
     logger::initializeLogger(sim_name, logFileName);
-    
 }
 
 // destructor
@@ -39,15 +40,12 @@ Simulation::~Simulation()
     logger::deInitializeLogger();
 }
 
-
-
-std::vector<Agent::AgentWorkspace> Simulation::registerAgents(const YAML::Node& config)
+std::vector<Agent::AgentWorkspace> Simulation::registerAgents(const YAML::Node &config)
 {
-    // here we instantiate 
+    // here we instantiate
     std::vector<Agent::AgentWorkspace> agentWorkspaces;
 
-
-    for (const auto& node : config["agents"]) 
+    for (const auto &node : config["agents"])
     {
 
         // workspace to be added to sim vector
@@ -58,11 +56,11 @@ std::vector<Agent::AgentWorkspace> Simulation::registerAgents(const YAML::Node& 
 
         if (true == config["simulation"]["spawn_explicit"].as<bool>())
         {
-        std::vector<double> ics = node["ics"].as<std::vector<double>>(); 
-        // Agent::State ownState{ics[0], ics[1], ics[2]}
-        ws.observationSpace.ownState.x = ics[0];
-        ws.observationSpace.ownState.y = ics[1];
-        ws.observationSpace.ownState.theta = ics[2];
+            std::vector<double> ics = node["ics"].as<std::vector<double>>();
+            // Agent::State ownState{ics[0], ics[1], ics[2]}
+            ws.observationSpace.ownState.x = ics[0];
+            ws.observationSpace.ownState.y = ics[1];
+            ws.observationSpace.ownState.theta = ics[2];
         }
         else if (true == config["simulation"]["spawn_distributed"].as<bool>())
         {
@@ -70,63 +68,61 @@ std::vector<Agent::AgentWorkspace> Simulation::registerAgents(const YAML::Node& 
         }
 
         ws.fsm = Agent::INIT;
-        
-        // Read in simulation type 
+
+        // Read in simulation type
         int performanceType{config["simulation"]["performance"].as<int>()};
-        
-        switch(performanceType)
+
+        switch (performanceType)
         {
-            case Simulation::performanceType::WAYPOINT:
-                
-                for (auto it = node["waypoints"].begin(); it != node["waypoints"].end(); ++it)
+        case Simulation::performanceType::WAYPOINT:
+
+            for (auto it = node["waypoints"].begin(); it != node["waypoints"].end(); ++it)
+            {
+                int waypoint_id = it->first.as<int>();
+                std::vector<double> waypoint_coords = it->second.as<std::vector<double>>();
+                ws.waypointPlan[waypoint_id] = {waypoint_coords[0], waypoint_coords[1], waypoint_coords[2]};
+            }
+            break;
+
+        case Simulation::performanceType::RENDEVOUS:
+
+            static const double neighbor_radius = config["simulation"]["neighbor_radius"].as<double>();
+
+            // append neighbor states
+            // only look for other agents, not self
+            if (node["id"].as<int>() != ws.id)
+            {
+                Agent::State otherState;
+                otherState.x = node["ics"].as<std::vector<double>>()[0];
+                otherState.y = node["ics"].as<std::vector<double>>()[1];
+                std::cout << "####################" << std::endl;
+                std::cout << "State for agent " << node["id"].as<int>() << ": " << otherState.x << ", " << otherState.y << std::endl;
+                std::cout << "####################" << std::endl;
+                otherState.theta = node["ics"].as<std::vector<double>>()[2];
+
+                // add neighbor states to observation space
+                std::cout << "comparing agent " << ws.id << " to agent " << node["id"].as<int>() << " ";
+                bool result{false};
+                if (true == Agent::isNeighbor(otherState, ws.observationSpace.ownState, neighbor_radius))
                 {
-                    int waypoint_id = it->first.as<int>();
-                    std::vector<double> waypoint_coords = it->second.as<std::vector<double>>();
-                    ws.waypointPlan[waypoint_id] = { waypoint_coords[0], waypoint_coords[1], waypoint_coords[2] };
+                    // push state onto priority queue
+                    ws.neighborStates.push({otherState.x, otherState.y, otherState.theta});
+                    result = true;
                 }
-                break;
+                std::cout << "result: " << result << std::endl;
+            }
 
-            case Simulation::performanceType::RENDEVOUS:
+            if (DEBUG_MODE)
+            {
+                std::cout << "Agent " << ws.id << " number of neighbors:  " << ws.neighborStates.size() << std::endl;
+            }
 
-                static const double neighbor_radius = config["simulation"]["neighbor_radius"].as<double>();
+            break;
 
-                // append neighbor states
-                    // only look for other agents, not self
-                    if (node["id"].as<int>() != ws.id)
-                    {
-                        Agent::State otherState;
-                        otherState.x = node["ics"].as<std::vector<double>>()[0];
-                        otherState.y = node["ics"].as<std::vector<double>>()[1];
-                        std::cout << "####################" << std::endl;
-                        std::cout << "State for agent " << node["id"].as<int>() << ": " << otherState.x << ", " << otherState.y << std::endl;
-                        std::cout << "####################" << std::endl;
-                        otherState.theta = node["ics"].as<std::vector<double>>()[2];
+        default:
 
-                        // add neighbor states to observation space
-                        std::cout << "comparing agent " << ws.id << " to agent " << node["id"].as<int>() << " ";
-                        bool result{false};
-                        if (true == Agent::isNeighbor(otherState, ws.observationSpace.ownState, neighbor_radius))
-                        {
-                            // push state onto priority queue
-                            ws.neighborStates.push({otherState.x, otherState.y, otherState.theta});
-                            result = true;
-                        }
-                        std::cout << "result: " << result << std::endl;
-
-                    }
-
-                if (DEBUG_MODE)
-                {
-                    std::cout << "Agent " << ws.id << " number of neighbors:  " << ws.neighborStates.size() << std::endl;
-                }
-
-                break;
-
-            default:
-            
-                std::cout << performanceType << std::endl;
-                throw std::invalid_argument( "performance type not found" );
-
+            std::cout << performanceType << std::endl;
+            throw std::invalid_argument("performance type not found");
         }
         if ("waypoint" == config["simulation"]["performance"].as<std::string>())
         {
@@ -134,7 +130,7 @@ std::vector<Agent::AgentWorkspace> Simulation::registerAgents(const YAML::Node& 
             {
                 int waypoint_id = it->first.as<int>();
                 std::vector<double> waypoint_coords = it->second.as<std::vector<double>>();
-                ws.waypointPlan[waypoint_id] = { waypoint_coords[0], waypoint_coords[1], waypoint_coords[2] };
+                ws.waypointPlan[waypoint_id] = {waypoint_coords[0], waypoint_coords[1], waypoint_coords[2]};
             }
         }
         // register fully initialized agent into the sim
@@ -143,7 +139,7 @@ std::vector<Agent::AgentWorkspace> Simulation::registerAgents(const YAML::Node& 
 
     return agentWorkspaces;
 }
-std::vector<Vehicle::VehicleWorkspace> Simulation::registerVehicles(const YAML::Node& config)
+std::vector<Vehicle::VehicleWorkspace> Simulation::registerVehicles(const YAML::Node &config)
 {
     std::vector<Vehicle::VehicleWorkspace> vehicleWorkspaces;
 
@@ -166,26 +162,28 @@ std::vector<Vehicle::VehicleWorkspace> Simulation::registerVehicles(const YAML::
     return vehicleWorkspaces;
 }
 
-
 Simulation::SimulationWorkspace Simulation::initialize(std::string configPath)
 {
     // initialize sim workspace
     Simulation::SimulationWorkspace wsOut;
-    
-    // read in config 
+
+    // read in config
     YAML::Node config;
-    try 
+    try
     {
         config = YAML::LoadFile(configPath);
         if (DEBUG_MODE)
         {
-            std::cout << "Loaded configuration:\n" << YAML::Dump(config) << "\n" <<std::endl;
+            std::cout << "Loaded configuration:\n"
+                      << YAML::Dump(config) << "\n"
+                      << std::endl;
             std::cout << " " << std::endl;
         }
     }
-    catch (const YAML::Exception& e) 
+    catch (const YAML::Exception &e)
     {
-        std::cerr << "ERROR reading YAML file: "<< std::endl << e.what() << std::endl;
+        std::cerr << "ERROR reading YAML file: " << std::endl
+                  << e.what() << std::endl;
     }
 
     // initialize sim environment
@@ -194,7 +192,7 @@ Simulation::SimulationWorkspace Simulation::initialize(std::string configPath)
     dt = config["simulation"]["dt"].as<double>();
     int num_vehicles = config["simulation"]["num_vehicles"].as<int>();
 
-    // instantiate sim child objects 
+    // instantiate sim child objects
     Agent simAgent;
     wsOut.agentObj = simAgent;
     Vehicle simVehicle;
@@ -213,9 +211,9 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
 {
     Simulation::SimulationWorkspace wsOut{ws};
     std::vector<std::tuple<float, float>> vehicleCmds;
-    
+
     // step agents - update agent observation space in sim workspace in place
-    for (Agent::AgentWorkspace& agentWs : wsOut.agentWorkspaces)
+    for (Agent::AgentWorkspace &agentWs : wsOut.agentWorkspaces)
     {
         std::vector<double> logData = {agentWs.observationSpace.ownState.x, agentWs.observationSpace.ownState.y, agentWs.observationSpace.ownState.theta};
         std::string info = "Agent " + std::to_string(agentWs.id) + " ownState: ";
@@ -224,21 +222,32 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
         // Step the agent to update workspace and get commands
         agentWs = Agent::stepAgent(agentWs);
         vehicleCmds.push_back(std::make_tuple(agentWs.actionSpace.v, agentWs.actionSpace.w));
-        
+
         logData = {agentWs.actionSpace.v, agentWs.actionSpace.w};
         info = "Agent " + std::to_string(agentWs.id) + " actionSpace: ";
         logger::createEvent(__func__, info, logData);
     }
-    
+
+    // grab new agent states and compute Laplacian
+    std::unordered_map<int, std::vector<double>> agentStates;
+
+    for (Agent::AgentWorkspace &agentWs : wsOut.agentWorkspaces)
+    {
+        // std::vector<double> state = {agentWs.observationSpace.ownState.x, agentWs.observationSpace.ownState.y};
+        agentStates[agentWs.id] = {agentWs.observationSpace.ownState.x, agentWs.observationSpace.ownState.y};
+    }
+
+    Eigen::MatrixXd laplacianMatrix = graphTheoryTools::computeLaplacianMatrix(agentStates);
+
     // step vehicles - update vehicle state space in sim workspace in place
-    
-    for (Vehicle::VehicleWorkspace& vehicleWs : wsOut.vehicleWorkspaces)
+
+    for (Vehicle::VehicleWorkspace &vehicleWs : wsOut.vehicleWorkspaces)
     {
         // step
         std::tuple<float, float> cmd = vehicleCmds.front();
         vehicleWs = Vehicle::stepVehicle(vehicleWs, cmd);
         vehicleCmds.erase(vehicleCmds.begin());
-        
+
         // log vehicle states
         std::vector<double> stateVec;
         stateVec.push_back(vehicleWs.state.x);
@@ -249,25 +258,23 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
         std::vector<double> logData = {vehicleWs.state.x, vehicleWs.state.y, vehicleWs.state.theta};
         std::string info = "Vehicle " + std::to_string(vehicleWs.id) + " state: ";
         logger::createEvent(__func__, info, logData);
-
     }
-    
+
     // update agent observation space
-    for (Agent::AgentWorkspace& agentWs : wsOut.agentWorkspaces)
+    for (Agent::AgentWorkspace &agentWs : wsOut.agentWorkspaces)
     {
         int i{0};
-        
 
         agentWs.observationSpace.ownState.x = ws.vehicleWorkspaces[i].state.x;
         agentWs.observationSpace.ownState.y = ws.vehicleWorkspaces[i].state.y;
         agentWs.observationSpace.ownState.theta = ws.vehicleWorkspaces[i].state.theta;
 
         Agent::State ownState = agentWs.observationSpace.ownState;
-        
+
         std::vector<double> logData = {ownState.x, ownState.y, ownState.theta};
         std::string info = "Agent " + std::to_string(agentWs.id) + " ownState: ";
         logger::createEvent(__func__, info, logData);
-        
+
         i++;
     }
     ++t;
@@ -279,23 +286,24 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
 int main()
 {
 
-std::cout << "starting up firstRun..." << "\n" << std::endl;
+    std::cout << "starting up firstRun..." << "\n"
+              << std::endl;
 
-Simulation sim("TEST");
+    Simulation sim("TEST");
 
-YAML::Node config = YAML::LoadFile("config.yaml");
-std::string simName = config["simulation"]["sim_name"].as<std::string>();
+    YAML::Node config = YAML::LoadFile("config.yaml");
+    std::string simName = config["simulation"]["sim_name"].as<std::string>();
 
-Simulation::SimulationWorkspace simWs = sim.initialize("config.yaml");
+    Simulation::SimulationWorkspace simWs = sim.initialize("config.yaml");
 
-auto start = std::chrono::high_resolution_clock::now();
+    auto start = std::chrono::high_resolution_clock::now();
 
-for (int i = 0; i < config["simulation"]["time_steps"].as<int>(); ++i)
-{
+    for (int i = 0; i < config["simulation"]["time_steps"].as<int>(); ++i)
+    {
 
-    simWs = sim.stepSim(simWs);
-    int j = 0;
-}
+        simWs = sim.stepSim(simWs);
+        int j = 0;
+    }
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
 
@@ -304,5 +312,5 @@ for (int i = 0; i < config["simulation"]["time_steps"].as<int>(); ++i)
     std::cout << "" << std::endl;
     std::cout << "Duration in seconds: " << std::fixed << std::setprecision(9) << seconds << " s" << std::endl;
 
-return 0;
+    return 0;
 }

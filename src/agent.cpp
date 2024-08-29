@@ -7,6 +7,7 @@
 #include <iostream>
 #include <cmath>
 #include <yaml-cpp/yaml.h>
+#include <Eigen/Dense>
 
 #include "agent.h"
 #include "loggingTools.h"

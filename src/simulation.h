@@ -40,6 +40,7 @@ public:
         Vehicle vehicleObj;
         // std::vector<Vehicle> vehicles;
         // std::vector<Agent> agents;
+        int numAgents;
 
         bool is_connected_swarm;
     }; 
@@ -69,7 +70,7 @@ public:
     std::vector<Vehicle::VehicleWorkspace> registerVehicles(const YAML::Node& config);
     SimulationWorkspace initialize(std::string configPath);
     SimulationWorkspace stepSim(SimulationWorkspace ws);
-    
+
     
 };
 
