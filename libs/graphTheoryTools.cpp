@@ -13,7 +13,7 @@ namespace graphTheoryTools
 {
 
     // Helper function to calculate Euclidean distance between two state vectors
-    double calculateDistance(const std::vector<double> &state1, const std::vector<double> &state2)
+    double calculateDistance(const std::vector<double>& state1, const std::vector<double>& state2)
     {
         if (state1.size() != state2.size())
             throw std::invalid_argument("State vectors must be of the same dimension.");
@@ -34,16 +34,26 @@ namespace graphTheoryTools
         size_t n = states.size();
         Eigen::MatrixXd A = Eigen::MatrixXd::Zero(n, n);
 
-        for (const auto &[i, state_i] : states)
+        // Map keys to matrix indices
+        std::unordered_map<int, int> keyToIndex;
+        int index = 0;
+        for (const auto& [key, state] : states)
         {
-            for (const auto &[j, state_j] : states)
+            keyToIndex[key] = index++;
+        }
+
+        for (const auto& [i, state_i] : states)
+        {
+            int row = keyToIndex[i]; // Get the correct row index
+            for (const auto& [j, state_j] : states)
             {
                 if (i != j)
                 {
+                    int col = keyToIndex[j]; // Get the correct column index
                     double distance = calculateDistance(state_i, state_j);
                     if (distance <= neighborRadius)
                     {
-                        A(i, j) = 1.0;
+                        A(row, col) = 1.0;
                     }
                 }
             }
