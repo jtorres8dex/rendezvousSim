@@ -235,10 +235,9 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
 
     // grab new agent states and compute Laplacian
     std::unordered_map<int, std::vector<double>> agentStates;
-
+    // build agent state vector 
     for (Agent::AgentWorkspace &agentWs : wsOut.agentWorkspaces)
     {
-        // std::vector<double> state = {agentWs.observationSpace.ownState.x, agentWs.observationSpace.ownState.y};
         agentStates[agentWs.id] = {agentWs.observationSpace.ownState.x, agentWs.observationSpace.ownState.y};
     }
 
