@@ -24,7 +24,7 @@ typedef std::unique_ptr<Simulation::SimulationWorkspace> simulationWorkspacePtr;
 // typedef Agent::AgentWorkspace* agentWorkspacePtr;
 static int t = 0;
 static const bool DEBUG_MODE{true};
-// static double neighbor_radius;
+static double neighbor_radius;
 
 // constructor
 Simulation::Simulation(std::string sim_name_)
@@ -87,32 +87,35 @@ std::vector<Agent::AgentWorkspace> Simulation::registerAgents(const YAML::Node &
 
         case Simulation::performanceType::RENDEVOUS:
 
-            static const double RAD = config["simulation"]["neighbor_radius"].as<double>();
+            static const double neighbor_radius = config["simulation"]["neighbor_radius"].as<double>();
 
-            // append neighbor states
-            // only look for other agents, not self
-            if (node["id"].as<int>() != ws.id)
+            std::cout << node["id"].as<int>() << "::::::::" << ws.id << std::endl;
+            for (const auto &node : config["agents"])
             {
-                Agent::State otherState;
-                otherState.x = node["ics"].as<std::vector<double>>()[0];
-                otherState.y = node["ics"].as<std::vector<double>>()[1];
-                std::cout << "####################" << std::endl;
-                std::cout << "State for agent " << node["id"].as<int>() << ": " << otherState.x << ", " << otherState.y << std::endl;
-                std::cout << "####################" << std::endl;
-                otherState.theta = node["ics"].as<std::vector<double>>()[2];
 
-                // add neighbor states to observation space
-                std::cout << "comparing agent " << ws.id << " to agent " << node["id"].as<int>() << " ";
-                bool result{false};
-                if (true == Agent::isNeighbor(otherState, ws.observationSpace.ownState, RAD))
+                if (node["id"].as<int>() != ws.id)
                 {
-                    // push state onto priority queue
-                    ws.neighborStates.push({otherState.x, otherState.y, otherState.theta});
-                    result = true;
-                }
-                std::cout << "result: " << result << std::endl;
-            }
+                    std::cout << "XXXXXX" << std::endl;
+                    Agent::State otherState;
+                    otherState.x = node["ics"].as<std::vector<double>>()[0];
+                    otherState.y = node["ics"].as<std::vector<double>>()[1];
+                    std::cout << "####################" << std::endl;
+                    std::cout << "State for agent " << node["id"].as<int>() << ": " << otherState.x << ", " << otherState.y << std::endl;
+                    std::cout << "####################" << std::endl;
+                    otherState.theta = node["ics"].as<std::vector<double>>()[2];
 
+                    // add neighbor states to observation space
+                    std::cout << "comparing agent " << ws.id << " to agent " << node["id"].as<int>() << " ";
+                    bool result{false};
+                    if (true == Agent::isNeighbor(otherState, ws.observationSpace.ownState, neighbor_radius))
+                    {
+                        // push state onto priority queue
+                        ws.neighborStates.push({otherState.x, otherState.y, otherState.theta});
+                        result = true;
+                    }
+                    std::cout << "result: " << result << std::endl;
+                }
+            }
             if (DEBUG_MODE)
             {
                 std::cout << "Agent " << ws.id << " number of neighbors:  " << ws.neighborStates.size() << std::endl;
@@ -140,6 +143,7 @@ std::vector<Agent::AgentWorkspace> Simulation::registerAgents(const YAML::Node &
 
     return agentWorkspaces;
 }
+
 std::vector<Vehicle::VehicleWorkspace> Simulation::registerVehicles(const YAML::Node &config)
 {
     std::vector<Vehicle::VehicleWorkspace> vehicleWorkspaces;
@@ -175,9 +179,9 @@ Simulation::SimulationWorkspace Simulation::initialize(std::string configPath)
         config = YAML::LoadFile(configPath);
         if (DEBUG_MODE)
         {
-            std::cout << "Loaded configuration:\n"
-                      << YAML::Dump(config) << "\n"
-                      << std::endl;
+            // std::cout << "Loaded configuration:\n"
+            //           << YAML::Dump(config) << "\n"
+            //           << std::endl;
             std::cout << " " << std::endl;
         }
     }
@@ -238,7 +242,7 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
         agentStates[agentWs.id] = {agentWs.observationSpace.ownState.x, agentWs.observationSpace.ownState.y};
     }
 
-    Eigen::MatrixXd laplacianMatrix = graphTheoryTools::computeLaplacianMatrix(agentStates,100.0 /*neighbor_radius*/);
+    Eigen::MatrixXd laplacianMatrix = graphTheoryTools::computeLaplacianMatrix(agentStates, neighbor_radius);
 
     // step vehicles - update vehicle state space in sim workspace in place
 
