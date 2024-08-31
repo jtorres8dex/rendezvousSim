@@ -24,6 +24,7 @@ typedef std::unique_ptr<Simulation::SimulationWorkspace> simulationWorkspacePtr;
 // typedef Agent::AgentWorkspace* agentWorkspacePtr;
 static int t = 0;
 static const bool DEBUG_MODE{true};
+// static double neighbor_radius;
 
 // constructor
 Simulation::Simulation(std::string sim_name_)
@@ -86,7 +87,7 @@ std::vector<Agent::AgentWorkspace> Simulation::registerAgents(const YAML::Node &
 
         case Simulation::performanceType::RENDEVOUS:
 
-            static const double neighbor_radius = config["simulation"]["neighbor_radius"].as<double>();
+            static const double RAD = config["simulation"]["neighbor_radius"].as<double>();
 
             // append neighbor states
             // only look for other agents, not self
@@ -103,7 +104,7 @@ std::vector<Agent::AgentWorkspace> Simulation::registerAgents(const YAML::Node &
                 // add neighbor states to observation space
                 std::cout << "comparing agent " << ws.id << " to agent " << node["id"].as<int>() << " ";
                 bool result{false};
-                if (true == Agent::isNeighbor(otherState, ws.observationSpace.ownState, neighbor_radius))
+                if (true == Agent::isNeighbor(otherState, ws.observationSpace.ownState, RAD))
                 {
                     // push state onto priority queue
                     ws.neighborStates.push({otherState.x, otherState.y, otherState.theta});
@@ -237,7 +238,7 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
         agentStates[agentWs.id] = {agentWs.observationSpace.ownState.x, agentWs.observationSpace.ownState.y};
     }
 
-    Eigen::MatrixXd laplacianMatrix = graphTheoryTools::computeLaplacianMatrix(agentStates);
+    Eigen::MatrixXd laplacianMatrix = graphTheoryTools::computeLaplacianMatrix(agentStates,100.0 /*neighbor_radius*/);
 
     // step vehicles - update vehicle state space in sim workspace in place
 
