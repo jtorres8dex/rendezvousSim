@@ -15,7 +15,7 @@
 #include <Eigen/Dense>
 
 #include "simulation.h"
-#include "agent.h"
+#include "agents/agent.h"
 #include "vehicle.h"
 #include "loggingTools.h"
 #include "graphTheoryTools.h"

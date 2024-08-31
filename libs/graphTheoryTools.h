@@ -6,7 +6,6 @@
 #include <stdexcept>
 #include <Eigen/Dense>
 
-#include "../src/agent.h"
 
 namespace graphTheoryTools
 {

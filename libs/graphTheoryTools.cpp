@@ -4,7 +4,6 @@
 #include <Eigen/Dense>
 #include <cmath>
 
-#include "../src/agent.h"
 #include "graphTheoryTools.h"
 
 namespace graphTheoryTools

@@ -10,7 +10,7 @@
 #include <Eigen/Dense>
 
 #include "agent.h"
-#include "loggingTools.h"
+#include "../loggingTools.h"
 
 static const double TWO_PI = M_PI * 2;
 double dt = 0.1;
