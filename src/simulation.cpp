@@ -21,7 +21,7 @@
 #include "graphTheoryTools.h"
 
 typedef std::unique_ptr<Simulation::SimulationWorkspace> simulationWorkspacePtr;
-// typedef Agent::AgentWorkspace* agentWorkspacePtr;
+
 static int t = 0;
 static const bool DEBUG_MODE{true};
 static double neighbor_radius;
