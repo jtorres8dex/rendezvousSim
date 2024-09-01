@@ -10,8 +10,9 @@ class FollowerAgent : public Agent
     AgentWorkspace followerWorkspace;
 
 
-    State getLeaderState(AgentWorkspacePtr wsIn)
+    State getLeaderState()
     {
+        State leaderState;
 
         return leaderState;
     }
@@ -19,7 +20,7 @@ class FollowerAgent : public Agent
     Agent::AgentWorkspacePtr controller(AgentWorkspacePtr wsIn)
     {
         AgentWorkspacePtr wsOut{std::move(wsIn)};
-        State leaderState = getLeaderState(wsOut);
+        State leaderState = getLeaderState();
 
 
         State ownState = wsIn->observationSpace.ownState;
