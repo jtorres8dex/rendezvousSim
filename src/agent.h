@@ -67,7 +67,7 @@ class Agent
 
         struct AgentWorkspace 
         {
-            uint16_t id = 1;
+            uint16_t id;
             
             std::vector<int> neighbors;
             std::priority_queue<State, std::vector<State>, neighborSort> neighborStates;
