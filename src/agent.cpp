@@ -73,7 +73,7 @@ AgentWorkspacePtr Agent::setFSM(AgentWorkspacePtr ws)
         logger::createEvent<double>(__func__, info);
 
         wsOut->fsm = APPROACHING;
-        logger::logWaypointInfo(wpId, wpPos);
+        // logger::logWaypointInfo(wpId, wpPos);
     }
     else
     {
