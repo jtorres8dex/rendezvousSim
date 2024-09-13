@@ -20,7 +20,7 @@ static double eThetaMinus1{0};
 
 typedef std::unique_ptr<Agent::AgentWorkspace> AgentWorkspacePtr;
 
-Agent::Agent(){};
+Agent::Agent() {};
 
 AgentWorkspacePtr Agent::setFSM(AgentWorkspacePtr ws)
 {
@@ -48,42 +48,39 @@ AgentWorkspacePtr Agent::setFSM(AgentWorkspacePtr ws)
 
         if (!wsOut->waypointPlan.empty())
         {
-            // remove from global planner    
+            // remove from global planner
             wsOut->waypointPlan.erase(wsOut->waypointPlan.begin());
-            
+
             // move on to next waypoint or finish
             if (!wsOut->waypointPlan.empty())
             {
-                
+
                 wsOut->observationSpace.goalState = wsOut->waypointPlan.begin()->second;
             }
             else
             {
                 wsOut->fsm = DONE;
-                
+
                 std::string info = "Agent " + std::to_string(wsOut->id) + " is DONE";
                 logger::createEvent<double>(__func__, info);
             }
-
-
         }
     }
     // not at waypoint yet
     else if (wsOut->waypointRadius <= abs(distanceToGoal))
     {
-        std::string info = "Agent " + std::to_string(wsOut->id) + " FSM: APPROACHING" ;
+        std::string info = "Agent " + std::to_string(wsOut->id) + " FSM: APPROACHING";
         logger::createEvent<double>(__func__, info);
-        
-        wsOut->fsm = APPROACHING; 
+
+        wsOut->fsm = APPROACHING;
         logger::logWaypointInfo(wpId, wpPos);
     }
     else
     {
-        std::string info = "Agent " + std::to_string(wsOut->id) + " FSM: DONE" ;
+        std::string info = "Agent " + std::to_string(wsOut->id) + " FSM: DONE";
         logger::createEvent<double>(__func__, info);
         wsOut->fsm = ERROR;
     }
-
 
     return wsOut;
 }
@@ -99,11 +96,11 @@ AgentWorkspacePtr Agent::controller(AgentWorkspacePtr ws)
         return wsOut;
     }
 
-    float kp_v{1.0};     // Proportional gain
-    float kd_v{1.0};     // Derivative gain
+    float kp_v{1.0}; // Proportional gain
+    float kd_v{1.0}; // Derivative gain
 
-    float kp_w{5.0};     // Proportional gain
-    float kd_w{1.0};     // Derivative gain
+    float kp_w{5.0}; // Proportional gain
+    float kd_w{1.0}; // Derivative gain
 
     Agent::State goalState = wsOut->waypointPlan.begin()->second;
     Agent::State ownState = wsOut->observationSpace.ownState;
@@ -130,8 +127,7 @@ AgentWorkspacePtr Agent::controller(AgentWorkspacePtr ws)
     // Calculate linear and angular velocities
     wsOut->actionSpace.v = kp_v * distanceToGoal; // + kd_v * ePosMinus1;
     ePosMinus1 = distanceToGoal;
-    
-    
+
     wsOut->actionSpace.w = kp_w * theta_error; // + kd_w * eThetaMinus1;
     eThetaMinus1 = theta_error;
 
@@ -142,19 +138,18 @@ AgentWorkspacePtr Agent::controller(AgentWorkspacePtr ws)
     return wsOut;
 }
 
-
 AgentWorkspacePtr Agent::pathPlanner(AgentWorkspacePtr ws)
 {
     AgentWorkspacePtr wsOut{std::move(ws)};
-    
+
     if (APPROACHING == wsOut->fsm)
     {
         wsOut->observationSpace.goalState = wsOut->waypointPlan.begin()->second;
 
         // log goal state
-        std::vector<double> logData = { wsOut->observationSpace.goalState.x, 
-                                        wsOut->observationSpace.goalState.y, 
-                                        wsOut->observationSpace.goalState.theta};
+        std::vector<double> logData = {wsOut->observationSpace.goalState.x,
+                                       wsOut->observationSpace.goalState.y,
+                                       wsOut->observationSpace.goalState.theta};
 
         std::string info = "Agent " + std::to_string(wsOut->id) + " Goal State: ";
         logger::createEvent(__func__, info, logData);
@@ -163,10 +158,30 @@ AgentWorkspacePtr Agent::pathPlanner(AgentWorkspacePtr ws)
     return wsOut;
 }
 
-AgentWorkspacePtr getNeighbors(AgentWorkspacePtr wsIn, std::unordered_map<int, std::vector<double>> otherStates)
+AgentWorkspacePtr getNeighbors(AgentWorkspacePtr wsIn, std::unordered_map<int, std::vector<double>> allAgentStates, double R)
 {
     AgentWorkspacePtr wsOut{std::move(wsIn)};
 
+    for (const auto& pair : allAgentStates)
+    {
+        int otherId = pair.first;
+        if (otherId != wsOut->id)
+        {
+            double dx = pair.second[0] - wsOut->observationSpace.ownState.x;
+            double dy = pair.second[1] - wsOut->observationSpace.ownState.y;
+
+            // if inside neighbor radius
+            if (R <= std::sqrt(std::pow(dx, 2) + std::pow(dy, 2)))
+            {
+                Agent::State neighborState;
+                neighborState.x = pair.second[0];
+                neighborState.y = pair.second[1];
+                wsOut->neighborStates.push(neighborState);
+            }
+        }
+    }
+
+    return wsOut;
 }
 
 Agent::AgentWorkspace Agent::stepAgent(Agent::AgentWorkspace ws)
@@ -180,6 +195,7 @@ Agent::AgentWorkspace Agent::stepAgent(Agent::AgentWorkspace ws)
     std::vector<double> ics = {x, y, theta};
 
     Agent agent;
+    
 
     return *agent.controller(agent.pathPlanner(agent.setFSM(std::move(wsPtr))));
 }

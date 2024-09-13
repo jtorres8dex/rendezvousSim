@@ -87,6 +87,11 @@ std::vector<Agent::AgentWorkspace> Simulation::registerAgents(const YAML::Node &
 
         case Simulation::performanceType::RENDEVOUS:
 
+            /*
+            NOTE: here we are reading in neighbor radius as defined on the simulation level. 
+            It should also be possible to define this parameter per agent, as to represent 
+            different ranges of various sensors --> node["neighborRadius"].as<double>
+            */
             static const double neighbor_radius = config["simulation"]["neighbor_radius"].as<double>();
 
             std::cout << node["id"].as<int>() << "::::::::" << ws.id << std::endl;
@@ -118,7 +123,7 @@ std::vector<Agent::AgentWorkspace> Simulation::registerAgents(const YAML::Node &
             }
             if (DEBUG_MODE)
             {
-                std::cout << "Agent " << ws.id << " number of neighbors:  " << ws.neighborStates.size() << std::endl;
+                std::cout << "Agent " << ws.id << " number of neighbors at spawn:  " << ws.neighborStates.size() << std::endl;
             }
 
             break;
@@ -240,9 +245,17 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
     {
         // std::vector<double> state = {agentWs.observationSpace.ownState.x, agentWs.observationSpace.ownState.y};
         agentStates[agentWs.id] = {agentWs.observationSpace.ownState.x, agentWs.observationSpace.ownState.y};
+        
+        // now build neighbor space
+        
+
+
     }
 
-    Eigen::MatrixXd laplacianMatrix = graphTheoryTools::computeLaplacianMatrix(agentStates, neighbor_radius);
+
+    Eigen::MatrixXd globalLaplacianMatrix = graphTheoryTools::computeLaplacianMatrix(agentStates, neighbor_radius);
+
+
 
     // step vehicles - update vehicle state space in sim workspace in place
 

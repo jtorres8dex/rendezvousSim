@@ -69,11 +69,14 @@ class Agent
         {
             uint16_t id;
             
-            std::vector<int> neighbors;
+            double neighborRadius;
+            std::vector<int> neighborIds;
             std::priority_queue<State, std::vector<State>, neighborSort> neighborStates;
+
             ObservationSpace observationSpace;
             ActionSpace actionSpace;
             FSM fsm;
+
             std::map<int, Agent::State > waypointPlan;
             double waypointRadius;
         };
@@ -83,7 +86,7 @@ class Agent
 
         static AgentWorkspace stepAgent(AgentWorkspace wsIn);
 
-        AgentWorkspacePtr getNeighbors(AgentWorkspacePtr wsIn, std::unordered_map<int, std::vector<double>> otherStates);
+        AgentWorkspacePtr getNeighbors(AgentWorkspacePtr wsIn, std::unordered_map<int, std::vector<double>> allAgentStates, double R);
 
 
 
@@ -109,7 +112,7 @@ class Agent
 
         AgentWorkspacePtr pathPlanner(AgentWorkspacePtr wsIn);
 
-        AgentWorkspacePtr getNeighbors(AgentWorkspacePtr wsIn);
+        // AgentWorkspacePtr getNeighbors(AgentWorkspacePtr wsIn, std::unordered_map<int, std::vector<double>> otherStates);
 
 
 
