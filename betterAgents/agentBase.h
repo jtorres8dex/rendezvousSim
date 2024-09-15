@@ -61,21 +61,36 @@ public:
         }
     };
 
+    uint16_t id;
+
     struct AgentWorkspace
     {
-        uint16_t id;
         std::vector<int> neighborIds;
         std::priority_queue<State, std::vector<State>, neighborSort> neighborStates;
         ObservationSpace observationSpace;
         ActionSpace actionSpace;
         FSM fsm;
     };
+    AgentWorkspace agentWorkspace;
 
+    void Agent();
     virtual void controller();    // actuator commands
     virtual void stepAgent();    // simulation interface function
     virtual void pathPlanner();  //
     virtual void setFSM();       //
     virtual void getNeighbors(); //
+
+    // helper functions
+    template <typename T>
+    State vectorToState(const std::vector<T> input)
+    {
+        State out;
+        out.x = input[0];
+        out.y = input[1];
+        out.theta = input[2];
+
+        return out;
+    }
 };
 
 #endif

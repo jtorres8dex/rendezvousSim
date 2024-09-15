@@ -2,26 +2,26 @@ import csv
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import numpy as np
+from dataclasses import dataclass
 
+@dataclass
 class Config:
-    def __init__(self):
-        self.csv_file = 'logs/SIMULATION_TEST.csv'  # CSV file containing vehicle states
-        self.time_col = 0                  # Column index for time
-        self.type_col = 1                  # Column index for type (should be VEHICLE_STATE)
-        self.id_col = 2                    # Column index for vehicle ID
-        self.x_col = 3                     # Column index for x position
-        self.y_col = 4                     # Column index for y position
-        self.theta_col = 5                 # Column index for theta (orientation)
-        self.fps = 30                      # Frames per second for animation
-        self.trail_length = 50             # Number of previous points to display as a trail
-        self.fig_size = (10, 8)            # Figure size for the plot
-        self.xlim = (-100, 100)            # X-axis limits for the plot
-        self.ylim = (-100, 100)            # Y-axis limits for the plot
-        self.arrow_length = 5              # Length of the direction arrow representing theta
+        csv_file = 'logs/SIMULATION_TEST.csv'  # CSV file containing vehicle states
+        time_col = 0                           # Column index for time
+        type_col = 1                           # Column index for type (should be VEHICLE_STATE)
+        id_col = 2                             # Column index for vehicle ID
+        x_col = 3                              # Column index for x position
+        y_col = 4                              # Column index for y position
+        theta_col = 5                          # Column index for theta (orientation)
+        fps = 30                               # Frames per second for animation
+        trail_length = 50                      # Number of previous points to display as a trail
+        fig_size = (10, 8)                     # Figure size for the plot
+        xlim = (-100, 100)                     # X-axis limits for the plot
+        ylim = (-100, 100)                     # Y-axis limits for the plot
+        arrow_length = 5                       # Length of the direction arrow representing theta
 
 VEHICLE_STATE = 0
 
-# Read vehicle states from CSV
 def read_vehicle_data(csv_file):
     vehicle_data = {}
 
@@ -56,7 +56,6 @@ def read_vehicle_data(csv_file):
     
     return vehicle_data
 
-# Plot setup
 def setup_plot(config, vehicle_ids):
     fig, ax = plt.subplots(figsize=config.fig_size)
     ax.set_xlim(config.xlim)
@@ -74,7 +73,6 @@ def setup_plot(config, vehicle_ids):
     ax.legend()
     return fig, ax, vehicle_plots
 
-# Update function for animation
 def update_plot(frame, vehicle_data, config, vehicle_plots):
     for vehicle_id, vehicle in vehicle_data.items():
         if frame < len(vehicle['time']):
@@ -95,19 +93,15 @@ def update_plot(frame, vehicle_data, config, vehicle_plots):
 def main():
     config = Config()
     
-    # Load vehicle data from CSV
     vehicle_data = read_vehicle_data(config.csv_file)
     vehicle_ids = list(vehicle_data.keys())
 
-    # Setup plot
     fig, ax, vehicle_plots = setup_plot(config, vehicle_ids)
 
-    # Animation function
     anim = FuncAnimation(fig, update_plot, frames=len(next(iter(vehicle_data.values()))['time']),
                          fargs=(vehicle_data, config, vehicle_plots),
                          interval=1000/config.fps, blit=True)
 
-    # Show plot
     plt.show()
 
 if __name__ == "__main__":
