@@ -3,10 +3,11 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import numpy as np
 from dataclasses import dataclass
+import argparse
 
 @dataclass
 class Config:
-        csv_file = 'logs/SIMULATION_TEST.csv'  # CSV file containing vehicle states
+        csv_file: str                          # CSV file containing vehicle states
         time_col = 0                           # Column index for time
         type_col = 1                           # Column index for type (should be VEHICLE_STATE)
         id_col = 2                             # Column index for vehicle ID
@@ -21,18 +22,25 @@ class Config:
         arrow_length = 5                       # Length of the direction arrow representing theta
 
 VEHICLE_STATE = 0
+static num_skipped_rows = 0
+skipped_rows = []
 
 def read_vehicle_data(csv_file):
     vehicle_data = {}
-
+    row_number = 0
+    num_skipped_rows = 0
+    skipped_rows = []
     with open(csv_file, 'r') as file:
         reader = csv.reader(file)
         for row in reader:
             # Skip rows that are too short to be valid
             if len(row) < 6:
-                print(f"Warning: Skipping incomplete row: {row}")
-                continue
+                num_skipped_rows += 1
+                skipped_rows.append(row_number)
+                print(f"Warning: Skipping incomplete row: {row_number}: {row}")
 
+                continue
+            row_number += 1
             try:
                 log_type = int(row[1])  # logType column (should be VEHICLE_STATE)
 
@@ -91,7 +99,13 @@ def update_plot(frame, vehicle_data, config, vehicle_plots):
     return [plot for vehicle_plot in vehicle_plots.values() for plot in vehicle_plot.values()]
 
 def main():
-    config = Config()
+    
+    parser = argparse.ArgumentParser(description="Plot vehicle movements from a CSV file.")
+    parser.add_argument('csv_file', type=str, help='Path to the CSV file containing vehicle states')
+    args = parser.parse_args()
+
+    # Create the config with the provided CSV file path
+    config = Config(csv_file=args.csv_file)
     
     vehicle_data = read_vehicle_data(config.csv_file)
     vehicle_ids = list(vehicle_data.keys())
@@ -103,6 +117,8 @@ def main():
                          interval=1000/config.fps, blit=True)
 
     plt.show()
+    print("Skipped rows: ", num_skipped_rows)
+
 
 if __name__ == "__main__":
     main()

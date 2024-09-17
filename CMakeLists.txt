@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.10)
 project(Simulation VERSION 1.0)
 
 # Specify the C++ standard
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -22,12 +22,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/Debug)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release)
 
 # Add an executable target called "runMe" and specify the source files
-add_executable(runMe src/simulation.cpp src/Vehicle.cpp src/agents/agent.cpp 
-                src/agents/follower.cpp src/loggingTools.cpp libs/graphTheoryTools.cpp
-                betterAgents/agentBase.cpp betterAgents/followerAgent.cpp)
+add_executable(runMe src/sim/simulation.cpp src/physics/Vehicle.cpp src/agents/agent.cpp 
+                src/agents/followerAgent.cpp src/sim/loggingTools.cpp libs/graphTheoryTools.cpp
+                src/agents/agentBase.cpp src/agents/leaderAgent.cpp)
 
 # Now specify the include directories after defining the target
-target_include_directories(runMe PRIVATE src/ libs/ betterAgents/)
+target_include_directories(runMe PRIVATE src/ libs/)
 
 # Link directories for libraries
 include_directories("/opt/homebrew/Cellar/yaml-cpp/0.8.0/include")
