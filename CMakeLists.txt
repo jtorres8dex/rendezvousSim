@@ -7,6 +7,7 @@ project(Simulation VERSION 1.0)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Find yaml-cpp package
 find_package(yaml-cpp REQUIRED)
@@ -23,11 +24,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release)
 
 # Add an executable target called "runMe" and specify the source files
 add_executable(runMe src/sim/simulation.cpp src/physics/Vehicle.cpp src/agents/agent.cpp 
-                src/agents/followerAgent.cpp src/sim/loggingTools.cpp libs/graphTheoryTools.cpp
-                src/agents/agentBase.cpp src/agents/leaderAgent.cpp)
+src/agents/followerAgent.cpp libs/loggingTools.cpp libs/graphTheoryTools.cpp
+src/agents/agentBase.cpp src/agents/leaderAgent.cpp)
 
+target_include_directories(runMe PRIVATE ${CMAKE_SOURCE_DIR}/libs ${CMAKE_SOURCE_DIR}/src)
 # Now specify the include directories after defining the target
-target_include_directories(runMe PRIVATE src/ libs/)
 
 # Link directories for libraries
 include_directories("/opt/homebrew/Cellar/yaml-cpp/0.8.0/include")

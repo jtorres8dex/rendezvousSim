@@ -1,6 +1,6 @@
 
 #include "agentBase.h"
-#include "sim/loggingTools.h"
+#include "loggingTools.h"
 
 using namespace logger;
 static double ePosMinus1{0};
