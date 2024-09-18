@@ -3,7 +3,7 @@
 .devcontainer
 
 .github
-
+.gitignore
 .vscode
 outputs/
 build/
