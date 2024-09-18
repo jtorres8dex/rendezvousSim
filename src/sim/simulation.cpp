@@ -1,18 +1,4 @@
-#include <iostream>
-#include <fstream>
-#include <chrono>
-#include <iomanip>
-#include <ctime>
-#include <sstream>
-#include <memory>
-
-#include <unordered_map>
-#include <vector>
-#include <tuple>
-#include <queue>
-
-#include <yaml-cpp/yaml.h>
-#include <Eigen/Dense>
+#include "standard_includes.h"
 
 #include "simulation.h"
 #include "agents/agent.h"

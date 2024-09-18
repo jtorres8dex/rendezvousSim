@@ -1,13 +1,7 @@
 #ifndef AGENT_BASE_H
 #define AGENT_BASE_H
 
-#include <vector>
-#include <queue>
-#include <unordered_map>
-#include <map>
-
-#include <iostream>
-#include <cmath>
+#include "standard_includes.h"
 
 class AgentBase
 {
@@ -91,6 +85,6 @@ public:
 
         return out;
     }
-};
+}; // class Agentbase
 
 #endif

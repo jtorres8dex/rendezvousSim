@@ -1,12 +1,4 @@
-#include <vector>
-#include <queue>
-#include <unordered_map>
-#include <map>
-
-#include <iostream>
-#include <cmath>
-#include <yaml-cpp/yaml.h>
-#include <Eigen/Dense>
+#include "standard_includes.h"
 
 #include "agent.h"
 #include "loggingTools.h"
