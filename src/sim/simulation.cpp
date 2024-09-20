@@ -5,6 +5,7 @@
 #include "physics/vehicle.h"
 #include "loggingTools.h"
 #include "graphTheoryTools.h"
+#include "agents/agentManager.h"
 
 typedef std::unique_ptr<Simulation::SimulationWorkspace> simulationWorkspacePtr;
 // typedef Agent::AgentWorkspace* agentWorkspacePtr;
@@ -184,6 +185,10 @@ Simulation::SimulationWorkspace Simulation::initialize(std::string configPath)
     int num_vehicles = config["simulation"]["num_vehicles"].as<int>();
 
     // instantiate sim child objects
+
+    AgentManager agentManager(num_vehicles);
+    agentManager.registerAgents(config["agents"]);
+
     Agent simAgent;
     wsOut.agentObj = simAgent;
     Vehicle simVehicle;

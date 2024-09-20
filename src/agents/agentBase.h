@@ -30,7 +30,7 @@ public:
         // Simulation States
         INIT,  // read in config
         ERROR, // error state
-        DONE,  // done simulation tasking
+        CONTENT,  // done simulation tasking
 
         // Graph States
         DISCONNECTED,     // has no nieghbors => disconnected graph
@@ -56,23 +56,25 @@ public:
     };
 
     uint16_t id;
-
+    uint16_t leader_id;
+    double   radius;   
+    FSM fsm;
+    std::unordered_map<int, State> neighborStates;
+    State state;
     struct AgentWorkspace
     {
         std::vector<int> neighborIds;
-        std::priority_queue<State, std::vector<State>, neighborSort> neighborStates;
+        // std::priority_queue<State, std::vector<State>, neighborSort> neighborStates;
         ObservationSpace observationSpace;
         ActionSpace actionSpace;
-        FSM fsm;
     };
     AgentWorkspace agentWorkspace;
 
-    void Agent();
-    virtual void controller();    // actuator commands
-    virtual void stepAgent();    // simulation interface function
-    virtual void pathPlanner();  //
-    virtual void setFSM();       //
-    virtual void getNeighbors(); //
+    virtual void controller();      // actuator commands
+    virtual void stepAgent();       // simulation interface function
+    virtual void pathPlanner();     //
+    virtual void setFSM();          //
+    virtual void getNeighbors();    //
 
     // helper functions
     template <typename T>

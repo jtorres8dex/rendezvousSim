@@ -1,5 +1,4 @@
 #include "agentManager.h"
-#include "standard_includes.h"
 
 AgentManager::AgentManager(int nAgents)
 {
@@ -17,6 +16,17 @@ void AgentManager::spawnAgent()
 }
 
 /// @brief  interfacing functions with simulatin layer below
+
+void AgentManager::registerAgents(const YAML::Node &config)
+{
+    std::vector<Agent::AgentWorkspace> agentWss;
+
+    for (const auto &node : config["agents"])
+    {
+        Agent::AgentWorkspace ws;   
+    }
+}
+
 void AgentManager::stepAgents()
 {
 
