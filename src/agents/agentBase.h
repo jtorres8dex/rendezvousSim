@@ -7,6 +7,10 @@
 class AgentBase
 {
 public:
+    // Constructor
+    AgentBase(const YAML::Node &config);
+    // Destructor
+    virtual ~AgentBase() = default;
 
     struct ObservationSpace
     {
@@ -50,11 +54,12 @@ public:
         }
     };
 
-    uint16_t id;
-    uint16_t leader_id;
-    double   connection_radius;   
-    FSM fsm;
-    std::unordered_map<int, State> neighborStates;
+    uint16_t                        id;
+    uint16_t                        leader_id;
+    double                          connection_radius;   
+    std::string                     role;
+    FSM                             fsm;
+    std::unordered_map<int, State>  neighborStates;
     State state;
     State goalState;
     ActionSpace actionSpace;
@@ -67,7 +72,6 @@ public:
     };
     AgentWorkspace agentWorkspace;
 
-    virtual void init(const YAML::Node &config);
     virtual void controller();      // actuator commands
     virtual void stepAgent();       // simulation interface function
     virtual void pathPlanner();     //

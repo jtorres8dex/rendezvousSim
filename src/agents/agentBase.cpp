@@ -8,8 +8,13 @@ static double eThetaMinus1{0.0};
 
 using namespace logger;
 
-void AgentBase::init(const YAML::Node &config)
+AgentBase::AgentBase(const YAML::Node &agentConfig)
 {
+    id = agentConfig["name"].as<int>();
+    state = State::vectorToState(agentConfig["ics"].as<std::vector<double>>());
+    role = agentConfig["role"].as<std::string>();
+    connection_radius = agentConfig["connection_radius"].as<double>();
+    fsm = INIT;
 }
 
 void AgentBase::controller()
@@ -52,6 +57,7 @@ void AgentBase::controller()
 
 void AgentBase::pathPlanner()
 {
+    std::cout << "DEFAULTING TO: " << __PRETTY_FUNCTION__ << std::endl;
 }
 
 void AgentBase::setFSM()
@@ -69,12 +75,13 @@ void AgentBase::setFSM()
 
 void AgentBase::getNeighbors()
 {
+    // iterate through all the other agents
     for (const auto &otherState : neighborStates)
     {
-
+        // check if they are within edge radius
         if (state.distanceTo(otherState.second) <= connection_radius)
         {
-            // neighborStates[otherState.first] = otherState.second;
+            neighborStates[otherState.first] = otherState.second;
         }
     }
 }

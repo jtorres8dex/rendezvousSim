@@ -13,19 +13,18 @@ void AgentManager::spawnAgent()
 {
 }
 
-/// @brief  interfacing functions with simulatin layer below
+/// @brief  interfacing functions with simulation layer below
 void AgentManager::registerAgents(const YAML::Node &config)
 {
     for (const auto &agentConfig : config["agents"])
     {
         if (agentConfig["role"].as<std::string>() == "follower")
         {
-            // Create a FollowerAgent and push it into the vector as a unique pointer
-            allAgentObjs.push_back(std::make_unique<FollowerAgent>());
+            followerAgents.push_back(FollowerAgent(agentConfig));
         }
         else if (agentConfig["role"].as<std::string>() == "leader")
         {
-            allAgentObjs.push_back(std::make_unique<LeaderAgent>());
+            leaderAgents.push_back(LeaderAgent(agentConfig));
         }
         else
         {

@@ -11,15 +11,13 @@ static double eThetaMinus1{0};
 
 class FollowerAgent : public AgentBase
 {
-  
-    void init(const YAML::Node &config) override;
-
+public:
+    FollowerAgent(const YAML::Node &config) : AgentBase(config) {};
     void stepAgent() override;
 
     void pathPlanner() override;
 
     void setFSM() override;
-
 };
 
 #endif

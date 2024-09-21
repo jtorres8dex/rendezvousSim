@@ -95,7 +95,6 @@ Simulation::SimulationWorkspace Simulation::initialize(std::string configPath)
     wsOut.vehicleWorkspaces = registerVehicles(config);
 
     // initialize agent workspaces
-    wsOut.agentWorkspaces = registerAgents(config);
 
     return wsOut;
 }

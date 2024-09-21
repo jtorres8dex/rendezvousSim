@@ -66,7 +66,6 @@ public:
         SWARM_CONTROL
     };
 
-    std::vector<Agent::AgentWorkspace> registerAgents(const YAML::Node& config);
     std::vector<Vehicle::VehicleWorkspace> registerVehicles(const YAML::Node& config);
     SimulationWorkspace initialize(std::string configPath);
     SimulationWorkspace stepSim(SimulationWorkspace ws);
