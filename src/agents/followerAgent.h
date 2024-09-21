@@ -2,6 +2,7 @@
 #define FOLLOWER_AGENT_H
 
 #include "agentBase.h"
+#include "state.h"
 #include "loggingTools.h"
 
 using namespace logger;
@@ -10,27 +11,15 @@ static double eThetaMinus1{0};
 
 class FollowerAgent : public AgentBase
 {
-    void Agent(std::vector<double> ics, const int id_);
   
+    void init(const YAML::Node &config) override;
 
-    void controller() override;
-    
+    void stepAgent() override;
 
-    void stepAgent() override
-    {
-    }
+    void pathPlanner() override;
 
-    void pathPlanner() override
-    {
-    }
+    void setFSM() override;
 
-    void setFSM() override
-    {
-    }
-
-    void getNeighbors() override
-    {
-    }
 };
 
 #endif

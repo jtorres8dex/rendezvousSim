@@ -17,6 +17,8 @@ public:
     State operator-(const State &other);
 
     double distanceTo(const State &other);
+    double angleTo(const State &other);
+    static State vectorToState(std::vector<double> v);
 };
 
 #endif

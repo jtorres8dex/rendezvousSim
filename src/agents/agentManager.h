@@ -2,7 +2,7 @@
 #define AGENT_MANAGER_H
 
 #include "standard_includes.h"
-#include "Agent.h"
+#include "agentBase.h"
 
 class AgentManager
 {
@@ -12,6 +12,7 @@ class AgentManager
         void stepAgents();
 
     private:
+        std::vector<std::unique_ptr<AgentBase>> allAgentObjs;
         void killAgent(const int id);
         void spawnAgent();
 

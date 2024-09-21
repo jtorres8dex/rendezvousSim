@@ -36,21 +36,29 @@ agents:
     waypoint_mode: true
     leader: true
     ics: [0.0, 0.0, 0.0]
+    connection_radius: 50.0
+    role: "leader"
 
   - name: "albert2"
     id: 2
     waypoint_mode: true
     leader: true 
     ics: [20.0, 20.0, 20.0]
+    connection_radius: 50.0
+    role: "follower"
 
   - name: "albert3" 
     id: 3
     waypoint_mode: true
     leader: true 
     ics: [2000.0, 2000.0, 20.0]
+    connection_radius: 50.0
+    role: "follower"
 
   - name: "albert4"
     id: 4
     waypoint_mode: true
     leader: true 
     ics: [21.0, 0.0, 20.0]
+    connection_radius: 50.0
+    role: "follower"

@@ -2,16 +2,11 @@
 #define AGENT_BASE_H
 
 #include "standard_includes.h"
+#include "state.h"
 
 class AgentBase
 {
 public:
-    struct State
-    {
-        double x;
-        double y;
-        double theta;
-    };
 
     struct ObservationSpace
     {
@@ -28,14 +23,14 @@ public:
     enum FSM
     {
         // Simulation States
-        INIT,  // read in config
-        ERROR, // error state
-        CONTENT,  // done simulation tasking
+        INIT,               // read in config
+        ERROR,              // error state
+        CONTENT,            // done simulation tasking
 
         // Graph States
-        DISCONNECTED,     // has no nieghbors => disconnected graph
-        FOLLOWING_LEADER, // following leader agent
-        FOLLOWING_SIBLING // following a non-leader agent
+        DISCONNECTED,       // has no nieghbors => disconnected graph
+        FOLLOWING_LEADER,   // following leader agent
+        FOLLOWING_SIBLING   // following a non-leader agent
     };
     /*
     neighborSort for priority queue
@@ -57,36 +52,28 @@ public:
 
     uint16_t id;
     uint16_t leader_id;
-    double   radius;   
+    double   connection_radius;   
     FSM fsm;
     std::unordered_map<int, State> neighborStates;
     State state;
+    State goalState;
+    ActionSpace actionSpace;
+
     struct AgentWorkspace
     {
         std::vector<int> neighborIds;
         // std::priority_queue<State, std::vector<State>, neighborSort> neighborStates;
         ObservationSpace observationSpace;
-        ActionSpace actionSpace;
     };
     AgentWorkspace agentWorkspace;
 
+    virtual void init(const YAML::Node &config);
     virtual void controller();      // actuator commands
     virtual void stepAgent();       // simulation interface function
     virtual void pathPlanner();     //
     virtual void setFSM();          //
     virtual void getNeighbors();    //
 
-    // helper functions
-    template <typename T>
-    State vectorToState(const std::vector<T> input)
-    {
-        State out;
-        out.x = input[0];
-        out.y = input[1];
-        out.theta = input[2];
-
-        return out;
-    }
 }; // class Agentbase
 
 #endif

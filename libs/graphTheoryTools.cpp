@@ -1,10 +1,6 @@
-#include <iostream>
-#include <vector>
-#include <unordered_map>
-#include <Eigen/Dense>
-#include <cmath>
-
+#include "standard_includes.h"
 #include "graphTheoryTools.h"
+#include "state.h"
 
 namespace graphTheoryTools
 {
