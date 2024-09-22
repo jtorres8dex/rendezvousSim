@@ -12,6 +12,9 @@ simulation:
   neighbor_radius: 80.0
 
   log_events: false
+
+agent_manager:
+  connection_radius: 50.0
   
 vehicles:
   - id: 1

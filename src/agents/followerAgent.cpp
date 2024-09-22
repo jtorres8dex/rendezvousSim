@@ -6,21 +6,24 @@
 
 using namespace logger;
 
+void FollowerAgent::stepAgent()
+{
+}
 
-    void FollowerAgent::stepAgent()
+void FollowerAgent::pathPlanner()
+{
+    if (neighborStates.empty())
     {
-
+        std::cerr << __PRETTY_FUNCTION__ << "FollowerAgent ID: " << id << " has no neighbors!" << std::endl;
+        return;
     }
 
-    void FollowerAgent::pathPlanner()
-    {
-        
-    }
+    Eigen::VectorXd desiredPosition(2);
+    desiredPosition.setZero();
+}
 
-    void FollowerAgent::setFSM()
-    {
-        // call parent function
-        AgentBase::setFSM();
-
-
-    }
+void FollowerAgent::setFSM()
+{
+    // call parent function
+    AgentBase::setFSM();
+}

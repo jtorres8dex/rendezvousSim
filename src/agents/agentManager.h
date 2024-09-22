@@ -9,16 +9,24 @@
 class AgentManager
 {
     public:
-        AgentManager(int nAgents);
+        AgentManager(int nAgents, double r);
         void registerAgents(const YAML::Node &config);
         void stepAgents();
+        
+        double connection_radius;
 
     private:
-        // std::vector<std::unique_ptr<AgentBase>> allAgentObjs;
-        std::vector<LeaderAgent> leaderAgents;
-        std::vector<FollowerAgent> followerAgents;
+        
+        std::unordered_map<int, LeaderAgent> leaderAgents;
+        std::unordered_map<int, FollowerAgent> followerAgents;
+        
         void killAgent(const int id);
         void spawnAgent();
+
+        void buildAgentNetwork();
+
+        bool areNeighbors(State s1, State s2, double r);
+
 
 };
 

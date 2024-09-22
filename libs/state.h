@@ -33,7 +33,10 @@ public:
 
     double distanceTo(const State &other);
     double angleTo(const State &other);
+    
+    static double distanceBetween(State s1, State s2);
     static State vectorToState(std::vector<double> v);
+    static std::vector<double> stateToVector(State state);
 };
 
 #endif

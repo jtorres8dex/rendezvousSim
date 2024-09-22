@@ -25,3 +25,12 @@ State State::vectorToState(std::vector<double> v)
 {
     return State(v[0], v[1], v[2]);
 }
+std::vector<double> State::stateToVector(State state)
+{
+    std::vector<double> v({state.x, state.y, state.theta});
+    return v;
+}
+double State::distanceBetween(State s1, State s2)
+{
+    return s1.distanceTo(s2);
+}

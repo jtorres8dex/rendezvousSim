@@ -36,23 +36,6 @@ public:
         FOLLOWING_LEADER,   // following leader agent
         FOLLOWING_SIBLING   // following a non-leader agent
     };
-    /*
-    neighborSort for priority queue
-    */
-    struct neighborSort
-    {
-        State ownState;
-
-        neighborSort() = default; // Default constructor
-        neighborSort(State ownState) : ownState(ownState) {}
-
-        bool operator()(const State &a, const State &b)
-        {
-            double distanceA = std::sqrt(std::pow(a.x - ownState.x, 2) + std::pow(a.y - ownState.y, 2));
-            double distanceB = std::sqrt(std::pow(b.x - ownState.x, 2) + std::pow(b.y - ownState.y, 2));
-            return distanceA > distanceB;
-        }
-    };
 
     uint16_t                        id;
     uint16_t                        leader_id;
@@ -60,9 +43,9 @@ public:
     std::string                     role;
     FSM                             fsm;
     std::unordered_map<int, State>  neighborStates;
-    State state;
-    State goalState;
-    ActionSpace actionSpace;
+    State                           state;
+    State                           goalState;
+    ActionSpace                     actionSpace;
 
     struct AgentWorkspace
     {

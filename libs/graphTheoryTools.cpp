@@ -17,7 +17,6 @@ namespace graphTheoryTools
             double diff = state1[i] - state2[i];
             sum += diff * diff;
         }
-
         return std::sqrt(sum);
     }
 
