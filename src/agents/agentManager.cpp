@@ -2,10 +2,11 @@
 #include "followerAgent.h"
 #include "leaderAgent.h"
 
-AgentManager::AgentManager(int nAgents, double r)
+AgentManager::AgentManager(int _leader_id, double r)
 {
-    std::cout << "agent manager constructor" << std::endl;
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
     connection_radius = r;
+    leader_id = _leader_id;
 }
 void AgentManager::killAgent(const int id)
 {
@@ -17,15 +18,22 @@ void AgentManager::spawnAgent()
 /// @brief  interfacing functions with simulation layer below
 void AgentManager::registerAgents(const YAML::Node &config)
 {
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
     for (const auto &agentConfig : config["agents"])
     {
-        if (agentConfig["role"].as<std::string>() == "follower")
+        
+        std::string     agentType{agentConfig["role"].as<std::string>()};
+        int             _id{agentConfig["id"].as<int>()};
+
+        if (agentType == "follower")
         {
-            followerAgents.emplace(agentConfig["id"].as<int>(), FollowerAgent(agentConfig));
+            followerAgents.emplace(_id, FollowerAgent(agentConfig));
         }
-        else if (agentConfig["role"].as<std::string>() == "leader")
+        else if (agentType == "leader")
         {
-            leaderAgents.emplace(agentConfig["id"].as<int>(), LeaderAgent(agentConfig));
+            // std::cout << agentConfig["id"].IsScalar() << std::endl;
+            std::cout << "ID value: " << YAML::Dump(agentConfig["id"]) << std::endl;
+            leaderAgents.emplace(_id, LeaderAgent(agentConfig));
         }
         else
         {
@@ -36,6 +44,7 @@ void AgentManager::registerAgents(const YAML::Node &config)
 
 bool AgentManager::areNeighbors(State s1, State s2, double r)
 {
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
     double d = State::distanceBetween(s1, s2);
     return d <= r;
 }
@@ -45,6 +54,7 @@ Modifies downstream agent objects, building their neighbor map
 */
 void AgentManager::buildAgentNetwork()
 {
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
     // combine leader & follower states to form a full graph
     std::unordered_map<int, State> allStates;
     for (const auto &[id, leader] : leaderAgents)
@@ -61,10 +71,7 @@ void AgentManager::buildAgentNetwork()
     {
         for (const auto &[ido, otherAgentState] : allStates) // the agents its looking for
         {
-            if (ids == ido)
-            {
-                continue;
-            } // skip own comparison
+            if (ids == ido){continue;} // skip own comparison
 
             // check if inside connection radius
             if (areNeighbors(searchingAgentState, otherAgentState, connection_radius))
@@ -72,15 +79,17 @@ void AgentManager::buildAgentNetwork()
                 auto followerIt = followerAgents.find(ids);
                 if (followerIt != followerAgents.end())
                 {
-                    followerIt->second.neighborStates[ido] = otherAgentState;
+                    followerIt->second.neighborStates[ido]  = otherAgentState;
+                    followerIt->second.leaderState          = otherAgentState; // ASSUMPTION all followers know leader state
                 }
                 auto leaderIt = leaderAgents.find(ids);
                 if (leaderIt != leaderAgents.end())
                 {
-                    leaderIt->second.neighborStates[ido] = otherAgentState;
+                    leaderIt->second.neighborStates[ido]    = otherAgentState;
                 }
             }
         }
+
     }
 }
 

@@ -84,13 +84,13 @@ Simulation::SimulationWorkspace Simulation::initialize(std::string configPath)
     // instantiate sim child objects
     double r = config["agent_manager"]["connection_radius"].as<double>();
     AgentManager agentManager(num_vehicles, r);
-    agentManager.registerAgents(config["agents"]);
+    agentManager.registerAgents(config);
 
     Vehicle simVehicle;
     wsOut.vehicleObj = simVehicle;
-
     // spawn vehicles at given ics
     wsOut.vehicleWorkspaces = registerVehicles(config);
+
 
     // initialize agent workspaces
 
@@ -102,21 +102,21 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
     Simulation::SimulationWorkspace wsOut{ws};
     std::vector<std::tuple<float, float>> vehicleCmds;
 
-    // step agents - update agent observation space in sim workspace in place
-    for (Agent::AgentWorkspace &agentWs : wsOut.agentWorkspaces)
-    {
-        std::vector<double> logData = {agentWs.observationSpace.ownState.x, agentWs.observationSpace.ownState.y, agentWs.observationSpace.ownState.theta};
-        std::string info = "Agent " + std::to_string(agentWs.id) + " ownState: ";
-        logger::createEvent(__func__, info, logData);
+    // // step agents - update agent observation space in sim workspace in place
+    // for (Agent::AgentWorkspace &agentWs : wsOut.agentWorkspaces)
+    // {
+    //     std::vector<double> logData = {agentWs.observationSpace.ownState.x, agentWs.observationSpace.ownState.y, agentWs.observationSpace.ownState.theta};
+    //     std::string info = "Agent " + std::to_string(agentWs.id) + " ownState: ";
+    //     logger::createEvent(__func__, info, logData);
 
-        // Step the agent to update workspace and get commands
-        agentWs = Agent::stepAgent(agentWs);
-        vehicleCmds.push_back(std::make_tuple(agentWs.actionSpace.v, agentWs.actionSpace.w));
+    //     // Step the agent to update workspace and get commands
+    //     agentWs = Agent::stepAgent(agentWs);
+    //     vehicleCmds.push_back(std::make_tuple(agentWs.actionSpace.v, agentWs.actionSpace.w));
 
-        logData = {agentWs.actionSpace.v, agentWs.actionSpace.w};
-        info = "Agent " + std::to_string(agentWs.id) + " actionSpace: ";
-        logger::createEvent(__func__, info, logData);
-    }
+    //     logData = {agentWs.actionSpace.v, agentWs.actionSpace.w};
+    //     info = "Agent " + std::to_string(agentWs.id) + " actionSpace: ";
+    //     logger::createEvent(__func__, info, logData);
+    // }
 
     // grab new agent states and compute Laplacian
     std::unordered_map<int, std::vector<double>> agentStates;
@@ -184,12 +184,13 @@ int main()
     std::string simName = config["simulation"]["sim_name"].as<std::string>();
 
     Simulation::SimulationWorkspace simWs = sim.initialize("config.yaml");
+    
 
     auto start = std::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < config["simulation"]["time_steps"].as<int>(); ++i)
     {
-
+        
         simWs = sim.stepSim(simWs);
         int j = 0;
     }

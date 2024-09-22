@@ -46,6 +46,7 @@ public:
     State                           state;
     State                           goalState;
     ActionSpace                     actionSpace;
+    double                          desiredSeparation;
 
     struct AgentWorkspace
     {

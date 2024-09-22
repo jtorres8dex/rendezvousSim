@@ -9,11 +9,12 @@
 class AgentManager
 {
     public:
-        AgentManager(int nAgents, double r);
+        AgentManager(int leader_id, double r);
         void registerAgents(const YAML::Node &config);
         void stepAgents();
         
-        double connection_radius;
+        double  connection_radius;
+        int     leader_id;
 
     private:
         

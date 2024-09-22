@@ -14,7 +14,9 @@ simulation:
   log_events: false
 
 agent_manager:
-  connection_radius: 50.0
+  connection_radius: 100.0
+  desired_separation: 50.0
+  leader_id: 7
   
 vehicles:
   - id: 1
@@ -35,33 +37,33 @@ vehicles:
 
 agents:
   - name: "albert1"
-    id: 1
+    id: 7
     waypoint_mode: true
-    leader: true
     ics: [0.0, 0.0, 0.0]
     connection_radius: 50.0
     role: "leader"
+    desired_separation: 50.0
 
   - name: "albert2"
     id: 2
     waypoint_mode: true
-    leader: true 
     ics: [20.0, 20.0, 20.0]
     connection_radius: 50.0
     role: "follower"
+    desired_separation: 50.0
 
   - name: "albert3" 
     id: 3
     waypoint_mode: true
-    leader: true 
     ics: [2000.0, 2000.0, 20.0]
     connection_radius: 50.0
     role: "follower"
+    desired_separation: 50.0
 
   - name: "albert4"
     id: 4
     waypoint_mode: true
-    leader: true 
     ics: [21.0, 0.0, 20.0]
     connection_radius: 50.0
     role: "follower"
+    desired_separation: 50.0

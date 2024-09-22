@@ -18,6 +18,8 @@ public:
     void pathPlanner() override;
 
     void setFSM() override;
+
+    State leaderState;
 };
 
 #endif

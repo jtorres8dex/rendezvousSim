@@ -10,11 +10,12 @@ using namespace logger;
 
 AgentBase::AgentBase(const YAML::Node &agentConfig)
 {
-    id = agentConfig["name"].as<int>();
-    state = State::vectorToState(agentConfig["ics"].as<std::vector<double>>());
-    role = agentConfig["role"].as<std::string>();
-    connection_radius = agentConfig["connection_radius"].as<double>();
-    fsm = INIT;
+    id                  = agentConfig["id"].as<int>();
+    state               = State::vectorToState(agentConfig["ics"].as<std::vector<double>>());
+    role                = agentConfig["role"].as<std::string>();
+    connection_radius   = agentConfig["connection_radius"].as<double>();
+    fsm                 = INIT;
+    desiredSeparation   = agentConfig["desired_separation"].as<double>();
 }
 
 void AgentBase::controller()
