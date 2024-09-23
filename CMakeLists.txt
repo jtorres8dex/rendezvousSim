@@ -24,7 +24,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release)
 
 # Add an executable target called "runMe" and specify the source files
 add_executable(runMe src/sim/simulation.cpp src/physics/Vehicle.cpp src/agents/agent.cpp 
-src/agents/followerAgent.cpp libs/loggingTools.cpp libs/graphTheoryTools.cpp
+src/agents/followerAgent.cpp libs/loggingTools.cpp libs/graphTheoryTools.cpp libs/global.cpp
 src/agents/agentBase.cpp src/agents/leaderAgent.cpp src/agents/agentManager.cpp libs/state.cpp)
 
 target_include_directories(runMe PRIVATE ${CMAKE_SOURCE_DIR}/libs ${CMAKE_SOURCE_DIR}/src)

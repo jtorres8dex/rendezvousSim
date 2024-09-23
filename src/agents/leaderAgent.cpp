@@ -3,7 +3,7 @@
 using namespace logger;
 
 
-void LeaderAgent::stepAgent()
+void LeaderAgent::step()
 {
 
 }

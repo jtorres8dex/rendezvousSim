@@ -13,7 +13,7 @@ class FollowerAgent : public AgentBase
 {
 public:
     FollowerAgent(const YAML::Node &config) : AgentBase(config) {};
-    void stepAgent() override;
+    void step() override;
 
     void pathPlanner() override;
 

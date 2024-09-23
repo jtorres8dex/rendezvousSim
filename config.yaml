@@ -40,7 +40,7 @@ agents:
     id: 7
     waypoint_mode: true
     ics: [0.0, 0.0, 0.0]
-    connection_radius: 50.0
+    connection_radius: 150.0
     role: "leader"
     desired_separation: 50.0
 
@@ -48,15 +48,15 @@ agents:
     id: 2
     waypoint_mode: true
     ics: [20.0, 20.0, 20.0]
-    connection_radius: 50.0
+    connection_radius: 150.0
     role: "follower"
     desired_separation: 50.0
 
   - name: "albert3" 
     id: 3
     waypoint_mode: true
-    ics: [2000.0, 2000.0, 20.0]
-    connection_radius: 50.0
+    ics: [0.0, 20.0, 0.0]
+    connection_radius: 150.0
     role: "follower"
     desired_separation: 50.0
 
@@ -64,6 +64,6 @@ agents:
     id: 4
     waypoint_mode: true
     ics: [21.0, 0.0, 20.0]
-    connection_radius: 50.0
+    connection_radius: 150.0
     role: "follower"
     desired_separation: 50.0

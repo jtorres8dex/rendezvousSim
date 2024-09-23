@@ -6,26 +6,28 @@
 #include "loggingTools.h"
 #include "graphTheoryTools.h"
 #include "agents/agentManager.h"
+#include "state.h"
 
 typedef std::unique_ptr<Simulation::SimulationWorkspace> simulationWorkspacePtr;
-// typedef Agent::AgentWorkspace* agentWorkspacePtr;
-static int t = 0;
-static const bool DEBUG_MODE{true};
-static double neighbor_radius;
+
+static int                  t = 0;
+static double               neighbor_radius;
+
+using namespace logger;
 
 // constructor
 Simulation::Simulation(std::string sim_name_)
 {
     std::string sim_name = "logs/SIMULATION_" + sim_name_ + ".csv";
     std::string logFileName{"logs/" + sim_name_ + "_eventLogs.log"};
-    logger::initializeLogger(sim_name, logFileName);
+    initializeLogger(sim_name, logFileName);
 }
 
 // destructor
 Simulation::~Simulation()
 {
     std::cout << "Stopping Simulation" << std::endl;
-    logger::deInitializeLogger();
+    deInitializeLogger();
 }
 
 std::vector<Vehicle::VehicleWorkspace> Simulation::registerVehicles(const YAML::Node &config)
@@ -79,12 +81,13 @@ Simulation::SimulationWorkspace Simulation::initialize(std::string configPath)
     sim_step = 0;
     sim_time = 0.0;
     dt = config["simulation"]["dt"].as<double>();
-    int num_vehicles = config["simulation"]["num_vehicles"].as<int>();
 
     // instantiate sim child objects
-    double r = config["agent_manager"]["connection_radius"].as<double>();
-    AgentManager agentManager(num_vehicles, r);
-    agentManager.registerAgents(config);
+    int num_vehicles    = config["simulation"]["num_vehicles"].as<int>();
+    double r            = config["agent_manager"]["connection_radius"].as<double>();
+    wsOut.agentManager  = new AgentManager(num_vehicles, r);
+    
+    wsOut.agentManager->registerAgents(config);
 
     Vehicle simVehicle;
     wsOut.vehicleObj = simVehicle;
@@ -100,7 +103,7 @@ Simulation::SimulationWorkspace Simulation::initialize(std::string configPath)
 Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
 {
     Simulation::SimulationWorkspace wsOut{ws};
-    std::vector<std::tuple<float, float>> vehicleCmds;
+    std::unordered_map<int, std::tuple<double, double>> vehicleCmds;
 
     // // step agents - update agent observation space in sim workspace in place
     // for (Agent::AgentWorkspace &agentWs : wsOut.agentWorkspaces)
@@ -118,22 +121,29 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
     //     logger::createEvent(__func__, info, logData);
     // }
 
+    wsOut.agentManager->stepAgents();
+
+    for (const auto& [id, action] : wsOut.agentManager->agentActions)
+    {
+        vehicleCmds[id] = std::make_tuple(action[0], action[1]);
+    }
+
     // grab new agent states and compute Laplacian
     std::unordered_map<int, std::vector<double>> agentStates;
     // build agent state vector 
-    for (Agent::AgentWorkspace &agentWs : wsOut.agentWorkspaces)
-    {
-        agentStates[agentWs.id] = {agentWs.observationSpace.ownState.x, agentWs.observationSpace.ownState.y};
-    }
+    // for (Agent::AgentWorkspace &agentWs : wsOut.agentWorkspaces)
+    // {
+    //     agentStates[agentWs.id] = {agentWs.observationSpace.ownState.x, agentWs.observationSpace.ownState.y};
+    // }
 
     Eigen::MatrixXd laplacianMatrix = graphTheoryTools::computeLaplacianMatrix(agentStates, neighbor_radius);
 
-    // step vehicles - update vehicle state space in sim workspace in place
 
+    std::unordered_map<int, State> updatedStates;
     for (Vehicle::VehicleWorkspace &vehicleWs : wsOut.vehicleWorkspaces)
     {
         // step
-        std::tuple<float, float> cmd = vehicleCmds.front();
+        std::tuple<float, float> cmd = vehicleCmds[vehicleWs.id];
         vehicleWs = Vehicle::stepVehicle(vehicleWs, cmd);
         vehicleCmds.erase(vehicleCmds.begin());
 
@@ -142,30 +152,23 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
         stateVec.push_back(vehicleWs.state.x);
         stateVec.push_back(vehicleWs.state.y);
         stateVec.push_back(vehicleWs.state.theta);
-        logger::logVehicleState(t, vehicleWs.id, stateVec);
+        logVehicleState(t, vehicleWs.id, stateVec);
 
         std::vector<double> logData = {vehicleWs.state.x, vehicleWs.state.y, vehicleWs.state.theta};
         std::string info = "Vehicle " + std::to_string(vehicleWs.id) + " state: ";
-        logger::createEvent(__func__, info, logData);
+        createEvent(__func__, info, logData);
+        
+        // add to shared state vector
+        updatedStates[vehicleWs.id] = State::vectorToState(stateVec);
     }
 
-    // update agent observation space
-    for (Agent::AgentWorkspace &agentWs : wsOut.agentWorkspaces)
-    {
-        int i{0};
+        // now give state k + 1 to agents
+        wsOut.agentManager->updateAgentStates(updatedStates);
 
-        agentWs.observationSpace.ownState.x = ws.vehicleWorkspaces[i].state.x;
-        agentWs.observationSpace.ownState.y = ws.vehicleWorkspaces[i].state.y;
-        agentWs.observationSpace.ownState.theta = ws.vehicleWorkspaces[i].state.theta;
+        // log states to csv
+        wsOut.agentManager->logAgentStates();
 
-        Agent::State ownState = agentWs.observationSpace.ownState;
 
-        std::vector<double> logData = {ownState.x, ownState.y, ownState.theta};
-        std::string info = "Agent " + std::to_string(agentWs.id) + " ownState: ";
-        logger::createEvent(__func__, info, logData);
-
-        i++;
-    }
     ++t;
     return wsOut;
 } // step sim

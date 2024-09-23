@@ -65,7 +65,7 @@ void AgentBase::setFSM()
 {
     if (0 == agentWorkspace.neighborIds.size())
     {
-        std::cout << "Agent " << id << " disconnected from network";
+        std::cout << "Agent " << id << " disconnected from network" << std::endl;
         fsm = DISCONNECTED;
     }
 
@@ -87,6 +87,7 @@ void AgentBase::getNeighbors()
     }
 }
 
-void AgentBase::stepAgent()
+void AgentBase::step()
 {
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
 }

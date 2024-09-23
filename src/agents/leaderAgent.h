@@ -11,7 +11,7 @@ class LeaderAgent : public AgentBase
 {
 public:
     LeaderAgent(const YAML::Node &config) : AgentBase(config) {};
-    void stepAgent() override;
+    void step() override;
     void pathPlanner() override;
     void setFSM() override;
 }; // class LeaderAgent

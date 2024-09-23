@@ -2,6 +2,8 @@
 #include "followerAgent.h"
 #include "leaderAgent.h"
 
+using namespace logger;
+
 AgentManager::AgentManager(int _leader_id, double r)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
@@ -21,9 +23,9 @@ void AgentManager::registerAgents(const YAML::Node &config)
     std::cout << __PRETTY_FUNCTION__ << std::endl;
     for (const auto &agentConfig : config["agents"])
     {
-        
-        std::string     agentType{agentConfig["role"].as<std::string>()};
-        int             _id{agentConfig["id"].as<int>()};
+
+        std::string agentType{agentConfig["role"].as<std::string>()};
+        int _id{agentConfig["id"].as<int>()};
 
         if (agentType == "follower")
         {
@@ -32,7 +34,6 @@ void AgentManager::registerAgents(const YAML::Node &config)
         else if (agentType == "leader")
         {
             // std::cout << agentConfig["id"].IsScalar() << std::endl;
-            std::cout << "ID value: " << YAML::Dump(agentConfig["id"]) << std::endl;
             leaderAgents.emplace(_id, LeaderAgent(agentConfig));
         }
         else
@@ -71,7 +72,10 @@ void AgentManager::buildAgentNetwork()
     {
         for (const auto &[ido, otherAgentState] : allStates) // the agents its looking for
         {
-            if (ids == ido){continue;} // skip own comparison
+            if (ids == ido)
+            {
+                continue;
+            } // skip own comparison
 
             // check if inside connection radius
             if (areNeighbors(searchingAgentState, otherAgentState, connection_radius))
@@ -79,22 +83,66 @@ void AgentManager::buildAgentNetwork()
                 auto followerIt = followerAgents.find(ids);
                 if (followerIt != followerAgents.end())
                 {
-                    followerIt->second.neighborStates[ido]  = otherAgentState;
-                    followerIt->second.leaderState          = otherAgentState; // ASSUMPTION all followers know leader state
+                    followerIt->second.neighborStates[ido] = otherAgentState;
+                    followerIt->second.leaderState = otherAgentState; // ASSUMPTION all followers know leader state
                 }
                 auto leaderIt = leaderAgents.find(ids);
                 if (leaderIt != leaderAgents.end())
                 {
-                    leaderIt->second.neighborStates[ido]    = otherAgentState;
+                    leaderIt->second.neighborStates[ido] = otherAgentState;
                 }
             }
         }
+    }
+}
 
+void AgentManager::updateAgentStates(std::unordered_map<int, State> newAgentStates)
+{
+    for (auto &[id, leader] : leaderAgents)
+    {
+        leader.state = newAgentStates[id];
+    }
+    for (auto &[id, follower] : followerAgents)
+    {
+        follower.state = newAgentStates[id];
+    }
+}
+
+void AgentManager::logAgentStates()
+{
+    // Log leader agents
+    for (const auto &leaderEntry : leaderAgents)
+    {
+        int leaderId                        = leaderEntry.first;
+        const LeaderAgent &leaderAgent      = leaderEntry.second;
+
+        logAgentState(leaderId, LEADER, leaderAgent.state);
+    }
+
+    // Log follower agents
+    for (const auto &followerEntry : followerAgents)
+    {
+        int followerId                      = followerEntry.first;
+        const FollowerAgent &followerAgent  = followerEntry.second;
+
+        logAgentState(followerId, FOLLOWER, followerAgent.state);
     }
 }
 
 void AgentManager::stepAgents()
 {
-    // construct graph
     buildAgentNetwork();
+
+    // step leader agents first
+    for (auto &[id, agent] : leaderAgents)
+    {
+        agent.step();
+        agentActions[id] = {agent.actionSpace.v, agent.actionSpace.w};
+    }
+    // then step follower agents
+    for (auto &[id, agent] : followerAgents)
+    {
+        agent.step();
+        agentActions[id] = {agent.actionSpace.v, agent.actionSpace.w};
+    }
 }

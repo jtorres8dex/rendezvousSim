@@ -57,9 +57,9 @@ public:
     AgentWorkspace agentWorkspace;
 
     virtual void controller();      // actuator commands
-    virtual void stepAgent();       // simulation interface function
-    virtual void pathPlanner();     //
-    virtual void setFSM();          //
+    virtual void step();            // simulation interface function
+    virtual void pathPlanner();     // desired states
+    virtual void setFSM();          // sets FSM
     virtual void getNeighbors();    //
 
 }; // class Agentbase

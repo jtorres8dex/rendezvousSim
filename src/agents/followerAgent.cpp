@@ -6,8 +6,11 @@
 
 using namespace logger;
 
-void FollowerAgent::stepAgent()
+void FollowerAgent::step()
 {
+    setFSM();
+    pathPlanner();
+    controller();   
 }
 
 void FollowerAgent::pathPlanner()
@@ -39,7 +42,6 @@ void FollowerAgent::pathPlanner()
             desiredPosition(0) -= (desiredSeparation - distance) * (dx / distance);
             desiredPosition(1) -= (desiredSeparation - distance) * (dy / distance);
         }
-
     }
 
     // Update the desired state based on the calculated position
