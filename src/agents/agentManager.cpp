@@ -117,6 +117,7 @@ void AgentManager::logAgentStates()
         const LeaderAgent &leaderAgent      = leaderEntry.second;
 
         logAgentState(leaderId, LEADER, leaderAgent.state);
+        std::cout << "logging agent state" << std::endl;
     }
 
     // Log follower agents

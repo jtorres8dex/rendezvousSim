@@ -48,6 +48,7 @@ void FollowerAgent::pathPlanner()
     goalState.x     = desiredPosition(0);
     goalState.y     = desiredPosition(1);
     goalState.theta = std::atan2(leaderState.y - state.y, leaderState.x - state.x); // TODO:
+    
 }
 
 void FollowerAgent::setFSM()

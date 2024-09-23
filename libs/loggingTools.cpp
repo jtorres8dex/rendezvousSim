@@ -59,7 +59,7 @@ namespace logger
     {
         if (logFile.is_open())
         {
-            logFile << id << "," << type << "," << state.x << "," << state.y << state.theta << "\n";
+            logFile << id << "," << type << "," << state.x << "," << state.y << "," << state.theta << "\n";
         }
         else
         {

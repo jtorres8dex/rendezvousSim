@@ -105,39 +105,12 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
     Simulation::SimulationWorkspace wsOut{ws};
     std::unordered_map<int, std::tuple<double, double>> vehicleCmds;
 
-    // // step agents - update agent observation space in sim workspace in place
-    // for (Agent::AgentWorkspace &agentWs : wsOut.agentWorkspaces)
-    // {
-    //     std::vector<double> logData = {agentWs.observationSpace.ownState.x, agentWs.observationSpace.ownState.y, agentWs.observationSpace.ownState.theta};
-    //     std::string info = "Agent " + std::to_string(agentWs.id) + " ownState: ";
-    //     logger::createEvent(__func__, info, logData);
-
-    //     // Step the agent to update workspace and get commands
-    //     agentWs = Agent::stepAgent(agentWs);
-    //     vehicleCmds.push_back(std::make_tuple(agentWs.actionSpace.v, agentWs.actionSpace.w));
-
-    //     logData = {agentWs.actionSpace.v, agentWs.actionSpace.w};
-    //     info = "Agent " + std::to_string(agentWs.id) + " actionSpace: ";
-    //     logger::createEvent(__func__, info, logData);
-    // }
-
     wsOut.agentManager->stepAgents();
 
     for (const auto& [id, action] : wsOut.agentManager->agentActions)
     {
         vehicleCmds[id] = std::make_tuple(action[0], action[1]);
     }
-
-    // grab new agent states and compute Laplacian
-    std::unordered_map<int, std::vector<double>> agentStates;
-    // build agent state vector 
-    // for (Agent::AgentWorkspace &agentWs : wsOut.agentWorkspaces)
-    // {
-    //     agentStates[agentWs.id] = {agentWs.observationSpace.ownState.x, agentWs.observationSpace.ownState.y};
-    // }
-
-    Eigen::MatrixXd laplacianMatrix = graphTheoryTools::computeLaplacianMatrix(agentStates, neighbor_radius);
-
 
     std::unordered_map<int, State> updatedStates;
     for (Vehicle::VehicleWorkspace &vehicleWs : wsOut.vehicleWorkspaces)
@@ -152,7 +125,7 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
         stateVec.push_back(vehicleWs.state.x);
         stateVec.push_back(vehicleWs.state.y);
         stateVec.push_back(vehicleWs.state.theta);
-        logVehicleState(t, vehicleWs.id, stateVec);
+        // logVehicleState(t, vehicleWs.id, stateVec);
 
         std::vector<double> logData = {vehicleWs.state.x, vehicleWs.state.y, vehicleWs.state.theta};
         std::string info = "Vehicle " + std::to_string(vehicleWs.id) + " state: ";
@@ -161,6 +134,8 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
         // add to shared state vector
         updatedStates[vehicleWs.id] = State::vectorToState(stateVec);
     }
+        // grab new agent states and compute Laplacian
+        // Eigen::MatrixXd laplacianMatrix = graphTheoryTools::computeLaplacianMatrix(updatedStates, neighbor_radius);
 
         // now give state k + 1 to agents
         wsOut.agentManager->updateAgentStates(updatedStates);
