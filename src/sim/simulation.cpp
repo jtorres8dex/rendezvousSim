@@ -97,24 +97,24 @@ Simulation::SimulationWorkspace Simulation::initialize(std::string configPath)
 
 Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
 {
+    if (DEBUG_MODE){std::cout << __PRETTY_FUNCTION__ << std::endl;}
     Simulation::SimulationWorkspace wsOut{ws};
-    std::unordered_map<int, std::tuple<double, double>> vehicleCmds;
+    std::unordered_map<int, std::vector<double>> vehicleCmds;
 
     wsOut.agentManager->stepAgents();
 
     for (const auto& [id, action] : wsOut.agentManager->agentActions)
     {//ERROR HEREEE
         std::cout << "action: " << action[0] << ", " << action[0] << std::endl;
-        vehicleCmds[id] = std::make_tuple(action[0], action[1]);
-        std::tuple<double, double> tup = vehicleCmds[id];
-        std::cout << "cmds after: " << get<0>(tup) << std::endl;
+        vehicleCmds[id] = {(action[0], action[1])};
+        std::cout << "cmds after: " << vehicleCmds[id][0] << ", " << vehicleCmds[id][1] << std::endl;
     }
 
     std::unordered_map<int, State> updatedStates;
     for (Vehicle::VehicleWorkspace &vehicleWs : wsOut.vehicleWorkspaces)
     {
         // step
-        std::tuple<float, float> cmd = vehicleCmds[vehicleWs.id];
+        std::vector<double> cmd = vehicleCmds[vehicleWs.id];
         vehicleWs = Vehicle::stepVehicle(vehicleWs, cmd);
         vehicleCmds.erase(vehicleCmds.begin());
 
@@ -136,6 +136,14 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
         // Eigen::MatrixXd laplacianMatrix = graphTheoryTools::computeLaplacianMatrix(updatedStates, neighbor_radius);
 
         // now give state k + 1 to agents
+        if (DEBUG_MODE)
+        {
+            std::cout << "Updated Agent States: " << std::endl;
+            for (const auto& [id,state] : updatedStates)
+            {
+                std::cout << "(ID:" << id << ") " << state.x << ", " << state.y << ", " << state.theta << std::endl;
+            }
+        }
         wsOut.agentManager->updateAgentStates(updatedStates);
 
         // log states to csv

@@ -14,27 +14,27 @@ public:
 
     struct ObservationSpace
     {
-        State ownState;
-        State goalState;
+    State                           ownState;
+    State                           goalState;
     };
 
     struct ActionSpace
     {
-        float v;
-        float w;
+    float                           v;
+    float                           w;
     };
 
     enum FSM
     {
-        // Simulation States
-        INIT,               // read in config
-        ERROR,              // error state
-        CONTENT,            // done simulation tasking
+    // Simulation States
+    INIT,                           // read in config
+    ERROR,                          // error state
+    CONTENT,                        // done simulation tasking
 
-        // Graph States
-        DISCONNECTED,       // has no nieghbors => disconnected graph
-        FOLLOWING_LEADER,   // following leader agent
-        FOLLOWING_SIBLING   // following a non-leader agent
+    // Graph States         
+    DISCONNECTED,                   // has no nieghbors => disconnected graph
+    FOLLOWING_LEADER,               // following leader agent
+    FOLLOWING_SIBLING               // following a non-leader agent
     };
 
     uint16_t                        id;
@@ -48,19 +48,12 @@ public:
     ActionSpace                     actionSpace;
     double                          desiredSeparation;
     std::vector<int>                neighborIds;
-
-    struct AgentWorkspace
-    {
-        // std::priority_queue<State, std::vector<State>, neighborSort> neighborStates;
-        ObservationSpace observationSpace;
-    };
-    AgentWorkspace agentWorkspace;
+    ObservationSpace                observationSpace;
 
     virtual void controller();      // actuator commands
     virtual void step();            // simulation interface function
     virtual void pathPlanner();     // desired states
     virtual void setFSM();          // sets FSM
-    virtual void getNeighbors();    //
 
 }; // class Agentbase
 

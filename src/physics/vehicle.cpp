@@ -25,12 +25,12 @@ Vehicle::~Vehicle(){
     // std::cout << "Destroying Vehicle object" << std::endl;
 }
 
-Vehicle::VehicleWorkspace Vehicle::stepVehicle(Vehicle::VehicleWorkspace ws, const std::tuple<float, float> &cmd)
+Vehicle::VehicleWorkspace Vehicle::stepVehicle(Vehicle::VehicleWorkspace ws, const std::vector<double> &cmd)
 {
         Vehicle::VehicleWorkspace wsOut = ws; 
 
-        float v = std::get<0>(cmd);
-        float w = std::get<1>(cmd);
+        float v = cmd[0];
+        float w = cmd[1];
 
         float delta_x = v * cos(wsOut.state.theta) * dt;
         float delta_y = v * sin(wsOut.state.theta) * dt;

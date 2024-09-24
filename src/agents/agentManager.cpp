@@ -142,17 +142,31 @@ void AgentManager::stepAgents()
     buildAgentNetwork();
 
     // step leader agents first
+    std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
     for (auto &[id, agent] : leaderAgents)
     {
-        std::cout << "########################" << std::endl;
         agent.step();
         agentActions[id] = {agent.actionSpace.v, agent.actionSpace.w};
         agentActions[id] = {1.0, 0.0};
+        
+        if (DEBUG_MODE)
+        {
+            std::vector<double> t{agentActions[id]};
+            std::cout << "Leader Agent actions: " << t[0] << "," << t[1]<< std::endl;
+        }
     }
     // then step follower agents
     for (auto &[id, agent] : followerAgents)
     {
         agent.step();
         agentActions[id] = {agent.actionSpace.v, agent.actionSpace.w};
+
+        if (DEBUG_MODE)
+        {
+            std::vector<double> t{agentActions[id]};
+            std::cout << "Follower Agent actions: " << t[0] << "," << t[1]<< std::endl;
+        }
     }
+    std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+    std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
 }

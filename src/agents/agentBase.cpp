@@ -83,19 +83,6 @@ void AgentBase::setFSM()
     }
 }
 
-void AgentBase::getNeighbors()
-{
-    // iterate through all the other agents
-    for (const auto &otherState : neighborStates)
-    {
-        // check if they are within edge radius
-        if (state.distanceTo(otherState.second) <= connection_radius)
-        {
-            neighborStates[otherState.first] = otherState.second;
-        }
-    }
-}
-
 void AgentBase::step()
 {
     if (DEBUG_MODE){std::cout <<  __PRETTY_FUNCTION__ << std::endl;}
