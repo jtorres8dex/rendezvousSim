@@ -8,6 +8,7 @@ using namespace logger;
 
 void FollowerAgent::step()
 {
+    if (DEBUG_MODE){std::cout <<  __PRETTY_FUNCTION__ << std::endl;}
     setFSM();
     pathPlanner();
     controller();   
@@ -15,6 +16,7 @@ void FollowerAgent::step()
 
 void FollowerAgent::pathPlanner()
 {
+    if (DEBUG_MODE){std::cout <<  __PRETTY_FUNCTION__ << std::endl;}
     if (neighborStates.empty())
     {
         std::cout << __PRETTY_FUNCTION__ << "FollowerAgent ID: " << id << " has no neighbors!" << std::endl;
@@ -26,6 +28,11 @@ void FollowerAgent::pathPlanner()
 
     desiredPosition(0) = leaderState.x;
     desiredPosition(1) = leaderState.y;
+
+    if (DEBUG_MODE)
+    {
+        std::cout <<  "Follower Own State: " << state.x << ", " << state.y << ", "<< state.theta << std::endl;
+    }
 
     // Adjust position to avoid collisions with neighbors
     for (const auto &[neighborId, neighborState] : neighborStates)
@@ -48,11 +55,17 @@ void FollowerAgent::pathPlanner()
     goalState.x     = desiredPosition(0);
     goalState.y     = desiredPosition(1);
     goalState.theta = std::atan2(leaderState.y - state.y, leaderState.x - state.x); // TODO:
+
+    if (DEBUG_MODE)
+    {
+        std::cout <<  "Follower Goal State: " << goalState.x << ", " << goalState.y << ", "<< goalState.theta << std::endl;
+    }
     
 }
 
 void FollowerAgent::setFSM()
 {
+    if (DEBUG_MODE){std::cout <<  __PRETTY_FUNCTION__ << std::endl;}
     // call parent function
     AgentBase::setFSM();
 }

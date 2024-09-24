@@ -10,6 +10,7 @@ using namespace logger;
 
 AgentBase::AgentBase(const YAML::Node &agentConfig)
 {
+    if (DEBUG_MODE){std::cout <<  __PRETTY_FUNCTION__ << std::endl;}
     id                  = agentConfig["id"].as<int>();
     state               = State::vectorToState(agentConfig["ics"].as<std::vector<double>>());
     role                = agentConfig["role"].as<std::string>();
@@ -20,6 +21,7 @@ AgentBase::AgentBase(const YAML::Node &agentConfig)
 
 void AgentBase::controller()
 {
+    if (DEBUG_MODE){std::cout <<  __PRETTY_FUNCTION__ << std::endl;}
     if (CONTENT == fsm)
     {
         return;
@@ -54,6 +56,12 @@ void AgentBase::controller()
     logData = {actionSpace.v, actionSpace.w};
     info = "Agent " + std::to_string(id) + " actionSpace: ";
     createEvent(__func__, info, logData);
+    
+    if (DEBUG_MODE){std::cout <<  __PRETTY_FUNCTION__ << std::endl;}
+    if (DEBUG_MODE)
+    {
+        std::cout <<  "Action: " << actionSpace.v << ", " << actionSpace.w  << std::endl;
+    }
 }
 
 void AgentBase::pathPlanner()
@@ -63,7 +71,8 @@ void AgentBase::pathPlanner()
 
 void AgentBase::setFSM()
 {
-    if (0 == agentWorkspace.neighborIds.size())
+    if (DEBUG_MODE){std::cout <<  __PRETTY_FUNCTION__ << std::endl;}
+    if (0 == neighborIds.size())
     {
         std::cout << "Agent " << id << " disconnected from network" << std::endl;
         fsm = DISCONNECTED;
@@ -89,5 +98,5 @@ void AgentBase::getNeighbors()
 
 void AgentBase::step()
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    if (DEBUG_MODE){std::cout <<  __PRETTY_FUNCTION__ << std::endl;}
 }

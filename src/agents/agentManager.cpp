@@ -6,7 +6,7 @@ using namespace logger;
 
 AgentManager::AgentManager(int _leader_id, double r)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    if (DEBUG_MODE){std::cout <<  __PRETTY_FUNCTION__ << std::endl;}
     connection_radius = r;
     leader_id = _leader_id;
 }
@@ -20,7 +20,7 @@ void AgentManager::spawnAgent()
 /// @brief  interfacing functions with simulation layer below
 void AgentManager::registerAgents(const YAML::Node &config)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    if (DEBUG_MODE){std::cout <<  __PRETTY_FUNCTION__ << std::endl;}
     for (const auto &agentConfig : config["agents"])
     {
 
@@ -45,7 +45,7 @@ void AgentManager::registerAgents(const YAML::Node &config)
 
 bool AgentManager::areNeighbors(State s1, State s2, double r)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    if (DEBUG_MODE){std::cout <<  __PRETTY_FUNCTION__ << std::endl;}
     double d = State::distanceBetween(s1, s2);
     return d <= r;
 }
@@ -55,6 +55,7 @@ Modifies downstream agent objects, building their neighbor map
 */
 void AgentManager::buildAgentNetwork()
 {
+    if (DEBUG_MODE){std::cout <<  __PRETTY_FUNCTION__ << std::endl;}
     std::cout << __PRETTY_FUNCTION__ << std::endl;
     // combine leader & follower states to form a full graph
     std::unordered_map<int, State> allStates;
@@ -85,11 +86,14 @@ void AgentManager::buildAgentNetwork()
                 {
                     followerIt->second.neighborStates[ido] = otherAgentState;
                     followerIt->second.leaderState = otherAgentState; // ASSUMPTION all followers know leader state
+                    followerIt->second.neighborIds.push_back(ido);
                 }
+                
                 auto leaderIt = leaderAgents.find(ids);
                 if (leaderIt != leaderAgents.end())
                 {
                     leaderIt->second.neighborStates[ido] = otherAgentState;
+                    leaderIt->second.neighborIds.push_back(ido);
                 }
             }
         }
@@ -98,6 +102,7 @@ void AgentManager::buildAgentNetwork()
 
 void AgentManager::updateAgentStates(std::unordered_map<int, State> newAgentStates)
 {
+    if (DEBUG_MODE){std::cout <<  __PRETTY_FUNCTION__ << std::endl;}
     for (auto &[id, leader] : leaderAgents)
     {
         leader.state = newAgentStates[id];
@@ -110,6 +115,7 @@ void AgentManager::updateAgentStates(std::unordered_map<int, State> newAgentStat
 
 void AgentManager::logAgentStates()
 {
+    if (DEBUG_MODE){std::cout <<  __PRETTY_FUNCTION__ << std::endl;}
     // Log leader agents
     for (const auto &leaderEntry : leaderAgents)
     {
@@ -132,13 +138,16 @@ void AgentManager::logAgentStates()
 
 void AgentManager::stepAgents()
 {
+    if (DEBUG_MODE){std::cout <<  __PRETTY_FUNCTION__ << std::endl;}
     buildAgentNetwork();
 
     // step leader agents first
     for (auto &[id, agent] : leaderAgents)
     {
+        std::cout << "########################" << std::endl;
         agent.step();
         agentActions[id] = {agent.actionSpace.v, agent.actionSpace.w};
+        agentActions[id] = {1.0, 0.0};
     }
     // then step follower agents
     for (auto &[id, agent] : followerAgents)

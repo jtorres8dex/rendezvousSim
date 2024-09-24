@@ -47,10 +47,10 @@ public:
     State                           goalState;
     ActionSpace                     actionSpace;
     double                          desiredSeparation;
+    std::vector<int>                neighborIds;
 
     struct AgentWorkspace
     {
-        std::vector<int> neighborIds;
         // std::priority_queue<State, std::vector<State>, neighborSort> neighborStates;
         ObservationSpace observationSpace;
     };

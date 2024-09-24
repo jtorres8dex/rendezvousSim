@@ -108,8 +108,11 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
     wsOut.agentManager->stepAgents();
 
     for (const auto& [id, action] : wsOut.agentManager->agentActions)
-    {
+    {//ERROR HEREEE
+        std::cout << "action: " << action[0] << ", " << action[0] << std::endl;
         vehicleCmds[id] = std::make_tuple(action[0], action[1]);
+        std::tuple<double, double> tup = vehicleCmds[id];
+        std::cout << "cmds after: " << get<0>(tup) << std::endl;
     }
 
     std::unordered_map<int, State> updatedStates;
