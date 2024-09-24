@@ -1,12 +1,7 @@
 #include "standard_includes.h"
 
 #include "simulation.h"
-#include "agents/agent.h"
-#include "physics/vehicle.h"
-#include "loggingTools.h"
-#include "graphTheoryTools.h"
-#include "agents/agentManager.h"
-#include "state.h"
+
 
 typedef std::unique_ptr<Simulation::SimulationWorkspace> simulationWorkspacePtr;
 

@@ -3,9 +3,12 @@
 
 
 #include "simulation.h"  
-#include "agents/agent.h"
 #include "physics/vehicle.h"
 #include "agents/agentManager.h"
+#include "loggingTools.h"
+#include "graphTheoryTools.h"
+#include "agents/agentManager.h"
+#include "state.h"
 
 #include "standard_includes.h"
 
@@ -19,11 +22,9 @@ public:
     struct SimulationWorkspace
     {
         std::vector<int>                        active_vehicle_ids;
-        std::vector<Agent::AgentWorkspace>      agentWorkspaces;
         std::vector<Vehicle::VehicleWorkspace>  vehicleWorkspaces;
         AgentManager*                           agentManager;
 
-        Agent agentObj;
         Vehicle vehicleObj;
         // std::vector<Vehicle> vehicles;
         // std::vector<Agent> agents;
