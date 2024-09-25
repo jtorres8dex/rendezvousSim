@@ -105,40 +105,19 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
 
     for (const auto& [id, action] : wsOut.agentManager.agentActions)
     {
-        std::cout << "cmds before: " << action[0] << ", " << action[1] << std::endl;
         vehicleCmds[id] = {action[0], action[1]};
-        std::cout << "cmds after: " << vehicleCmds[id][0] << ", " << vehicleCmds[id][1] << std::endl;
-
-        if (id == 4)
-        {
-            std::cout << "@@@ cmds: " << vehicleCmds[id][0] << ", " << vehicleCmds[id][1] << std::endl;
-        }
-        if (id == 4)
-        {
-            std::cout << "@@@ size1: " << vehicleCmds[id].size() << std::endl;
-            std::cout << "@@@ setting agent " << id << " actions to "<< vehicleCmds[id][0] << ", " << vehicleCmds[id][1] << std::endl;
-        }
+        std::cout << "Setting actions for agent " << id << " to be: " << vehicleCmds[id][0] << ", " << vehicleCmds[id][1] << std::endl;
     }
 
     std::unordered_map<int, State> updatedStates;
     for (Vehicle::VehicleWorkspace &vehicleWs : wsOut.vehicleWorkspaces)
     {
-        if (vehicleCmds[vehicleWs.id].size() == 0)
-        {
-            std::cout <<"@@@ agent " << vehicleWs.id  << " size is 0" << std::endl;
-        }
-        if (vehicleWs.id == 4)
-        {    std::cout << "@@@@@@: " <<  std::endl;
-            std::cout << "@@@ cmds: " << vehicleCmds.at(vehicleWs.id)[0] << ", " << vehicleCmds.at(vehicleWs.id)[1] << std::endl;
-            std::cout << "@@@ size2: " << vehicleCmds[vehicleWs.id].size() << std::endl;
-        }
         // step
-  
-        std::cout << "vehiclecmds size: " << vehicleCmds[vehicleWs.id].size() << " for agent " << vehicleWs.id << std::endl;
-        std::cout << "1111: " << vehicleCmds[vehicleWs.id][0] << ", " << vehicleCmds[vehicleWs.id][1] << std::endl;
-        std::vector<double> cmd = vehicleCmds[vehicleWs.id];
-        std::cout << "2222: " << cmd[0] << ", " << cmd[1] << std::endl;
-        vehicleWs = Vehicle::stepVehicle(vehicleWs, cmd);
+        std::cout << "cmds being passed in for agent " << vehicleWs.id << ":  " << vehicleCmds[vehicleWs.id][0] << ", " << vehicleCmds[vehicleWs.id][1] << std::endl;
+        
+        
+        std::vector<double> cmd     = vehicleCmds[vehicleWs.id];
+        vehicleWs                   = Vehicle::stepVehicle(vehicleWs, cmd);
 
         // log vehicle states
         std::vector<double> stateVec;
@@ -154,10 +133,6 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
         // add to shared state vector
         updatedStates[vehicleWs.id] = State::vectorToState(stateVec);
 
-        // if (vehicleWs.id == 4)
-        // {
-        //    std::cout << "@@@vehicle state: " << id <<  std::endl;   
-        // }
     }
         // grab new agent states and compute Laplacian
         // Eigen::MatrixXd laplacianMatrix = graphTheoryTools::computeLaplacianMatrix(updatedStates, neighbor_radius);

@@ -33,7 +33,6 @@ void AgentManager::registerAgents(const YAML::Node &config)
         }
         else if (agentType == "leader")
         {
-            // std::cout << agentConfig["id"].IsScalar() << std::endl;
             leaderAgents.emplace(_id, LeaderAgent(agentConfig));
         }
         else

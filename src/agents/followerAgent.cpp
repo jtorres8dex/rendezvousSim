@@ -45,9 +45,9 @@ void FollowerAgent::pathPlanner()
     for (const auto &[neighborId, neighborState] : neighborStates)
     {
         // Calculate the vector from the agent to the neighbor
-        double dx = neighborState.x - state.x;
-        double dy = neighborState.y - state.y;
-        double distance = std::sqrt(dx * dx + dy * dy);
+        double dx           = neighborState.x - state.x;
+        double dy           = neighborState.y - state.y;
+        double distance     = std::sqrt(dx * dx + dy * dy);
 
         // Maintain separation distance from neighbors
         if (distance < desiredSeparation)
@@ -67,10 +67,6 @@ void FollowerAgent::pathPlanner()
     {
         std::cout << "Follower Goal State: " << goalState.x << ", " << goalState.y << ", " << goalState.theta << std::endl;
     }
-    if (id == 4)
-    {
-        std::cout << "@@@ goal state: "<< goalState.x << ", " << goalState.y << std::endl;
-    }
 }
 
 void FollowerAgent::setFSM()
@@ -82,8 +78,4 @@ void FollowerAgent::setFSM()
     // call parent function
     AgentBase::setFSM();
 
-        if (id == 4)
-    {
-        std::cout << "@@@ fsm: "<< fsm << std::endl;
-    }
 }

@@ -33,11 +33,9 @@ def read_agent_data(csv_file):
     with open(csv_file, 'r') as file:
         reader = csv.reader(file)
         for row in reader:
-            print("::::", len(row))
             if len(row) < 5:
                 continue  # Skip incomplete rows
             
-            print(";")  
             agent_id = int(row[0])
             agent_type = int(row[1])  # 0 for leader, 1 for follower (based on AgentType enum)
             x = float(row[2])
@@ -103,7 +101,6 @@ def main():
 
     print(args.csv_file)
     agent_data = read_agent_data(args.csv_file)
-    print(agent_data)
     if not agent_data:
         print("No agent data found.")
         return

@@ -1,12 +1,8 @@
-#include <memory>
-#include <iostream>
-#include <cmath>
-#include <tuple>
-
+#include "standard_includes.h"
 #include "Vehicle.h"
 
-static const double TWO_PI = M_PI * 2;
-static const double dt = 0.1;
+static const double TWO_PI  = M_PI * 2;
+static const double dt      = 0.1;
 
 typedef std::unique_ptr<Vehicle::VehicleWorkspace> vehicleWorkspacePtr;
 
@@ -27,20 +23,17 @@ Vehicle::~Vehicle(){
 
 Vehicle::VehicleWorkspace Vehicle::stepVehicle(Vehicle::VehicleWorkspace &ws, const std::vector<double> &cmd)
 {
-        Vehicle::VehicleWorkspace wsOut = ws; 
-        std::cout << cmd.size() << std::endl;
-        std::cout << "3333: " << cmd[0] << ", " << cmd[1] << std::endl;
-        float v = cmd[0];
-        float w = cmd[1];
-
-        float delta_x = v * cos(wsOut.state.theta) * dt;
-        float delta_y = v * sin(wsOut.state.theta) * dt;
-        float delta_theta = w * dt;
+        Vehicle::VehicleWorkspace wsOut  = ws; 
+        float v                          = cmd[0];
+        float w                          = cmd[1];
+        float delta_x                    = v * cos(wsOut.state.theta) * dt;
+        float delta_y                    = v * sin(wsOut.state.theta) * dt;
+        float delta_theta                = w * dt;
 
         // Update  state
-        wsOut.state.x += delta_x;
-        wsOut.state.y += delta_y;
-        wsOut.state.theta += delta_theta;
+        wsOut.state.x                   += delta_x;
+        wsOut.state.y                   += delta_y;
+        wsOut.state.theta               += delta_theta;
     
         // Normalize theta to be within [-pi, pi]
         while (wsOut.state.theta > M_PI) {
