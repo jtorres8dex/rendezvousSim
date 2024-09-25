@@ -1,12 +1,13 @@
 import csv
 import matplotlib.pyplot as plt
+import argparse
 
 class Config:
     def __init__(self):
-        self.csv_file = 'logs/SIMULATION_TEST.csv'  # CSV file containing vehicle states
+        self.csv_file = str                # CSV file containing vehicle states
         self.time_col = 0                  # Column index for time
         self.type_col = 1                  # Column index for type (should be VEHICLE_STATE)
-        self.id_col = 2                    # Column index for vehicle ID
+        self.id_col   = 2                  # Column index for vehicle ID
         self.x_col = 3                     # Column index for x position
         self.y_col = 4                     # Column index for y position
         self.theta_col = 5                 # Column index for theta (orientation)
@@ -83,10 +84,14 @@ def plot_vehicle_states(vehicle_data):
         plt.show()
 
 def main():
+    parser = argparse.ArgumentParser(description="strip charts")
+    parser.add_argument('csv_file', type=str, help='Path to the CSV file containing vehicle and follower states')
+    args = parser.parse_args()
+
     config = Config()
     
     # Load vehicle data from CSV
-    vehicle_data = read_vehicle_data(config.csv_file)
+    vehicle_data = read_vehicle_data(args.csv_file)
 
     # Plot the data
     plot_vehicle_states(vehicle_data)

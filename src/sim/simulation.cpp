@@ -30,8 +30,9 @@ std::vector<Vehicle::VehicleWorkspace> Simulation::registerVehicles(const YAML::
     std::vector<Vehicle::VehicleWorkspace> vehicleWorkspaces;
 
     int num_vehicles = config["simulation"]["num_vehicles"].as<int>();
+    std::string vehicle_type = config["simulation"]["vehicle_type"].as<std::string>();
 
-    for (const auto &vehicleConfig : config["vehicles"])
+    for (const auto &vehicleConfig : config["agents"])
     {
         Vehicle::VehicleWorkspace ws;
 
@@ -105,24 +106,14 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
 
     for (const auto& [id, action] : wsOut.agentManager.agentActions)
     {
-        vehicleCmds[id] = {action[0], action[1]};
-        std::cout << "Setting actions for agent " << id << " to be: " << vehicleCmds[id][0] << ", " << vehicleCmds[id][1] << std::endl;
+        vehicleCmds[id]             = {action[0], action[1]};
     }
 
     std::unordered_map<int, State> updatedStates;
+
     for (Vehicle::VehicleWorkspace &vehicleWs : wsOut.vehicleWorkspaces)
     {
         // step
-        std::cout << "vehicleWs.id: " << vehicleWs.id << std::endl;
-        std::cout << "keys: " ;
-        for (auto&  [k, v] : vehicleCmds)
-        {
-            std::cout << k << ", ";
-        }
-        std::cout << std::endl;
-        std::cout << "cmds being passed in for agent " << vehicleWs.id << ":  " << vehicleCmds[vehicleWs.id][0] << ", " << vehicleCmds[vehicleWs.id][1] << std::endl;
-        
-        
         std::vector<double> cmd     = vehicleCmds[vehicleWs.id];
         vehicleWs                   = Vehicle::stepVehicle(vehicleWs, cmd);
 

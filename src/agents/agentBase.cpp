@@ -47,7 +47,7 @@ void AgentBase::controller()
     theta_error = std::atan2(std::sin(theta_error), std::cos(theta_error));
 
     // Calculate linear and angular velocities
-    actionSpace.v = kp_v * distanceToGoal; // + kd_v * ePosMinus1;
+    actionSpace.v = -1.0 *kp_v * distanceToGoal; // + kd_v * ePosMinus1;
     ePosMinus1 = distanceToGoal;
 
     actionSpace.w = kp_w * theta_error; // + kd_w * eThetaMinus1;
