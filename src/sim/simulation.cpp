@@ -113,6 +113,13 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
     for (Vehicle::VehicleWorkspace &vehicleWs : wsOut.vehicleWorkspaces)
     {
         // step
+        std::cout << "vehicleWs.id: " << vehicleWs.id << std::endl;
+        std::cout << "keys: " ;
+        for (auto&  [k, v] : vehicleCmds)
+        {
+            std::cout << k << ", ";
+        }
+        std::cout << std::endl;
         std::cout << "cmds being passed in for agent " << vehicleWs.id << ":  " << vehicleCmds[vehicleWs.id][0] << ", " << vehicleCmds[vehicleWs.id][1] << std::endl;
         
         
