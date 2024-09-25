@@ -21,31 +21,28 @@ public:
 
     struct SimulationWorkspace
     {
-        std::vector<int>                        active_vehicle_ids;
-        std::vector<Vehicle::VehicleWorkspace>  vehicleWorkspaces;
-        AgentManager*                           agentManager;
+        std::vector<int>                            active_vehicle_ids;
+        std::vector<Vehicle::VehicleWorkspace>      vehicleWorkspaces;
+        AgentManager                                agentManager;
+        Vehicle                                     vehicleObj;
+        int                                         numAgents;
+        bool                                        is_connected_swarm;
+    };  
 
-        Vehicle vehicleObj;
-        // std::vector<Vehicle> vehicles;
-        // std::vector<Agent> agents;
-        int numAgents;
+    SimulationWorkspace                             simulationWorkspace;
 
-        bool is_connected_swarm;
-    }; 
-    SimulationWorkspace simulationWorkspace;
+    int                                             time_steps;
+    int                                             sim_step;
+    double                                          sim_time;
+    double                                          dt;
+    std::ofstream                                   file;
+
+    typedef std::unique_ptr<SimulationWorkspace>    simulationWorkspacePtr;
 
     // Constructor 
     Simulation(std::string sim_name);
     // Destructor
     ~Simulation();
-
-    int time_steps;
-    int sim_step;
-    double sim_time;
-    double dt;
-    std::ofstream file;
-
-    typedef std::unique_ptr<SimulationWorkspace> simulationWorkspacePtr;
 
     enum performanceType
     {
@@ -54,9 +51,9 @@ public:
         SWARM_CONTROL
     };
 
-    std::vector<Vehicle::VehicleWorkspace> registerVehicles(const YAML::Node& config);
-    SimulationWorkspace initialize(std::string configPath);
-    SimulationWorkspace stepSim(SimulationWorkspace ws);
+    std::vector<Vehicle::VehicleWorkspace>  registerVehicles(const YAML::Node& config);
+    SimulationWorkspace                     initialize(std::string configPath);
+    SimulationWorkspace                     stepSim(SimulationWorkspace ws);
 
     
 };

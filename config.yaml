@@ -19,7 +19,7 @@ agent_manager:
   leader_id: 7
   
 vehicles:
-  - id: 1
+  - id: 7
     ics: [0.0, 0.0, 0.0]
     agent: "albert"
 

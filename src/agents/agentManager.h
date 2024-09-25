@@ -10,6 +10,7 @@
 class AgentManager
 {
     public:
+        AgentManager() = default;
         AgentManager(int leader_id, double r);
 
         void registerAgents(const YAML::Node &config);

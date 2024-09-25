@@ -31,13 +31,13 @@ std::vector<Vehicle::VehicleWorkspace> Simulation::registerVehicles(const YAML::
 
     int num_vehicles = config["simulation"]["num_vehicles"].as<int>();
 
-    for (int i = 0; i < num_vehicles; ++i)
+    for (const auto &vehicleConfig : config["vehicles"])
     {
         Vehicle::VehicleWorkspace ws;
 
-        ws.id = i + 1;
+        ws.id = vehicleConfig["id"].as<int>();
 
-        std::vector<double> ics = {config["vehicles"][i]["ics"].as<std::vector<double>>()};
+        std::vector<double> ics = vehicleConfig["ics"].as<std::vector<double>>();
         ws.state.x = ics[0];
         ws.state.y = ics[1];
         ws.state.theta = ics[2];
@@ -80,9 +80,9 @@ Simulation::SimulationWorkspace Simulation::initialize(std::string configPath)
     // instantiate sim child objects
     int num_vehicles    = config["simulation"]["num_vehicles"].as<int>();
     double r            = config["agent_manager"]["connection_radius"].as<double>();
-    wsOut.agentManager  = new AgentManager(num_vehicles, r);
+    wsOut.agentManager  = AgentManager(num_vehicles, r);
     
-    wsOut.agentManager->registerAgents(config);
+    wsOut.agentManager.registerAgents(config);
 
     Vehicle simVehicle;
     wsOut.vehicleObj = simVehicle;
@@ -101,22 +101,44 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
     Simulation::SimulationWorkspace wsOut{ws};
     std::unordered_map<int, std::vector<double>> vehicleCmds;
 
-    wsOut.agentManager->stepAgents();
+    wsOut.agentManager.stepAgents();
 
-    for (const auto& [id, action] : wsOut.agentManager->agentActions)
-    {//ERROR HEREEE
-        std::cout << "action: " << action[0] << ", " << action[0] << std::endl;
-        vehicleCmds[id] = {(action[0], action[1])};
+    for (const auto& [id, action] : wsOut.agentManager.agentActions)
+    {
+        std::cout << "cmds before: " << action[0] << ", " << action[1] << std::endl;
+        vehicleCmds[id] = {action[0], action[1]};
         std::cout << "cmds after: " << vehicleCmds[id][0] << ", " << vehicleCmds[id][1] << std::endl;
+
+        if (id == 4)
+        {
+            std::cout << "@@@ cmds: " << vehicleCmds[id][0] << ", " << vehicleCmds[id][1] << std::endl;
+        }
+        if (id == 4)
+        {
+            std::cout << "@@@ size1: " << vehicleCmds[id].size() << std::endl;
+            std::cout << "@@@ setting agent " << id << " actions to "<< vehicleCmds[id][0] << ", " << vehicleCmds[id][1] << std::endl;
+        }
     }
 
     std::unordered_map<int, State> updatedStates;
     for (Vehicle::VehicleWorkspace &vehicleWs : wsOut.vehicleWorkspaces)
     {
+        if (vehicleCmds[vehicleWs.id].size() == 0)
+        {
+            std::cout <<"@@@ agent " << vehicleWs.id  << " size is 0" << std::endl;
+        }
+        if (vehicleWs.id == 4)
+        {    std::cout << "@@@@@@: " <<  std::endl;
+            std::cout << "@@@ cmds: " << vehicleCmds.at(vehicleWs.id)[0] << ", " << vehicleCmds.at(vehicleWs.id)[1] << std::endl;
+            std::cout << "@@@ size2: " << vehicleCmds[vehicleWs.id].size() << std::endl;
+        }
         // step
+  
+        std::cout << "vehiclecmds size: " << vehicleCmds[vehicleWs.id].size() << " for agent " << vehicleWs.id << std::endl;
+        std::cout << "1111: " << vehicleCmds[vehicleWs.id][0] << ", " << vehicleCmds[vehicleWs.id][1] << std::endl;
         std::vector<double> cmd = vehicleCmds[vehicleWs.id];
+        std::cout << "2222: " << cmd[0] << ", " << cmd[1] << std::endl;
         vehicleWs = Vehicle::stepVehicle(vehicleWs, cmd);
-        vehicleCmds.erase(vehicleCmds.begin());
 
         // log vehicle states
         std::vector<double> stateVec;
@@ -131,6 +153,11 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
         
         // add to shared state vector
         updatedStates[vehicleWs.id] = State::vectorToState(stateVec);
+
+        // if (vehicleWs.id == 4)
+        // {
+        //    std::cout << "@@@vehicle state: " << id <<  std::endl;   
+        // }
     }
         // grab new agent states and compute Laplacian
         // Eigen::MatrixXd laplacianMatrix = graphTheoryTools::computeLaplacianMatrix(updatedStates, neighbor_radius);
@@ -144,10 +171,10 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
                 std::cout << "(ID:" << id << ") " << state.x << ", " << state.y << ", " << state.theta << std::endl;
             }
         }
-        wsOut.agentManager->updateAgentStates(updatedStates);
+        wsOut.agentManager.updateAgentStates(updatedStates);
 
         // log states to csv
-        wsOut.agentManager->logAgentStates();
+        wsOut.agentManager.logAgentStates();
 
 
     ++t;
@@ -174,7 +201,7 @@ int main()
 
     for (int i = 0; i < config["simulation"]["time_steps"].as<int>(); ++i)
     {
-        
+        std::cout << "TIMESTEP: " << i << std::endl;
         simWs = sim.stepSim(simWs);
         int j = 0;
     }

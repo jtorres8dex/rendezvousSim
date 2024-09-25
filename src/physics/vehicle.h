@@ -50,7 +50,7 @@ public:
     typedef std::unique_ptr<VehicleWorkspace> vehicleWorkspacePtr;
 
     // static vehicleWorkspacePtr stepVehicle(vehicleWorkspacePtr ws, const std::tuple<float, float> &cmds);
-    static VehicleWorkspace stepVehicle(VehicleWorkspace ws, const std::vector<double> &cmd);
+    static VehicleWorkspace stepVehicle(VehicleWorkspace &ws, const std::vector<double> &cmd);
 };
 
 #endif 

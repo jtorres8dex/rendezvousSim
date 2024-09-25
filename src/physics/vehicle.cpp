@@ -25,10 +25,11 @@ Vehicle::~Vehicle(){
     // std::cout << "Destroying Vehicle object" << std::endl;
 }
 
-Vehicle::VehicleWorkspace Vehicle::stepVehicle(Vehicle::VehicleWorkspace ws, const std::vector<double> &cmd)
+Vehicle::VehicleWorkspace Vehicle::stepVehicle(Vehicle::VehicleWorkspace &ws, const std::vector<double> &cmd)
 {
         Vehicle::VehicleWorkspace wsOut = ws; 
-
+        std::cout << cmd.size() << std::endl;
+        std::cout << "3333: " << cmd[0] << ", " << cmd[1] << std::endl;
         float v = cmd[0];
         float w = cmd[1];
 

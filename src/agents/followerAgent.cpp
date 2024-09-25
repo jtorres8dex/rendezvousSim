@@ -8,15 +8,22 @@ using namespace logger;
 
 void FollowerAgent::step()
 {
-    if (DEBUG_MODE){std::cout <<  __PRETTY_FUNCTION__ << std::endl;}
+    if (DEBUG_MODE)
+    {
+        std::cout << __PRETTY_FUNCTION__ << std::endl;
+    }
     setFSM();
     pathPlanner();
-    controller();   
+    controller();
 }
 
 void FollowerAgent::pathPlanner()
 {
-    if (DEBUG_MODE){std::cout <<  __PRETTY_FUNCTION__ << std::endl;}
+
+    if (DEBUG_MODE)
+    {
+        std::cout << __PRETTY_FUNCTION__ << std::endl;
+    }
     if (neighborStates.empty())
     {
         std::cout << __PRETTY_FUNCTION__ << "FollowerAgent ID: " << id << " has no neighbors!" << std::endl;
@@ -31,7 +38,7 @@ void FollowerAgent::pathPlanner()
 
     if (DEBUG_MODE)
     {
-        std::cout <<  "Follower Own State: " << state.x << ", " << state.y << ", "<< state.theta << std::endl;
+        std::cout << "Follower Own State: " << state.x << ", " << state.y << ", " << state.theta << std::endl;
     }
 
     // Adjust position to avoid collisions with neighbors
@@ -52,20 +59,31 @@ void FollowerAgent::pathPlanner()
     }
 
     // Update the desired state based on the calculated position
-    goalState.x     = desiredPosition(0);
-    goalState.y     = desiredPosition(1);
-    goalState.theta = std::atan2(leaderState.y - state.y, leaderState.x - state.x); // TODO:
+    goalState.x      = desiredPosition(0);
+    goalState.y      = desiredPosition(1);
+    goalState.theta  = std::atan2(leaderState.y - state.y, leaderState.x - state.x); // TODO:
 
     if (DEBUG_MODE)
     {
-        std::cout <<  "Follower Goal State: " << goalState.x << ", " << goalState.y << ", "<< goalState.theta << std::endl;
+        std::cout << "Follower Goal State: " << goalState.x << ", " << goalState.y << ", " << goalState.theta << std::endl;
     }
-    
+    if (id == 4)
+    {
+        std::cout << "@@@ goal state: "<< goalState.x << ", " << goalState.y << std::endl;
+    }
 }
 
 void FollowerAgent::setFSM()
 {
-    if (DEBUG_MODE){std::cout <<  __PRETTY_FUNCTION__ << std::endl;}
+    if (DEBUG_MODE)
+    {
+        std::cout << __PRETTY_FUNCTION__ << std::endl;
+    }
     // call parent function
     AgentBase::setFSM();
+
+        if (id == 4)
+    {
+        std::cout << "@@@ fsm: "<< fsm << std::endl;
+    }
 }

@@ -62,6 +62,10 @@ void AgentBase::controller()
     {
         std::cout <<  "Action: " << actionSpace.v << ", " << actionSpace.w  << std::endl;
     }
+        if (id == 4)
+    {
+        std::cout << "@@@ action: "<< actionSpace.v << ", " << actionSpace.w << std::endl;
+    }
 }
 
 void AgentBase::pathPlanner()
