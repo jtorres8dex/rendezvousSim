@@ -14,6 +14,8 @@ void FollowerAgent::step()
     setFSM();
     pathPlanner();
     controller();
+
+    // std::cout << "Follower goal state: " << goalState.x << ", " << goalState.y << std::endl;
 }
 
 void FollowerAgent::pathPlanner()
@@ -41,8 +43,10 @@ void FollowerAgent::pathPlanner()
     }
 
     // Adjust position to avoid collisions with neighbors
+    std::cout << "@@@ neighbor IDS: " ;
     for (const auto &[neighborId, neighborState] : neighborStates)
     {
+        std::cout << neighborId << std::endl;
         // Calculate the vector from the agent to the neighbor
         double dx           = neighborState.x - state.x;
         double dy           = neighborState.y - state.y;

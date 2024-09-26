@@ -29,7 +29,7 @@ public:
     // Simulation States
     INIT,                           // read in config
     ERROR,                          // error state
-    CONTENT,                        // done simulation tasking
+    DONE,                        // done simulation tasking
 
     // Graph States         
     DISCONNECTED,                   // has no nieghbors => disconnected graph

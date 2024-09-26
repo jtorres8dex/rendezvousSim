@@ -31,7 +31,7 @@ namespace logger
 
     void initializeLogger(std::string sim_name, std::string eventFileName);
     void logVehicleState(int id, int t, std::vector<double> vState);
-    void logAgentState(int id, AgentType type, State state); 
+    void logAgentState(int id, AgentType type, State state, std::vector<double> cmds); 
     void logWaypointInfo(int id, std::vector<double> location);
     void deInitializeLogger();
 

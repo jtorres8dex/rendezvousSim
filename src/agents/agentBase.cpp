@@ -22,13 +22,13 @@ AgentBase::AgentBase(const YAML::Node &agentConfig)
 void AgentBase::controller()
 {
     if (DEBUG_MODE){std::cout <<  __PRETTY_FUNCTION__ << std::endl;}
-    if (CONTENT == fsm)
+    if (DONE == fsm)
     {
         return;
     }
 
-    float kp_v{1.0}; // Proportional gain
-    float kd_v{1.0}; // Derivative gain
+    float kp_v{0.1}; // Proportional gain
+    float kd_v{0.1}; // Derivative gain
 
     float kp_w{5.0}; // Proportional gain
     float kd_w{1.0}; // Derivative gain
@@ -38,16 +38,18 @@ void AgentBase::controller()
     createEvent(__func__, info, logData);
 
     double distanceToGoal = state.distanceTo(goalState);
-
+    std::cout << "distanceToGoal: " << distanceToGoal << std::endl;
     // angle agent should be facing towards the waypoint in global frame
     double angleToGoal = state.angleTo(goalState);
+    std::cout << "ANGLE TO GOAL: " << angleToGoal << std::endl;
     float theta_error = angleToGoal - state.theta;
+    std::cout << "theta_error: " << theta_error << std::endl;
 
     // Normalize theta error to be within -PI to PI
     theta_error = std::atan2(std::sin(theta_error), std::cos(theta_error));
 
     // Calculate linear and angular velocities
-    actionSpace.v = -1.0 *kp_v * distanceToGoal; // + kd_v * ePosMinus1;
+    actionSpace.v = kp_v * distanceToGoal; // + kd_v * ePosMinus1;
     ePosMinus1 = distanceToGoal;
 
     actionSpace.w = kp_w * theta_error; // + kd_w * eThetaMinus1;

@@ -48,18 +48,21 @@ namespace logger
     {
         if (logFile.is_open())
         {
-            logFile << WAYPOINT << "," << id << "," << location[0] << "," << location[1] << "\n";
+            logFile << "waypoint" << ",";
+            logFile << id << "," << location[0] << "," << location[1] << "\n";
         }
         else
         {
             std::cout << "ERROR- logger::" << __func__ << " file not open" << std::endl;
         }
     };
-    void logAgentState(int id, AgentType type, State state)
+    void logAgentState(int id, AgentType type, State state, std::vector<double> cmds)
     {
         if (logFile.is_open())
         {
-            logFile << id << "," << type << "," << state.x << "," << state.y << "," << state.theta << "\n";
+            logFile << "agent" << ",";
+            logFile << id << "," << type << "," << state.x << "," << state.y << "," << state.theta << ",";
+            logFile << cmds[0] << "," << cmds[1] << "," << "\n";
         }
         else
         {

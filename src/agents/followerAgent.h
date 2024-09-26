@@ -12,6 +12,14 @@ static double eThetaMinus1{0};
 class FollowerAgent : public AgentBase
 {
 public:
+
+    enum FSM
+    {
+        INIT,
+        DISCONNECTED,
+        EQUILIBRIUM,
+        PURSUEING_NEIGHBOR
+    };
     FollowerAgent(const YAML::Node &config) : AgentBase(config) {};
     void step() override;
 
@@ -19,7 +27,8 @@ public:
 
     void setFSM() override;
 
-    State leaderState;
+    State   leaderState;
+    FSM     fsm;
 };
 
 #endif

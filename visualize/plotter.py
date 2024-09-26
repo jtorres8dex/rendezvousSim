@@ -2,78 +2,67 @@ import csv
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import numpy as np
-from dataclasses import dataclass
 import argparse
-import time
 
-@dataclass
-class Config:
-        csv_file: str                          # CSV file containing vehicle states
-        time_col = 0                           # Column index for time
-        type_col = 1                           # Column index for type (should be VEHICLE_STATE)
-        id_col = 2                             # Column index for vehicle ID
-        x_col = 3                              # Column index for x position
-        y_col = 4                              # Column index for y position
-        theta_col = 5                          # Column index for theta (orientation)
-        follower_type = 1                      # follower type     
-        fps = 30                               # Frames per second for animation
-        trail_length = 50                      # Number of previous points to display as a trail
-        fig_size = (10, 8)                     # Figure size for the plot
-        xlim = (-100, 100)                     # X-axis limits for the plot
-        ylim = (-100, 100)                     # Y-axis limits for the plot
-        arrow_length = 5                       # Length of the direction arrow representing theta
+DIMENSION = 500
 
-VEHICLE_STATE = 0
-FOLLOWER_AGENT_STATE = 1
-
-# Read the agent state data from CSV
-def read_agent_data(csv_file):
+# Read agent and waypoint data from CSV
+def read_data(csv_file):
     agent_data = {}
-    
+    waypoints = {}
+
     with open(csv_file, 'r') as file:
         reader = csv.reader(file)
         for row in reader:
-            if len(row) < 5:
-                continue  # Skip incomplete rows
-            
-            agent_id = int(row[0])
-            agent_type = int(row[1])  # 0 for leader, 1 for follower (based on AgentType enum)
-            x = float(row[2])
-            y = float(row[3])
-            theta = float(row[4])
-            
-            # Store the data for each agent ID
-            if agent_id not in agent_data:
-                agent_data[agent_id] = {'x': [], 'y': [], 'theta': [], 'type': agent_type}
-            
-            agent_data[agent_id]['x'].append(x)
-            agent_data[agent_id]['y'].append(y)
-            agent_data[agent_id]['theta'].append(theta)
+            print(row)
+            if row[0] == "waypoint":
+                waypoint_id = int(row[1])
+                x = float(row[2])
+                y = float(row[3])
+                waypoints[waypoint_id] = {'x': x, 'y': y}
+            elif row[0] == "agent":
+                agent_id = int(row[1])
+                agent_type = int(row[2])  # 0 for leader, 1 for follower
+                x = float(row[3])
+                y = float(row[4])
+                theta = float(row[5])
+                v = float(row[6])  # Linear velocity
+                w = float(row[7])  # Angular velocity
+
+                if agent_id not in agent_data:
+                    agent_data[agent_id] = {'x': [], 'y': [], 'theta': [], 'v': [], 'w': [], 'type': agent_type}
+
+                agent_data[agent_id]['x'].append(x)
+                agent_data[agent_id]['y'].append(y)
+                agent_data[agent_id]['theta'].append(theta)
+                agent_data[agent_id]['v'].append(v)
+                agent_data[agent_id]['w'].append(w)
     
-    return agent_data
+    return agent_data, waypoints
 
 # Function to setup the plot
-def setup_plot(agent_data):
+def setup_plot(agent_data, waypoints):
     fig, ax = plt.subplots()
-    ax.set_xlim(-100, 100)
-    ax.set_ylim(-100, 100)
+    ax.set_xlim(-DIMENSION, DIMENSION)
+    ax.set_ylim(-DIMENSION, DIMENSION)
     
-    # Create a dictionary to store plot lines for each agent
     agent_plots = {}
-    
+
+    # Plot agents
     for agent_id, data in agent_data.items():
         if data['type'] == 0:  # Leader
-            line, = ax.plot([], [], 'bo-', label=f'Leader {agent_id}')  # 'bo-' for blue leader
+            line, = ax.plot([], [], 'bo-', label=f'Leader {agent_id}')
         else:  # Follower
-            line, = ax.plot([], [], 'ro-', label=f'Follower {agent_id}')  # 'ro-' for red follower
-        
-        direction_arrow, = ax.plot([], [], 'g-')  # Arrow representing theta (orientation)
-        
+            line, = ax.plot([], [], 'ro-', label=f'Follower {agent_id}')
+        direction_arrow, = ax.plot([], [], 'g-')
         agent_plots[agent_id] = {'line': line, 'arrow': direction_arrow}
-    
+
+    # Plot waypoints
+    for waypoint_id, waypoint in waypoints.items():
+        ax.plot(waypoint['x'], waypoint['y'], 'kx', label=f'Waypoint {waypoint_id}')
+
     ax.legend()
     return fig, ax, agent_plots
-
 
 # Function to update the plot at each frame
 def update_plot(frame, agent_data, agent_plots):
@@ -83,10 +72,8 @@ def update_plot(frame, agent_data, agent_plots):
             y = data['y'][frame]
             theta = data['theta'][frame]
             
-            # Plot the path of the agent
             agent_plots[agent_id]['line'].set_data(data['x'][:frame], data['y'][:frame])
             
-            # Update the direction arrow (for example, with length 5 units)
             arrow_x = [x, x + 5 * np.cos(theta)]
             arrow_y = [y, y + 5 * np.sin(theta)]
             agent_plots[agent_id]['arrow'].set_data(arrow_x, arrow_y)
@@ -94,20 +81,17 @@ def update_plot(frame, agent_data, agent_plots):
     return [plot for agent_plot in agent_plots.values() for plot in agent_plot.values()]
 
 def main():
-
-    parser = argparse.ArgumentParser(description="Plot vehicle and follower movements from a CSV file.")
-    parser.add_argument('csv_file', type=str, help='Path to the CSV file containing vehicle and follower states')
+    parser = argparse.ArgumentParser(description="Plot vehicle and waypoint data from CSV file.")
+    parser.add_argument('csv_file', type=str, help='Path to the CSV file containing data')
     args = parser.parse_args()
 
-    print(args.csv_file)
-    agent_data = read_agent_data(args.csv_file)
-    if not agent_data:
-        print("No agent data found.")
+    agent_data, waypoints = read_data(args.csv_file)
+    if not agent_data and not waypoints:
+        print("No data found.")
         return
     
-    fig, ax, agent_plots = setup_plot(agent_data)
+    fig, ax, agent_plots = setup_plot(agent_data, waypoints)
     
-    # Number of frames is determined by the longest agent's time history
     num_frames = max(len(data['x']) for data in agent_data.values())
     
     anim = FuncAnimation(fig, update_plot, frames=num_frames,
@@ -116,5 +100,4 @@ def main():
     plt.show()
 
 if __name__ == "__main__":
-    # Replace 'agent_data.csv' with the path to your CSV file
     main()

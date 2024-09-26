@@ -2,7 +2,7 @@
 #include "Vehicle.h"
 
 static const double TWO_PI  = M_PI * 2;
-static const double dt      = 0.1;
+static const double dt      = 1.0;
 
 typedef std::unique_ptr<Vehicle::VehicleWorkspace> vehicleWorkspacePtr;
 

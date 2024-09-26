@@ -120,9 +120,12 @@ void AgentManager::logAgentStates()
     {
         int leaderId                        = leaderEntry.first;
         const LeaderAgent &leaderAgent      = leaderEntry.second;
-
-        logAgentState(leaderId, LEADER, leaderAgent.state);
+        
+        std::cout << "@@@ AGENTMANAGER " << leaderAgent.state.x << ", " << std::endl;
+        logAgentState(leaderId, LEADER, leaderAgent.state, {leaderAgent.actionSpace.v, leaderAgent.actionSpace.w});
         std::cout << "logging agent state" << std::endl;
+        // log waypoints
+        logWaypointInfo(leaderAgent.currentWaypointId, State::stateToVector(leaderAgent.currentWaypoint));
     }
 
     // Log follower agents
@@ -131,8 +134,9 @@ void AgentManager::logAgentStates()
         int followerId                      = followerEntry.first;
         const FollowerAgent &followerAgent  = followerEntry.second;
 
-        logAgentState(followerId, FOLLOWER, followerAgent.state);
+        logAgentState(followerId, LEADER, followerAgent.state, {followerAgent.actionSpace.v, followerAgent.actionSpace.w});
     }
+
 }
 
 void AgentManager::stepAgents()
