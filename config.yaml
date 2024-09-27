@@ -34,6 +34,7 @@ agents:
       - [0.0, 100.0]
       - [100.0, 200.0]
     loop_waypoints: true
+    waypoint_radius: 10.0
     # FOLLOWERS
   # - name: "albert2"
   #   id: 2

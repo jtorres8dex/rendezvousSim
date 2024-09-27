@@ -18,7 +18,17 @@ double State::distanceTo(const State &other)
 
 double State::angleTo(const State &other)
 {
-    return std::atan2(y - other.y, x - other.x);
+    double target_angle = std::atan2(other.y - y, other.x - x);
+    
+    double angle_diff = target_angle - theta;
+    
+    // Normalize the angle difference to be within the range [-pi, pi]
+    angle_diff = std::fmod(angle_diff + M_PI, 2 * M_PI);
+    if (angle_diff < 0) {
+        angle_diff += 2 * M_PI;
+    }
+    angle_diff -= M_PI;
+    return angle_diff;
 }
 
 State State::vectorToState(std::vector<double> v)

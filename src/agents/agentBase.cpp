@@ -21,6 +21,7 @@ AgentBase::AgentBase(const YAML::Node &agentConfig)
 
 void AgentBase::controller()
 {
+    std::cout <<  __PRETTY_FUNCTION__ << std::endl;
     if (DEBUG_MODE){std::cout <<  __PRETTY_FUNCTION__ << std::endl;}
     if (DONE == fsm)
     {
@@ -37,32 +38,28 @@ void AgentBase::controller()
     std::string info = "Agent " + std::to_string(id) + " ownState: ";
     createEvent(__func__, info, logData);
 
-    double distanceToGoal = state.distanceTo(goalState);
-    std::cout << "distanceToGoal: " << distanceToGoal << std::endl;
-    // angle agent should be facing towards the waypoint in global frame
-    double angleToGoal = state.angleTo(goalState);
-    std::cout << "ANGLE TO GOAL: " << angleToGoal << std::endl;
-    float theta_error = angleToGoal - state.theta;
-    std::cout << "theta_error: " << theta_error << std::endl;
+    double distanceToGoal   = state.distanceTo(goalState);
+    double angleToGoal      = state.angleTo(goalState);
+    float theta_error       = angleToGoal - state.theta;
 
-    // Normalize theta error to be within -PI to PI
-    theta_error = std::atan2(std::sin(theta_error), std::cos(theta_error));
+    theta_error             = std::atan2(std::sin(theta_error), std::cos(theta_error));
 
-    // Calculate linear and angular velocities
-    actionSpace.v = kp_v * distanceToGoal; // + kd_v * ePosMinus1;
-    ePosMinus1 = distanceToGoal;
+    actionSpace.v           = kp_v * distanceToGoal; // + kd_v * ePosMinus1;
+    ePosMinus1              = distanceToGoal;
 
-    actionSpace.w = kp_w * theta_error; // + kd_w * eThetaMinus1;
-    eThetaMinus1 = theta_error;
+    actionSpace.w           = kp_w * theta_error; // + kd_w * eThetaMinus1;
+    eThetaMinus1            = theta_error;
 
-    logData = {actionSpace.v, actionSpace.w};
-    info = "Agent " + std::to_string(id) + " actionSpace: ";
+    logData                 = {actionSpace.v, actionSpace.w};
+    info                    = "Agent " + std::to_string(id) + " actionSpace: ";
+
     createEvent(__func__, info, logData);
     
     if (DEBUG_MODE){std::cout <<  __PRETTY_FUNCTION__ << std::endl;}
     if (DEBUG_MODE)
     {
-        std::cout <<  "Action: " << actionSpace.v << ", " << actionSpace.w  << std::endl;
+        std::cout <<  __PRETTY_FUNCTION__;
+        std::cout <<  "--> Action: " << actionSpace.v << ", " << actionSpace.w  << std::endl;
     }
 }
 

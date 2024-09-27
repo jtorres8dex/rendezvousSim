@@ -55,7 +55,7 @@ Modifies downstream agent objects, building their neighbor map
 void AgentManager::buildAgentNetwork()
 {
     if (DEBUG_MODE){std::cout <<  __PRETTY_FUNCTION__ << std::endl;}
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    
     // combine leader & follower states to form a full graph
     std::unordered_map<int, State> allStates;
     for (const auto &[id, leader] : leaderAgents)
@@ -121,9 +121,7 @@ void AgentManager::logAgentStates()
         int leaderId                        = leaderEntry.first;
         const LeaderAgent &leaderAgent      = leaderEntry.second;
         
-        std::cout << "@@@ AGENTMANAGER " << leaderAgent.state.x << ", " << std::endl;
         logAgentState(leaderId, LEADER, leaderAgent.state, {leaderAgent.actionSpace.v, leaderAgent.actionSpace.w});
-        std::cout << "logging agent state" << std::endl;
         // log waypoints
         logWaypointInfo(leaderAgent.currentWaypointId, State::stateToVector(leaderAgent.currentWaypoint));
     }
@@ -149,12 +147,11 @@ void AgentManager::stepAgents()
     {
         agent.step();
         agentActions[id] = {agent.actionSpace.v, agent.actionSpace.w};
-        agentActions[id] = {1.0, 0.0};
         
         if (DEBUG_MODE)
         {
             std::vector<double> t{agentActions[id]};
-            std::cout << "Leader Agent actions: " << t[0] << "," << t[1]<< std::endl;
+            std::cout << "Leader Agent actions: " << t[0] << ", " << t[1]<< std::endl;
         }
     }
     // then step follower agents

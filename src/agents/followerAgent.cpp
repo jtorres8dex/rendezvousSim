@@ -15,8 +15,8 @@ void FollowerAgent::step()
     pathPlanner();
     controller();
 
-    // std::cout << "Follower goal state: " << goalState.x << ", " << goalState.y << std::endl;
 }
+
 
 void FollowerAgent::pathPlanner()
 {
@@ -43,7 +43,6 @@ void FollowerAgent::pathPlanner()
     }
 
     // Adjust position to avoid collisions with neighbors
-    std::cout << "@@@ neighbor IDS: " ;
     for (const auto &[neighborId, neighborState] : neighborStates)
     {
         std::cout << neighborId << std::endl;
