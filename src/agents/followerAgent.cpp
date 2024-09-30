@@ -5,12 +5,15 @@
 
 using namespace logger;
 
+FollowerAgent::FollowerAgent(const YAML::Node &config) : AgentBase(config)
+{
+    debugEvent(__PRETTY_FUNCTION__);
+}
+
 void FollowerAgent::step()
 {
-    if (DEBUG_MODE)
-    {
-        std::cout << __PRETTY_FUNCTION__ << std::endl;
-    }
+    debugEvent(__PRETTY_FUNCTION__);
+
     setFSM();
     pathPlanner();
     controller();
@@ -21,13 +24,12 @@ void FollowerAgent::step()
 void FollowerAgent::pathPlanner()
 {
 
-    if (DEBUG_MODE)
-    {
-        std::cout << __PRETTY_FUNCTION__ << std::endl;
-    }
+    debugEvent(__PRETTY_FUNCTION__);
+
     if (neighborStates.empty())
     {
-        std::cout << __PRETTY_FUNCTION__ << "FollowerAgent ID: " << id << " has no neighbors!" << std::endl;
+        std::string m =  "FollowerAgent ID: " + std::to_string(id) + " has no neighbors!";
+        debugEvent(m);
         return;
     }
 

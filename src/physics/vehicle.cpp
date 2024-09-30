@@ -23,28 +23,44 @@ Vehicle::~Vehicle(){
 
 Vehicle::VehicleWorkspace Vehicle::stepVehicle(Vehicle::VehicleWorkspace &ws, const std::vector<double> &cmd)
 {
-        Vehicle::VehicleWorkspace wsOut  = ws; 
-        float v                          = cmd[0];
-        float w                          = cmd[1];
-        float delta_x                    = v * cos(wsOut.state.theta) * dt;
-        float delta_y                    = v * sin(wsOut.state.theta) * dt;
-        float delta_theta                = w * dt;
-
-        // Update  state
-        wsOut.state.x                   += delta_x;
-        wsOut.state.y                   += delta_y;
-        wsOut.state.theta               += delta_theta;
+    Vehicle::VehicleWorkspace wsOut  = ws; 
     
-        // Normalize theta to be within [-pi, pi]
-        while (wsOut.state.theta > M_PI) {
-            wsOut.state.theta -= 2 * M_PI;
-        } 
-        while (wsOut.state.theta < -M_PI) {
-            wsOut.state.theta += 2 * M_PI;
-        }
+    // Setters
+    Commands cmds;
+    cmds.v              = cmd[0];
+    cmds.w              = cmd[1];                  
 
-        return wsOut;
+    State state         = ws.state;
+    int id              = ws.id;
+    double dx           = cmds.v * cos(state.theta) * dt;
+    double dy           = cmds.v * sin(state.theta) * dt;          
+    double dtheta       = 0;
+    Geometry geometry   = ws.geometry;
+
+    // Compute action level dynamics (v,w) -> (vL,vR)
+    double vL           = cmds.v - (cmds.w * geometry.width);
+    double vR           = cmds.v + (cmds.w * geometry.width);
+
+    // Compute wheel level dynamics (vL,vR) -> (dx,dy,dtheta)
+    double v            = (vR + vL) / 2.0;
+    double w            = (vR - vL) / geometry.width;
+
+    // Compute wheel level dynamics (vL,vR) -> (dx,dy,dtheta)
+    // insert noise here 
+    dx                  = v * cos(state.theta) * dt;
+    dy                  = v * sin(state.theta) * dt;
+    dtheta              = w * dt;
+
+    // Update the state
+    wsOut.state.x += dx;
+    wsOut.state.y += dy;
+    wsOut.state.theta += dtheta;
+
+    // Normalize theta to be between -pi and pi
+    if (wsOut.state.theta > M_PI)
+        wsOut.state.theta -= 2 * M_PI;
+    else if (wsOut.state.theta < -M_PI)
+        wsOut.state.theta += 2 * M_PI;
+
+    return wsOut;
 }
-
-
-

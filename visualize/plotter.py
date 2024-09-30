@@ -1,20 +1,23 @@
 import csv
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+from matplotlib.patches import FancyArrow
 import numpy as np
 import argparse
 
-DIMENSION = 500
+DIMENSION = 150
+
 
 # Read agent and waypoint data from CSV
 def read_data(csv_file):
+    current_waypoint_id = None
     agent_data = {}
     waypoints = {}
 
     with open(csv_file, 'r') as file:
         reader = csv.reader(file)
         for row in reader:
-            print(row)
+            # print(row)
             if row[0] == "waypoint":
                 waypoint_id = int(row[1])
                 x = float(row[2])
@@ -28,20 +31,23 @@ def read_data(csv_file):
                 theta = float(row[5])
                 v = float(row[6])  # Linear velocity
                 w = float(row[7])  # Angular velocity
+                current_waypoint_id = int(row[8])
+                # print("SDSDS", current_waypoint_id)
 
                 if agent_id not in agent_data:
-                    agent_data[agent_id] = {'x': [], 'y': [], 'theta': [], 'v': [], 'w': [], 'type': agent_type}
+                    agent_data[agent_id] = {'x': [], 'y': [], 'theta': [], 'v': [], 'w': [], 'type': agent_type, 'wpid': []}
 
                 agent_data[agent_id]['x'].append(x)
                 agent_data[agent_id]['y'].append(y)
                 agent_data[agent_id]['theta'].append(theta)
                 agent_data[agent_id]['v'].append(v)
                 agent_data[agent_id]['w'].append(w)
+                agent_data[agent_id]['wpid'].append(current_waypoint_id)
     
-    return agent_data, waypoints
+    return agent_data, waypoints, current_waypoint_id
 
 # Function to setup the plot
-def setup_plot(agent_data, waypoints):
+def setup_plot(agent_data, waypoints, current_waypoint_id):
     fig, ax = plt.subplots()
     ax.set_xlim(-DIMENSION, DIMENSION)
     ax.set_ylim(-DIMENSION, DIMENSION)
@@ -57,9 +63,17 @@ def setup_plot(agent_data, waypoints):
         direction_arrow, = ax.plot([], [], 'g-')
         agent_plots[agent_id] = {'line': line, 'arrow': direction_arrow}
 
+        # Initialize a FancyArrow instead of a line for direction
+        arrow = FancyArrow(0, 0, 0, 0, width=1.0, color='g')
+        ax.add_patch(arrow)
+        agent_plots[agent_id] = {'line': line, 'arrow': arrow}
+
     # Plot waypoints
     for waypoint_id, waypoint in waypoints.items():
-        ax.plot(waypoint['x'], waypoint['y'], 'kx', label=f'Waypoint {waypoint_id}')
+        print("current_waypoint_id",current_waypoint_id)
+        print("waypoint_id", waypoint_id)
+        wp = 'gs' if waypoint_id == current_waypoint_id else 'ks'
+        ax.plot(waypoint['x'], waypoint['y'], wp, label=f'Waypoint {waypoint_id}')
 
     ax.legend()
     return fig, ax, agent_plots
@@ -71,12 +85,21 @@ def update_plot(frame, agent_data, agent_plots):
             x = data['x'][frame]
             y = data['y'][frame]
             theta = data['theta'][frame]
+            v = data['v'][frame]  # Get the agent's velocity
+
+            # Update the agent's position
+            agent_plots[agent_id]['line'].set_data([x], [y])
             
-            agent_plots[agent_id]['line'].set_data(data['x'][:frame], data['y'][:frame])
+            # Set the direction arrow's position and angle
+            arrow_length = 5 + v  # Make arrow length proportional to velocity
+            dx = arrow_length * np.cos(theta)
+            dy = arrow_length * np.sin(theta)
             
-            arrow_x = [x, x + 5 * np.cos(theta)]
-            arrow_y = [y, y + 5 * np.sin(theta)]
-            agent_plots[agent_id]['arrow'].set_data(arrow_x, arrow_y)
+            # Remove and recreate arrow to update it
+            agent_plots[agent_id]['arrow'].remove()
+            arrow = FancyArrow(x, y, dx, dy, width=1.0, color='g')
+            agent_plots[agent_id]['arrow'] = arrow
+            plt.gca().add_patch(arrow)
     
     return [plot for agent_plot in agent_plots.values() for plot in agent_plot.values()]
 
@@ -85,17 +108,17 @@ def main():
     parser.add_argument('csv_file', type=str, help='Path to the CSV file containing data')
     args = parser.parse_args()
 
-    agent_data, waypoints = read_data(args.csv_file)
+    agent_data, waypoints, current_waypoint_id = read_data(args.csv_file)
     if not agent_data and not waypoints:
         print("No data found.")
         return
     
-    fig, ax, agent_plots = setup_plot(agent_data, waypoints)
+    fig, ax, agent_plots = setup_plot(agent_data, waypoints, current_waypoint_id)
     
     num_frames = max(len(data['x']) for data in agent_data.values())
     
     anim = FuncAnimation(fig, update_plot, frames=num_frames,
-                         fargs=(agent_data, agent_plots), interval=100, blit=True)
+                         fargs=(agent_data, agent_plots), interval=10, blit=True)
     
     plt.show()
 

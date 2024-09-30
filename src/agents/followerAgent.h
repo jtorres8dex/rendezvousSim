@@ -20,7 +20,7 @@ public:
         EQUILIBRIUM,
         PURSUEING_NEIGHBOR
     };
-    FollowerAgent(const YAML::Node &config) : AgentBase(config) {};
+    FollowerAgent(const YAML::Node &config);
     void step() override;
 
     void pathPlanner() override;

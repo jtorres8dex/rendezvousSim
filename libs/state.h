@@ -30,6 +30,7 @@ public:
 
     State operator+(const State &other);
     State operator-(const State &other);
+    // State operator=(const State &other);
 
     double distanceTo(const State &other);
     double angleTo(const State &other);

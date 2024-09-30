@@ -59,13 +59,6 @@ Simulation::SimulationWorkspace Simulation::initialize(std::string configPath)
     try
     {
         config = YAML::LoadFile(configPath);
-        if (DEBUG_MODE)
-        {
-            // std::cout << "Loaded configuration:\n"
-            //           << YAML::Dump(config) << "\n"
-            //           << std::endl;
-            std::cout << " " << std::endl;
-        }
     }
     catch (const YAML::Exception &e)
     {
@@ -98,7 +91,7 @@ Simulation::SimulationWorkspace Simulation::initialize(std::string configPath)
 
 Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
 {
-    if (DEBUG_MODE){std::cout << __PRETTY_FUNCTION__ << std::endl;}
+    debugEvent(__func__);
     Simulation::SimulationWorkspace wsOut{ws};
     std::unordered_map<int, std::vector<double>> vehicleCmds;
 
@@ -126,7 +119,7 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
 
         std::vector<double> logData = {vehicleWs.state.x, vehicleWs.state.y, vehicleWs.state.theta};
         std::string info = "Vehicle " + std::to_string(vehicleWs.id) + " state: ";
-        createEvent(__func__, info, logData);
+        debugEvent(__func__, info, logData);
         
         // add to shared state vector
         updatedStates[vehicleWs.id] = State::vectorToState(stateVec);
@@ -136,21 +129,13 @@ Simulation::SimulationWorkspace Simulation::stepSim(SimulationWorkspace ws)
         // Eigen::MatrixXd laplacianMatrix = graphTheoryTools::computeLaplacianMatrix(updatedStates, neighbor_radius);
 
         // now give state k + 1 to agents
-        if (DEBUG_MODE)
-        {
-            std::cout << "Updated Agent States: " << std::endl;
-            for (const auto& [id,state] : updatedStates)
-            {
-                std::cout << "(ID:" << id << ") " << state.x << ", " << state.y << ", " << state.theta << std::endl;
-            }
-        }
         wsOut.agentManager.updateAgentStates(updatedStates);
 
-        // log states to csv
+        // log states to csv for sim playback
         wsOut.agentManager.logAgentStates();
 
 
-    ++t;
+        ++t;
     return wsOut;
 } // step sim
 
@@ -174,7 +159,7 @@ int main()
 
     for (int i = 0; i < config["simulation"]["time_steps"].as<int>(); ++i)
     {
-        std::cout << "TIMESTEP: " << i << std::endl;
+        debugEvent("==================== TIMESTEP " + std::to_string(i) + " ====================");
         simWs = sim.stepSim(simWs);
         int j = 0;
     }

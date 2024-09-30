@@ -42,6 +42,16 @@ public:
     };
     VehicleWorkspace                            vehicleWorkspace;
 
+    // int                                         id;
+    // Geometry                                    geometry;
+    // Commands                                    cmds;
+    // State                                       state;
+    // double                                      dx;
+    // double                                      dy;
+    // double                                      dtheta;
+    // double                                      vL;
+    // double                                      vR;
+
     // constructor
     Vehicle();
     // destructor

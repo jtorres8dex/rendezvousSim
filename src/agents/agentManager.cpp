@@ -20,7 +20,8 @@ void AgentManager::spawnAgent()
 /// @brief  interfacing functions with simulation layer below
 void AgentManager::registerAgents(const YAML::Node &config)
 {
-    if (DEBUG_MODE){std::cout <<  __PRETTY_FUNCTION__ << std::endl;}
+    debugEvent(__PRETTY_FUNCTION__);
+
     for (const auto &agentConfig : config["agents"])
     {
 
@@ -33,6 +34,7 @@ void AgentManager::registerAgents(const YAML::Node &config)
         }
         else if (agentType == "leader")
         {
+            YAML::Dump(agentConfig["waypoints"]);
             leaderAgents.emplace(_id, LeaderAgent(agentConfig));
         }
         else
@@ -44,7 +46,7 @@ void AgentManager::registerAgents(const YAML::Node &config)
 
 bool AgentManager::areNeighbors(State s1, State s2, double r)
 {
-    if (DEBUG_MODE){std::cout <<  __PRETTY_FUNCTION__ << std::endl;}
+    debugEvent(__PRETTY_FUNCTION__);
     double d = State::distanceBetween(s1, s2);
     return d <= r;
 }
@@ -54,7 +56,7 @@ Modifies downstream agent objects, building their neighbor map
 */
 void AgentManager::buildAgentNetwork()
 {
-    if (DEBUG_MODE){std::cout <<  __PRETTY_FUNCTION__ << std::endl;}
+    debugEvent(__PRETTY_FUNCTION__);
     
     // combine leader & follower states to form a full graph
     std::unordered_map<int, State> allStates;
@@ -101,7 +103,7 @@ void AgentManager::buildAgentNetwork()
 
 void AgentManager::updateAgentStates(std::unordered_map<int, State> newAgentStates)
 {
-    if (DEBUG_MODE){std::cout <<  __PRETTY_FUNCTION__ << std::endl;}
+    debugEvent(__PRETTY_FUNCTION__);
     for (auto &[id, leader] : leaderAgents)
     {
         leader.state = newAgentStates[id];
@@ -114,16 +116,14 @@ void AgentManager::updateAgentStates(std::unordered_map<int, State> newAgentStat
 
 void AgentManager::logAgentStates()
 {
-    if (DEBUG_MODE){std::cout <<  __PRETTY_FUNCTION__ << std::endl;}
+    debugEvent(__PRETTY_FUNCTION__);
     // Log leader agents
     for (const auto &leaderEntry : leaderAgents)
     {
         int leaderId                        = leaderEntry.first;
         const LeaderAgent &leaderAgent      = leaderEntry.second;
         
-        logAgentState(leaderId, LEADER, leaderAgent.state, {leaderAgent.actionSpace.v, leaderAgent.actionSpace.w});
-        // log waypoints
-        logWaypointInfo(leaderAgent.currentWaypointId, State::stateToVector(leaderAgent.currentWaypoint));
+        logAgentState(leaderId, LEADER, leaderAgent.state, {leaderAgent.actionSpace.v, leaderAgent.actionSpace.w}, leaderAgent.currentWaypointId);
     }
 
     // Log follower agents
@@ -132,14 +132,14 @@ void AgentManager::logAgentStates()
         int followerId                      = followerEntry.first;
         const FollowerAgent &followerAgent  = followerEntry.second;
 
-        logAgentState(followerId, LEADER, followerAgent.state, {followerAgent.actionSpace.v, followerAgent.actionSpace.w});
+        logAgentState(followerId, FOLLOWER, followerAgent.state, {followerAgent.actionSpace.v, followerAgent.actionSpace.w});
     }
 
 }
 
 void AgentManager::stepAgents()
 {
-    if (DEBUG_MODE){std::cout <<  __PRETTY_FUNCTION__ << std::endl;}
+    debugEvent(__PRETTY_FUNCTION__);
     buildAgentNetwork();
 
     // step leader agents first
@@ -147,23 +147,11 @@ void AgentManager::stepAgents()
     {
         agent.step();
         agentActions[id] = {agent.actionSpace.v, agent.actionSpace.w};
-        
-        if (DEBUG_MODE)
-        {
-            std::vector<double> t{agentActions[id]};
-            std::cout << "Leader Agent actions: " << t[0] << ", " << t[1]<< std::endl;
-        }
     }
     // then step follower agents
     for (auto &[id, agent] : followerAgents)
     {
         agent.step();
         agentActions[id] = {agent.actionSpace.v, agent.actionSpace.w};
-
-        if (DEBUG_MODE)
-        {
-            std::vector<double> t{agentActions[id]};
-            std::cout << "Follower Agent actions: " << t[0] << "," << t[1]<< std::endl;
-        }
     }
 }

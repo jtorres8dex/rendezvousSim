@@ -31,28 +31,79 @@ namespace logger
 
     void initializeLogger(std::string sim_name, std::string eventFileName);
     void logVehicleState(int id, int t, std::vector<double> vState);
-    void logAgentState(int id, AgentType type, State state, std::vector<double> cmds); 
+    void logAgentState(int id, AgentType type, State state, std::vector<double> cmds, int wpID);
+    void logAgentState(int id, AgentType type, State state, std::vector<double> cmds);
     void logWaypointInfo(int id, std::vector<double> location);
     void deInitializeLogger();
 
-    template <typename T>
-    void createEvent(const std::string &fun, const std::string &info, const std::vector<T> &data = {})
+    // overloaded debug logger
+    inline void debugEvent(const std::string &fun, const std::string &info, const std::vector<double> &data = {})
     {
-        if (eventFile.is_open())
+        if (DEBUG_MODE)
         {
-            eventFile << fun << "(): " << info;
-
-            for (int i = 0; i < data.size(); ++i)
+            if (eventFile.is_open())
             {
-                eventFile << data[i] << ", ";
+                eventFile << fun << "(): " << info;
+
+                for (int i = 0; i < data.size(); ++i)
+                {
+                    eventFile << data[i] << ", ";
+                }
+                eventFile << "\n";
             }
-            eventFile << "\n";
-        }
-        else
-        {
-            std::cout << "ERROR- logger::" << __func__ << " file not open" << std::endl;
+            else
+            {
+                std::cout << "ERROR- logger::" << __func__ << " file not open" << std::endl;
+            }
         }
     };
+
+    inline void debugEvent(const std::string &fun, const std::string &info)
+    {
+        if (DEBUG_MODE)
+        {
+
+            if (eventFile.is_open())
+            {
+                eventFile << fun << "(): " << info << "\n";
+            }
+            else
+            {
+                std::cout << "ERROR- logger::" << __func__ << " file not open" << std::endl;
+            }
+        }
+    };
+    inline void debugEvent(const std::string &fun, const std::string &info, int num)
+    {
+        if (DEBUG_MODE)
+        {
+
+            if (eventFile.is_open())
+            {
+                eventFile << fun << "(): " << info << num << "\n";
+            }
+            else
+            {
+                std::cout << "ERROR- logger::" << __func__ << " file not open" << std::endl;
+            }
+        }
+    };
+    inline void debugEvent(const std::string &fun)
+    {
+        if (DEBUG_MODE)
+        {
+
+            if (eventFile.is_open())
+            {
+                eventFile << fun << "() " << "\n";
+            }
+            else
+            {
+                std::cout << "ERROR- logger::" << __func__ << " file not open" << std::endl;
+            }
+        }
+    };
+
 };
 
 #endif

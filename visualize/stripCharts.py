@@ -5,8 +5,8 @@ import argparse
 class Config:
     def __init__(self):
         self.csv_file = str                # CSV file containing vehicle states
-        self.id_col   = 0                  # Column index for vehicle ID
-        self.type_col = 1                  # Column index for type (should be VEHICLE_STATE)
+        self.entity_type_col = 0
+        self.id_col   = 1                  # Column index for vehicle ID
         self.x_col = 2                     # Column index for x position
         self.y_col = 3                     # Column index for y position
         self.theta_col = 4                 # Column index for theta (orientation)
@@ -14,40 +14,42 @@ class Config:
 VEHICLE_STATE = 0
 
 # Read vehicle states from CSV
+# Read vehicle states from CSV
 def read_vehicle_data(csv_file):
     vehicle_data = {}
 
     with open(csv_file, 'r') as file:
         reader = csv.reader(file)
         for row in reader:
-            if len(row) < 5:  # Ensure row has enough columns
-                print(f"Warning: Skipping incomplete row: {row}")
+            if row[0] != "agent":  # Ensure row has at least 8 columns (agent, id, type, x, y, theta, cmds[0], cmds[1])
+                print(f"Skipping non agent row: {row}")
                 continue
 
-            try:
-                log_type = int(row[1])  # logType column (should be VEHICLE_STATE)
+            if row[0] == "agent":  # Check that the first column is "agent"
+                try:
+                    vehicle_id = int(row[1])  # Vehicle ID
+                    log_type = int(row[2])  # logType column (should be VEHICLE_STATE)
 
-                if log_type == VEHICLE_STATE:
-                    vehicle_id = int(row[0])  # Vehicle ID
-                    x = float(row[2])  # X position
-                    y = float(row[3])  # Y position
-                    theta = float(row[4])  # Theta (orientation)
-                    v = float(row[5])
-                    w = float(row[6])
+                    # Only consider rows for vehicles with a known log type
+                    if log_type == VEHICLE_STATE:
+                        x = float(row[3])  # X position
+                        y = float(row[4])  # Y position
+                        theta = float(row[5])  # Theta (orientation)
+                        v = float(row[6])  # cmds[0] -> Linear velocity
+                        w = float(row[7])  # cmds[1] -> Angular velocity
 
-                    if vehicle_id not in vehicle_data:
-                        vehicle_data[vehicle_id] = {'x': [], 'y': [], 'theta': [], 'v': [], 'w': []}
-                    vehicle_data[vehicle_id]['x'].append(x)
-                    vehicle_data[vehicle_id]['y'].append(y)
-                    vehicle_data[vehicle_id]['theta'].append(theta)
-                    vehicle_data[vehicle_id]['v'].append(v)
-                    vehicle_data[vehicle_id]['w'].append(w)
+                        if vehicle_id not in vehicle_data:
+                            vehicle_data[vehicle_id] = {'x': [], 'y': [], 'theta': [], 'v': [], 'w': []}
+                        vehicle_data[vehicle_id]['x'].append(x)
+                        vehicle_data[vehicle_id]['y'].append(y)
+                        vehicle_data[vehicle_id]['theta'].append(theta)
+                        vehicle_data[vehicle_id]['v'].append(v)
+                        vehicle_data[vehicle_id]['w'].append(w)
 
-            except ValueError as e:
-                print(f"Warning: Skipping row due to data error: {row}. Error: {e}")
+                except ValueError as e:
+                    print(f"Warning: Skipping row due to data error: {row}. Error: {e}")
     
     return vehicle_data
-
 # Plot x, y, and theta over the data for each vehicle
 def plot_vehicle_states(vehicle_data):
     for vehicle_id, data in vehicle_data.items():
