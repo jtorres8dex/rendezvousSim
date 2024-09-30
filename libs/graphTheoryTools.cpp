@@ -1,11 +1,6 @@
-#include <iostream>
-#include <vector>
-#include <unordered_map>
-#include <Eigen/Dense>
-#include <cmath>
-
-#include "../src/agent.h"
+#include "standard_includes.h"
 #include "graphTheoryTools.h"
+#include "state.h"
 
 namespace graphTheoryTools
 {
@@ -22,7 +17,6 @@ namespace graphTheoryTools
             double diff = state1[i] - state2[i];
             sum += diff * diff;
         }
-
         return std::sqrt(sum);
     }
 

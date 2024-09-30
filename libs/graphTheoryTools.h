@@ -6,11 +6,9 @@
 #include <stdexcept>
 #include <Eigen/Dense>
 
-#include "../src/agent.h"
 
 namespace graphTheoryTools
 {
-    double calculateDistance(const std::vector<double> &state1, const std::vector<double> &state2);
     Eigen::MatrixXd computeAdjacencyMatrix(std::unordered_map<int, std::vector<double> >, double R);
     Eigen::MatrixXd computeDegreeMatrix(std::unordered_map<int, std::vector<double> >, double R);
     Eigen::MatrixXd computeLaplacianMatrix(std::unordered_map<int, std::vector<double> >, double R);
