@@ -33,7 +33,7 @@ def read_data(csv_file):
                 theta = float(row[5])
                 v = float(row[6])  # Linear velocity
                 w = float(row[7])  # Angular velocity
-                current_waypoint_id = int(row[8])
+                # current_waypoint_id = int(row[8])
                 # print("SDSDS", current_waypoint_id)
 
                 if agent_id not in agent_data:

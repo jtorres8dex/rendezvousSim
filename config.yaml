@@ -36,26 +36,26 @@ agents:
     loop_waypoints: true
     waypoint_radius: 10.0
     # FOLLOWERS
-  # - name: "albert2"
-  #   id: 2
-  #   waypoint_mode: true
-  #   ics: [20.0, 20.0, 20.0]
-  #   connection_radius: 150.0
-  #   role: "follower"
-  #   desired_separation: 15.0
+  - name: "albert2"
+    id: 2
+    waypoint_mode: true
+    ics: [20.0, 20.0, 20.0]
+    connection_radius: 150.0
+    role: "follower"
+    desired_separation: 15.0
 
-  # - name: "albert3" 
-  #   id: 3
-  #   waypoint_mode: true
-  #   ics: [0.0, 20.0, 0.0]
-  #   connection_radius: 150.0
-  #   role: "follower"
-  #   desired_separation: 15.0
+  - name: "albert3" 
+    id: 3
+    waypoint_mode: true
+    ics: [0.0, 20.0, 0.0]
+    connection_radius: 150.0
+    role: "follower"
+    desired_separation: 15.0
 
-  # - name: "albert4"
-  #   id: 4
-  #   waypoint_mode: true
-  #   ics: [21.0, 0.0, 20.0]
-  #   connection_radius: 150.0
-  #   role: "follower"
-  #   desired_separation: 15.0
+  - name: "albert4"
+    id: 4
+    waypoint_mode: true
+    ics: [21.0, 0.0, 20.0]
+    connection_radius: 150.0
+    role: "follower"
+    desired_separation: 15.0
