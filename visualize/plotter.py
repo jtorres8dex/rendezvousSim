@@ -22,7 +22,9 @@ def read_data(csv_file):
                 waypoint_id = int(row[1])
                 x = float(row[2])
                 y = float(row[3])
-                waypoints[waypoint_id] = {'x': x, 'y': y}
+                current_id = int(row[4])
+                waypoints[waypoint_id] = {'x': x, 'y': y, 'current_id' : current_id}
+
             elif row[0] == "agent":
                 agent_id = int(row[1])
                 agent_type = int(row[2])  # 0 for leader, 1 for follower
@@ -44,10 +46,10 @@ def read_data(csv_file):
                 agent_data[agent_id]['w'].append(w)
                 agent_data[agent_id]['wpid'].append(current_waypoint_id)
     
-    return agent_data, waypoints, current_waypoint_id
+    return agent_data, waypoints#, current_waypoint_id
 
 # Function to setup the plot
-def setup_plot(agent_data, waypoints, current_waypoint_id):
+def setup_plot(agent_data, waypoints):
     fig, ax = plt.subplots()
     ax.set_xlim(-DIMENSION, DIMENSION)
     ax.set_ylim(-DIMENSION, DIMENSION)
@@ -70,9 +72,9 @@ def setup_plot(agent_data, waypoints, current_waypoint_id):
 
     # Plot waypoints
     for waypoint_id, waypoint in waypoints.items():
-        print("current_waypoint_id",current_waypoint_id)
+        print("current_waypoint_id",waypoint['current_id'])
         print("waypoint_id", waypoint_id)
-        wp = 'gs' if waypoint_id == current_waypoint_id else 'ks'
+        wp = 'gs' if waypoint_id == waypoint['current_id'] else 'ks'
         ax.plot(waypoint['x'], waypoint['y'], wp, label=f'Waypoint {waypoint_id}')
 
     ax.legend()
@@ -108,12 +110,12 @@ def main():
     parser.add_argument('csv_file', type=str, help='Path to the CSV file containing data')
     args = parser.parse_args()
 
-    agent_data, waypoints, current_waypoint_id = read_data(args.csv_file)
+    agent_data, waypoints = read_data(args.csv_file)
     if not agent_data and not waypoints:
         print("No data found.")
         return
     
-    fig, ax, agent_plots = setup_plot(agent_data, waypoints, current_waypoint_id)
+    fig, ax, agent_plots = setup_plot(agent_data, waypoints)
     
     num_frames = max(len(data['x']) for data in agent_data.values())
     

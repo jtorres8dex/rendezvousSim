@@ -44,12 +44,13 @@ namespace logger
             std::cout << "ERROR- logger::" << __func__ << " file not open" << std::endl;
         }
     };
-    void logWaypointInfo(int id, std::vector<double> location)
+    void logWaypointInfo(int id, std::vector<double> location, int current)
     {
         if (logFile.is_open())
         {
             logFile << "waypoint" << ",";
-            logFile << id << "," << location[0] << "," << location[1] << "\n";
+            logFile << id << "," << location[0] << "," << location[1] 
+            << "," << current << "\n";
         }
         else
         {

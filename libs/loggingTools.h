@@ -33,7 +33,7 @@ namespace logger
     void logVehicleState(int id, int t, std::vector<double> vState);
     void logAgentState(int id, AgentType type, State state, std::vector<double> cmds, int wpID);
     void logAgentState(int id, AgentType type, State state, std::vector<double> cmds);
-    void logWaypointInfo(int id, std::vector<double> location);
+    void logWaypointInfo(int id, std::vector<double> location, int current);
     void deInitializeLogger();
 
     // overloaded debug logger

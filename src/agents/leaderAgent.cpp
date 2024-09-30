@@ -40,7 +40,7 @@ void LeaderAgent::pathPlanner()
     // log waypoints
     for (int i=0; i < waypoints.size(); ++i)
     {
-        logWaypointInfo(i, State::stateToVector(waypoints[i]));
+        logWaypointInfo(i, State::stateToVector(waypoints[i]), currentWaypointId);
     }
     if (fsm == DONE)
     {
@@ -78,7 +78,7 @@ void LeaderAgent::setFSM()
         {
             if (loopWaypoints)
             {
-                currentWaypointId   = 1;
+                currentWaypointId   = 0;
                 currentWaypoint     = waypoints[currentWaypointId];
                 fsm                 = TRACKING_WAYPOINT;
             }
