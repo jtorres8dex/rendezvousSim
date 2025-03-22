@@ -28,16 +28,11 @@ src/agents/followerAgent.cpp libs/loggingTools.cpp libs/graphTheoryTools.cpp lib
 src/agents/agentBase.cpp src/agents/leaderAgent.cpp src/agents/agentManager.cpp libs/state.cpp)
 
 target_include_directories(runMe PRIVATE ${CMAKE_SOURCE_DIR}/libs ${CMAKE_SOURCE_DIR}/src)
-# Now specify the include directories after defining the target
-
-# Link directories for libraries
-include_directories("/opt/homebrew/Cellar/yaml-cpp/0.8.0/include")
-# link_directories("/opt/homebrew/Cellar/yaml-cpp/0.8.0/lib")
-link_directories(/opt/homebrew/opt/yaml-cpp/include)
 
 # Suppress warnings
 target_compile_options(runMe PRIVATE -w)
 
 # Link yaml-cpp and Eigen libraries
-target_link_libraries(runMe PRIVATE /opt/homebrew/opt/yaml-cpp/lib/libyaml-cpp.dylib Eigen3::Eigen)
-# target_link_libraries(runMe PRIVATE yaml-cpp Eigen3::Eigen)
+target_link_libraries(runMe yaml-cpp)
+find_package(Eigen3 REQUIRED)
+target_link_libraries(runMe Eigen3::Eigen)

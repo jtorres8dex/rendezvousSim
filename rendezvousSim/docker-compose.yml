@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  rendezvous:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: rendezvous-dev
+    container_name: rendezvous-container
+    volumes:
+      - /Users/juliantorres/projects/rendezvousSim/:/rendezvousSim
+    working_dir: /rendezvousSim
+    stdin_open: true
+    tty: true

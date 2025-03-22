@@ -120,7 +120,7 @@ void AgentManager::logAgentStates()
     // Log leader agents
     for (const auto &leaderEntry : leaderAgents)
     {
-        int leaderId                        = leaderEntry.first;
+        const int &leaderId                 = leaderEntry.first;
         const LeaderAgent &leaderAgent      = leaderEntry.second;
         
         logAgentState(leaderId, LEADER, leaderAgent.state, {leaderAgent.actionSpace.v, leaderAgent.actionSpace.w}, leaderAgent.currentWaypointId);

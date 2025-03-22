@@ -1,4 +1,6 @@
 #!/bin/bash
+sdfs
+rm -rf build
 
 # Set some colors
 RED='\033[0;31m'
@@ -32,6 +34,10 @@ mkdir -p build/$BUILD_TYPE
 
 # Navigate to the build directory
 cd build/$BUILD_TYPE
+
+# install cmake 
+apt update
+apt install -y build-essential cmake 
 
 # Run CMake and make
 echo -e "${BLUE}Running CMake...${NC}"
